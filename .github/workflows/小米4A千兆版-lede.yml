@@ -91,24 +91,24 @@ jobs:
           echo "release_pre=v2.$(TZ=Asia/Shanghai date +'%-m.%-d')" >> $GITHUB_ENV
       - name: 整理固件目录
         run: |
-          mkdir -p ./OpenWrt_firmware/packages
+          mkdir -p ./collected_firmware/packages
           rm -rf $(find ./bin/targets/ -type d -name "packages")
-          cp -rf $(find ./bin/targets/ -type f) ./OpenWrt_firmware
-          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./OpenWrt_firmware/packages
-          cd OpenWrt_firmware
+          cp -rf $(find ./bin/targets/ -type f) ./collected_firmware
+          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./collected_firmware/packages
+          cd collected_firmware
           zip -r ./allfiles.zip ./*
           cd packages
           zip -r ../packages.zip ./*
           cd ../..
           mv ./R4A说明.txt 说明.txt
-          zip -u ./OpenWrt_firmware/allfiles.zip 说明.txt
+          zip -u ./collected_firmware/allfiles.zip 说明.txt
       - name: 上传固件到release
         if: github.event.inputs.release == 'true'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
-          file: OpenWrt_firmware/* # 文件所在位置
-          #asset_name: OpenWrt_firmware.zip # tag下的资源名字
+          file: collected_firmware/* # 文件所在位置
+          #asset_name: collected_firmware.zip # tag下的资源名字
           tag: ${{ env.tag_title }}
           release_name: "${{ env.release_pre }} ${{ github.event.inputs.release_title }}" 
           overwrite: true
@@ -119,5 +119,5 @@ jobs:
         if: github.event.inputs.artifact == 'true'
         uses: actions/upload-artifact@v2
         with:
-          name: OpenWrt_firmware
-          path: ./OpenWrt_firmware
+          name: collected_firmware
+          path: ./collected_firmware
