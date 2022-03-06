@@ -1,0 +1,123 @@
+#
+# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
+# Copyright (C) 2020 KFERMercer <KFER.Mercer@gmail.com>
+# Copyright (c) 2022 hugcabbage <fengsongtianxia@gmail.com>
+#
+# This is free software, licensed under the MIT License.
+#
+#<https://github.com/hugcabbage/shared-lede>
+#
+# 源码采用lean lede
+#
+name: 小米4A千兆版-lede
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: '若要编译固件，请输入true'
+        required: true
+        default: 'true'
+      release:
+        description: '若要上传到release，请输入true'
+        required: true
+        default: 'true'
+      release_title:
+        description: '输入release标题'     
+        required: true
+        default: 'lede for xiaomi 4a gigabit'
+      content_description:
+        description: '输入版本描述'     
+        required: true
+        default: '版本：lean lede源码<br/>1.登陆IP 192.168.31.1，密码password<br/>2.升级内容：内核升级'
+      artifact:
+        description: '若要上传到构件（artifact），请输入true'
+        required: true
+        default: 'false'
+# 定时任务
+# schedule:
+#    - cron: 0 20 * * *
+jobs:
+  build_openwrt:
+    name: 固件编译
+    runs-on: ubuntu-latest
+    if: github.event.inputs.build == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: 环境准备
+        run: |
+          sudo -E apt-get update
+          sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git rename libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf swig libtinfo5
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
+          df -h   
+      - name: 下载源码与插件
+        run: |
+          chmod +x 1clone.sh
+          ./1clone.sh
+      - name: Update feeds
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+      - name: 修改配置
+        run: |
+          chmod +x 1modify.sh
+          ./1modify.sh
+      - name: 生成.config文件
+        run: |
+          mv -f ./.config.R4A ./.config
+          sed -i 's/^[ \t]*//g' ./.config
+          make defconfig
+      - name: Make download
+        run: |
+          make download -j8 || make download -j1 V=s
+          rm -rf $(find ./dl/ -size -1024c)
+          df -h
+      - name: 编译
+        run: |
+          make -j$(nproc) || make -j1 V=s
+          echo "======================="
+          echo "Space usage:"
+          echo "======================="
+          df -h
+          echo "======================="
+          du -h ./ --max-depth=1
+          du -h /mnt/openwrt/ --max-depth=1 || true
+      - name: 获取当前日期
+        run: |
+          echo "tag_title=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
+          echo "release_pre=v2.$(TZ=Asia/Shanghai date +'%-m.%-d')" >> $GITHUB_ENV
+      - name: 整理固件目录
+        run: |
+          mkdir -p ./OpenWrt_firmware/packages
+          rm -rf $(find ./bin/targets/ -type d -name "packages")
+          cp -rf $(find ./bin/targets/ -type f) ./OpenWrt_firmware
+          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./OpenWrt_firmware/packages
+          cd OpenWrt_firmware
+          zip -r ./allfiles.zip ./*
+          cd packages
+          zip -r ../packages.zip ./*
+          cd ../..
+          mv ./R4A说明.txt 说明.txt
+          zip -u ./OpenWrt_firmware/allfiles.zip 说明.txt
+      - name: 上传固件到release
+        if: github.event.inputs.release == 'true'
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.RELEASE_FIRMWARE }}
+          file: OpenWrt_firmware/* # 文件所在位置
+          #asset_name: OpenWrt_firmware.zip # tag下的资源名字
+          tag: ${{ env.tag_title }}
+          release_name: "${{ env.release_pre }} ${{ github.event.inputs.release_title }}" 
+          overwrite: true
+          prerelease: false
+          body: "小米4A千兆版lede固件<br/>${{ github.event.inputs.content_description }}"
+          file_glob: true
+      - name: 上传固件到artifact
+        if: github.event.inputs.artifact == 'true'
+        uses: actions/upload-artifact@v2
+        with:
+          name: OpenWrt_firmware
+          path: ./OpenWrt_firmware
