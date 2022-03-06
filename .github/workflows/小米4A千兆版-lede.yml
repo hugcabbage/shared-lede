@@ -117,7 +117,9 @@ jobs:
           file_glob: true
       - name: 上传固件到artifact
         if: github.event.inputs.artifact == 'true'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3.0.0
         with:
           name: collected_firmware
-          path: ./collected_firmware
+          path: |
+            collected_firmware/
+            !collected_firmware/*.zip
