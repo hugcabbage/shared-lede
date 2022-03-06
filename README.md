@@ -19,7 +19,7 @@
 
 ### 1. 注册GitHub账号并开启GitHub Actions
 
-### 2. fork [hugcabbage/shared-openwrt](https://github.com/hugcabbage/shared-openwrt)
+### 2. fork [hugcabbage/shared-lede](https://github.com/hugcabbage/shared-lede)
 
 ### 3. 设置Actions secrets
 
