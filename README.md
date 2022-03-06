@@ -67,16 +67,16 @@ Actions流程顺利完成(显示为绿色)后，去release(或者artifact)下载
 
 ### 关于小米4A千兆版
 
-直接运行`Workflow`就能编译出固件，但默认插件数量较少，如有需要到`.config.R4A`中自行选择。若在`1clone.sh`中添加了插件源，在`.config.R4A`要对应作修改。
+创建好Actions secrets后，直接运行`Workflow`就能编译出固件，但默认插件数量较少，如有需要到`.config.R4A`中自行选择。若在`1clone.sh`中添加了插件源，在`.config.R4A`要对应作修改。
 
-小米4A千兆版需修改分区才能在breed直刷，参考[链接](https://www.right.com.cn/forum/thread-4052254-1-1.html)
+小米4A千兆版需修改分区才能在breed直刷，参考[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
 
 该机型闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。<br/>
-可以去[官方插件库](https://downloads.openwrt.org/snapshots/packages/mips_24kc/packages/)参考各插件大小，下方列出了几个较大插件的最近版本体积:<br/>
-UnblockNeteaseMusic-Go_0.2.13 2.05MB<br/>
-luci-app-openclash_0.44.16 2.14MB<br/>
-luci-app-vssr_1.23 2.87MB<br/>
-xray-core_1.5.3 5.63MB<br/>
+可以去[官方插件库](https://downloads.openwrt.org/snapshots/packages/mips_24kc/packages/)参考各插件大小，下方列出了几个较大插件的最近版本的体积:<br/>
+UnblockNeteaseMusic-Go_0.2.13 --- 2.05MB<br/>
+luci-app-openclash_0.44.16 --- 2.14MB<br/>
+luci-app-vssr_1.23 --- 2.87MB<br/>
+xray-core_1.5.3 --- 5.63MB<br/>
 
 ---
 
