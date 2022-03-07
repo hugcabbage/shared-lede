@@ -1,6 +1,6 @@
 # 使用 GitHub Actions 快速定制编译 OpenWrt 固件
 
-流程文档大量参考[P3TERX](https://github.com/P3TERX/Actions-OpenWrt)、[KFERMercer](https://github.com/KFERMercer/OpenWrt-CI)，
+流程文档大量参考[P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt)、[KFERMercer/OpenWrt-CI](https://github.com/KFERMercer/OpenWrt-CI)，
 十分感谢！
 
 默认机型小米4A千兆版，源码[coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)，需要其他机型自行修改。
