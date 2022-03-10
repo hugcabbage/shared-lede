@@ -25,3 +25,7 @@ sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.10' target/linux/ramips/Makefile
 #sed -i '/encryption/a\set wireless.default_radio${devidx}.key=coolxiaomi' package/kernel/mac80211/files/lib/wifi/mac80211.sh
 #修改登录密码为coolxiaomi
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
+# release文本
+echo "RELEASE_TITLE=lede for xiaomi 4a gigabit" >> $GITHUB_ENV
+echo "KEYINFO=版本：lean lede源码<br/>登陆IP 192.168.31.1，密码password" >> $GITHUB_ENV
+echo "ZH_TITLE=小米4A千兆版lede固件" >> $GITHUB_ENV

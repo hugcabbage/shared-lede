@@ -7,9 +7,9 @@
 #
 #<https://github.com/hugcabbage/shared-lede>
 #
-# 源码采用lean lede
+# 源码采用lean lede或者lienol openwrt main分支
 #
-name: 小米4A千兆版-lede
+name: 固件编译
 on:
   workflow_dispatch:
     inputs:
@@ -17,22 +17,34 @@ on:
         description: '若要编译固件，请输入true'
         required: true
         default: 'true'
-      release:
-        description: '若要上传到release，请输入true'
+      model:
+        description: '选择机型'
         required: true
-        default: 'true'
-      release_title:
-        description: '输入release标题'     
-        required: true
-        default: 'lede for xiaomi 4a gigabit'
+        default: 'xiaomi-4a-gigabit' 
+        type: choice
+        options:
+        - xiaomi-4a-gigabit
+        - xiaomi-cr6608
+        - redmi-ac2100
       content_description:
         description: '输入版本描述'     
         required: true
-        default: '版本：lean lede源码<br/>1.登陆IP 192.168.31.1，密码password<br/>2.升级内容：内核升级'
-      artifact:
-        description: '若要上传到构件（artifact），请输入true'
-        required: true
+        default: '升级内容：内核升级'
+      cpu_overlock:
+        description: '超频到1100Mhz'
+        required: false
         default: 'false'
+        type: boolean
+      release:
+        description: '上传到release'
+        required: false
+        default: 'true'
+        type: boolean
+      artifact:
+        description: '上传到artifact'
+        required: false
+        default: 'false'
+        type: boolean
 # 定时任务
 # schedule:
 #    - cron: 0 20 * * *
@@ -46,7 +58,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: master
-      - name: 空间清理
+      - name: 环境准备
         run: |
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/apt/sources.list.d /usr/local/lib/android /opt/ghc
           sudo -E apt-get -y purge ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* php* android*
@@ -55,21 +67,39 @@ jobs:
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
           df -h
+      - name: 机型选择
+        run: |
+          if [ ${{github.event.inputs.model}} == xiaomi-4a-gigabit ]
+          then
+            NUMBER=1 ; echo "你选择了小米4A千兆版"
+          elif [ ${{github.event.inputs.model}} == xiaomi-cr6608 ]
+          then
+            NUMBER=2 ; echo "你选择了小米CR6608"
+          else
+            NUMBER=3 ; echo "你选择了红米AC2100"
+          fi
+          echo "CLONE=preset-models/${NUMBER}clone.sh" >> $GITHUB_ENV
+          echo "MODIFY=preset-models/${NUMBER}modify.sh" >> $GITHUB_ENV
+          echo "CONFIG=preset-models/${NUMBER}.config" >> $GITHUB_ENV
       - name: 下载源码与插件
         run: |
-          chmod +x 1clone.sh
-          ./1clone.sh
-      - name: Update feeds
+          chmod +x $CLONE
+          $CLONE
+      - name: 升级feeds
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
       - name: 修改配置
         run: |
-          chmod +x 1modify.sh
-          ./1modify.sh
+          if [ ${{github.event.inputs.cpu_overlock}} == true ]
+          then
+            sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY
+          fi
+          chmod +x $MODIFY
+          $MODIFY
       - name: 生成.config文件
         run: |
-          mv -f ./.config.R4A ./.config
+          mv -f $CONFIG ./.config
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
       - name: Make download
@@ -86,11 +116,10 @@ jobs:
           df -h
           echo "======================="
           du -h ./ --max-depth=1
-          du -h /mnt/openwrt/ --max-depth=1 || true
       - name: 获取当前日期
         run: |
-          echo "tag_title=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
-          echo "release_pre=v2.$(TZ=Asia/Shanghai date +'%-m.%-d')" >> $GITHUB_ENV
+          echo "TAGVER=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
+          echo "RELEASE_PRE=v2.$(TZ=Asia/Shanghai date +'%-m.%-d')" >> $GITHUB_ENV
       - name: 整理固件目录
         run: |
           mkdir -p ./collected_firmware/packages
@@ -101,25 +130,21 @@ jobs:
           zip -r ./allfiles.zip ./*
           cd packages
           zip -r ../packages.zip ./*
-          cd ../..
-          mv ./R4A说明.txt 说明.txt
-          zip -u ./collected_firmware/allfiles.zip 说明.txt
       - name: 上传固件到release
         if: github.event.inputs.release == 'true'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
-          file: collected_firmware/* # 文件所在位置
-          #asset_name: collected_firmware.zip # tag下的资源名字
-          tag: ${{ env.tag_title }}
-          release_name: "${{ env.release_pre }} ${{ github.event.inputs.release_title }}" 
+          file: collected_firmware/*
+          tag: ${{ env.TAGVER }}
+          release_name: "${{ env.RELEASE_PRE }} ${{ env.RELEASE_TITLE }}" 
           overwrite: true
           prerelease: false
-          body: "小米4A千兆版lede固件<br/>${{ github.event.inputs.content_description }}"
+          body: "${{ env.ZH_TITLE }}<br/>${{ env.KEYINFO }}<br/>${{ github.event.inputs.content_description }}"
           file_glob: true
       - name: 上传固件到artifact
         if: github.event.inputs.artifact == 'true'
-        uses: actions/upload-artifact@v3.0.0
+        uses: actions/upload-artifact@v3
         with:
           name: collected_firmware
           path: |

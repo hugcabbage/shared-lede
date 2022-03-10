@@ -1,5 +1,0 @@
-1.在manifest文件里可查看插件目录。
-2.若NAT6助手、vssr同时开启时，无法登录netflix（无此情况可忽略），这里提供一个解决办法：
-使用smartdns屏蔽掉netflix的ipv6的域名解析，只返回ipv4的ip。已配置好，去luci界面启动smartdns即可。
-更多smartdns高级用法去谷歌、youtube找，也可可参看作者文档，链接https://pymumu.github.io/smartdns/。
-其他方法自行研究。
