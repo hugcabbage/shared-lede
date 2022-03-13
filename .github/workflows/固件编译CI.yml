@@ -29,8 +29,8 @@ on:
       content_description:
         description: '输入版本描述'     
         required: true
-        default: '升级内容：内核升级'
-      cpu_overlock:
+        default: '升级内容：内核升级，更新应用版本'
+      cpu_overclock:
         description: '超频到1100Mhz'
         required: false
         default: 'false'
@@ -45,9 +45,6 @@ on:
         required: false
         default: 'false'
         type: boolean
-# 定时任务
-# schedule:
-#    - cron: 0 20 * * *
 jobs:
   build_openwrt:
     name: 固件编译
@@ -78,28 +75,28 @@ jobs:
           else
             NUMBER=3 ; echo "你选择了红米AC2100"
           fi
-          echo "CLONE=preset-models/${NUMBER}clone.sh" >> $GITHUB_ENV
-          echo "MODIFY=preset-models/${NUMBER}modify.sh" >> $GITHUB_ENV
-          echo "CONFIG=preset-models/${NUMBER}.config" >> $GITHUB_ENV
+          echo "CLONE_SH=preset-models/${NUMBER}clone.sh" >> $GITHUB_ENV
+          echo "MODIFY_SH=preset-models/${NUMBER}modify.sh" >> $GITHUB_ENV
+          echo "CONFIG_PA=preset-models/${NUMBER}.config" >> $GITHUB_ENV
       - name: 下载源码与插件
         run: |
-          chmod +x $CLONE
-          $CLONE
+          chmod +x $CLONE_SH
+          $CLONE_SH
       - name: 升级feeds
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
       - name: 修改配置
         run: |
-          if [ ${{github.event.inputs.cpu_overlock}} == true ]
+          if [ ${{github.event.inputs.cpu_overclock}} == true ]
           then
-            sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY
+            sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY_SH
           fi
-          chmod +x $MODIFY
-          $MODIFY
+          chmod +x $MODIFY_SH
+          $MODIFY_SH
       - name: 生成.config文件
         run: |
-          mv -f $CONFIG ./.config
+          mv -f $CONFIG_PA ./.config
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
       - name: Make download
@@ -118,7 +115,7 @@ jobs:
           du -h ./ --max-depth=1
       - name: 获取当前日期
         run: |
-          echo "TAGVER=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
+          echo "TAG_NAME=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
           echo "RELEASE_PRE=v2.$(TZ=Asia/Shanghai date +'%-m.%-d')" >> $GITHUB_ENV
       - name: 整理固件目录
         run: |
@@ -136,7 +133,7 @@ jobs:
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
           file: collected_firmware/*
-          tag: ${{ env.TAGVER }}
+          tag: ${{ env.TAG_NAME }}
           release_name: "${{ env.RELEASE_PRE }} ${{ env.RELEASE_TITLE }}" 
           overwrite: true
           prerelease: false
