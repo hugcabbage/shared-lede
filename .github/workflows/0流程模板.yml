@@ -115,7 +115,7 @@ jobs:
           body: "******机型******固件<br/>${{ github.event.inputs.content_description }}"
           file_glob: true
       - name: 上传固件到artifact
-        if: github.event.inputs.artifact == 'true'
+        if: github.event.inputs.artifact == 'true' || failure()
         uses: actions/upload-artifact@v3
         with:
           name: collected_firmware
