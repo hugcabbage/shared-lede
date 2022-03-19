@@ -35,9 +35,6 @@ on:
         required: false
         default: 'false'
         type: boolean
-# 定时任务
-# schedule:
-#    - cron: 0 20 * * *
 jobs:
   build_openwrt:
     name: 固件编译
@@ -50,8 +47,8 @@ jobs:
           ref: master
       - name: 环境准备
         run: |
-          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/apt/sources.list.d /usr/local/lib/android /opt/ghc
-          sudo -E apt-get -y purge ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* php* android*
+          #sudo rm -rf /usr/share/dotnet /etc/mysql /etc/apt/sources.list.d /usr/local/lib/android /opt/ghc
+          #sudo -E apt-get -y purge ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* php* android*
           sudo -E apt-get update
           sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 zip unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf swig libtinfo5
           sudo -E apt-get -y autoremove --purge
@@ -71,7 +68,7 @@ jobs:
           ./0modify.sh
       - name: 生成.config文件
         run: |
-          mv -f ./.config.blank ./.config
+          mv -f ./0.config ./.config
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
       - name: Make download
@@ -90,7 +87,7 @@ jobs:
           du -h ./ --max-depth=1
       - name: 获取当前日期
         run: |
-          echo "TAGVER=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
+          echo "TAG_NAME=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
           echo "RELEASE_PRE=v2.$(TZ=Asia/Shanghai date +'%-m.%-d')" >> $GITHUB_ENV
       - name: 整理固件目录
         run: |
@@ -108,7 +105,7 @@ jobs:
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
           file: collected_firmware/*
-          tag: ${{ env.TAGVER }}
+          tag: ${{ env.TAG_NAME }}
           release_name: "${{ env.RELEASE_PRE }} ${{ github.event.inputs.release_title }}" 
           overwrite: true
           prerelease: false
