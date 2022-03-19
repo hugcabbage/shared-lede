@@ -8,11 +8,11 @@ rm -rf feeds/packages/net/xray-core
 rm -rf package/feeds/packages/xray-core
 #配置ipv6、主题
 sed -i '/exit 0/d' package/default-settings/files/zzz-default-settings
-cat ./default-settings/config_ipv6 >> package/default-settings/files/zzz-default-settings
-cat ./default-settings/config_theme >> package/default-settings/files/zzz-default-settings
+cat default-settings/config_ipv6 >> package/default-settings/files/zzz-default-settings
+cat default-settings/config_theme >> package/default-settings/files/zzz-default-settings
 echo "exit 0" >> package/default-settings/files/zzz-default-settings
 #复制内核5.10版本CPU超频补丁
-#\cp -rf ./322-mt7621-fix-cpu-clk-add-clkdev.patch target/linux/ramips/patches-5.10/322-mt7621-fix-cpu-clk-add-clkdev.patch
+#\cp -rf preset-models/322-mt7621-fix-cpu-clk-add-clkdev.patch target/linux/ramips/patches-5.10/322-mt7621-fix-cpu-clk-add-clkdev.patch
 #设置WIFI
 #sed -i 's/OpenWrt/coolxiaomi/g' package/kernel/mac80211/files/lib/wifi/mac80211.sh
 #sed -i 's/wireless.default_radio${devidx}.encryption=none/wireless.default_radio${devidx}.encryption=psk-mixed/g' package/kernel/mac80211/files/lib/wifi/mac80211.sh
