@@ -1,0 +1,20 @@
+# This is release content.
+# It will be showed in the releases.
+-----------------------------------------------------------------------------------------
+# 1 model firmware
+release_title=lede for xiaomi 4a gigabit
+zh_title=小米4A千兆版lede固件
+key_info=版本：lean lede源码<br/>登陆IP 192.168.31.1，密码password
+# end of 1 model firmware
+-----------------------------------------------------------------------------------------
+# 2 model firmware
+release_title=openwrt for xiaomi cr6608
+zh_title=小米CR6608 openwrt固件
+key_info=版本：lienol openwrt源码，main分支<br/>登陆IP 192.168.31.1，密码无
+# end of 2 model firmware
+-----------------------------------------------------------------------------------------
+# 3 model firmware
+release_title=openwrt for redmi ac2100
+zh_title=红米AC2100 OpenWrt固件
+key_info=版本：lienol openwrt源码，main分支<br/>登陆IP 192.168.31.1，密码无
+# end of 3 model firmware

@@ -1,5 +1,4 @@
 #
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
 # Copyright (C) 2020 KFERMercer <KFER.Mercer@gmail.com>
 # Copyright (c) 2022 hugcabbage <fengsongtianxia@gmail.com>
 #
@@ -26,7 +25,7 @@ on:
         - xiaomi-4a-gigabit
         - xiaomi-cr6608
         - redmi-ac2100
-      content_description:
+      version_description:
         description: '输入版本描述'     
         required: true
         default: '升级内容：内核升级，更新应用版本'
@@ -52,9 +51,7 @@ jobs:
     if: github.event.inputs.build == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: master
+        uses: actions/checkout@v3
       - name: 环境准备
         run: |
           #sudo rm -rf /usr/share/dotnet /etc/mysql /etc/apt/sources.list.d /usr/local/lib/android /opt/ghc
@@ -78,6 +75,9 @@ jobs:
           echo "CLONE_SH=preset-models/${NUMBER}clone.sh" >> $GITHUB_ENV
           echo "MODIFY_SH=preset-models/${NUMBER}modify.sh" >> $GITHUB_ENV
           echo "CONFIG_PA=preset-models/${NUMBER}.config" >> $GITHUB_ENV
+          echo "RELEASE_TITLE=$(sed -n '/${NUMBER} model/,/end of ${NUMBER} model/p' preset-models/release_content.txt | grep 'release_title' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "ZH_TITLE=$(sed -n '/${NUMBER} model/,/end of ${NUMBER} model/p' preset-models/release_content.txt | grep 'zh_title' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "KEY_INFO=$(sed -n '/${NUMBER} model/,/end of ${NUMBER} model/p' preset-models/release_content.txt | grep 'key_info' | cut -d = -f 2)" >> $GITHUB_ENV
       - name: 下载源码与插件
         run: |
           chmod +x $CLONE_SH
@@ -113,10 +113,6 @@ jobs:
           df -h
           echo "======================="
           du -h ./ --max-depth=1
-      - name: 获取当前日期
-        run: |
-          echo "TAG_NAME=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
-          echo "RELEASE_PRE=v2.$(TZ=Asia/Shanghai date +'%-m.%-d')" >> $GITHUB_ENV
       - name: 整理固件目录
         run: |
           mkdir -p ./collected_firmware/packages
@@ -127,6 +123,12 @@ jobs:
           zip -r ./allfiles.zip ./*
           cd packages
           zip -r ../packages.zip ./*
+      - name: 获取当前日期
+        run: |
+          CURRENT_TIME=$(TZ=Asia/Shanghai date +'%y.%-m.%-d.%H%M%S')
+          CURRENT_TIME=${CURRENT_TIME:1}
+          echo "TAG_NAME=${CURRENT_TIME}" >> $GITHUB_ENV
+          echo "RELEASE_PRE=${CURRENT_TIME%.*}" >> $GITHUB_ENV
       - name: 上传固件到release
         if: github.event.inputs.release == 'true'
         uses: svenstaro/upload-release-action@v2
@@ -137,7 +139,7 @@ jobs:
           release_name: "${{ env.RELEASE_PRE }} ${{ env.RELEASE_TITLE }}" 
           overwrite: true
           prerelease: false
-          body: "${{ env.ZH_TITLE }}<br/>${{ env.KEYINFO }}<br/>${{ github.event.inputs.content_description }}"
+          body: "${{ env.ZH_TITLE }}<br/>${{ env.KEY_INFO }}<br/>${{ github.event.inputs.version_description }}"
           file_glob: true
       - name: 上传固件到artifact
         if: github.event.inputs.artifact == 'true' || failure()
