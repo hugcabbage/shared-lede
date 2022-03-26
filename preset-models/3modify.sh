@@ -21,7 +21,3 @@ echo "exit 0" >> package/default-settings/files/zzz-default-settings
 #sed -i '/encryption/a\set wireless.default_radio${devidx}.key=coolxiaomi' package/kernel/mac80211/files/lib/wifi/mac80211.sh
 #修改登录密码为coolxiaomi
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
-# release文本
-echo "RELEASE_TITLE=openwrt for redmi ac2100" >> $GITHUB_ENV
-echo "KEYINFO=版本：lienol openwrt源码，main分支<br/>登陆IP 192.168.31.1，密码无" >> $GITHUB_ENV
-echo "ZH_TITLE=红米AC2100 OpenWrt固件" >> $GITHUB_ENV

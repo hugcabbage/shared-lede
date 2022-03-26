@@ -75,9 +75,9 @@ jobs:
           echo "CLONE_SH=preset-models/${NUMBER}clone.sh" >> $GITHUB_ENV
           echo "MODIFY_SH=preset-models/${NUMBER}modify.sh" >> $GITHUB_ENV
           echo "CONFIG_PA=preset-models/${NUMBER}.config" >> $GITHUB_ENV
-          echo "RELEASE_TITLE=$(sed -n '/${NUMBER} model/,/end of ${NUMBER} model/p' preset-models/release_content.txt | grep 'release_title' | cut -d = -f 2)" >> $GITHUB_ENV
-          echo "ZH_TITLE=$(sed -n '/${NUMBER} model/,/end of ${NUMBER} model/p' preset-models/release_content.txt | grep 'zh_title' | cut -d = -f 2)" >> $GITHUB_ENV
-          echo "KEY_INFO=$(sed -n '/${NUMBER} model/,/end of ${NUMBER} model/p' preset-models/release_content.txt | grep 'key_info' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "RELEASE_TITLE=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/P" preset-models/release_content.txt | grep 'release_title' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "ZH_TITLE=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/P" preset-models/release_content.txt | grep 'zh_title' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "KEY_INFO=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/P" preset-models/release_content.txt | grep 'key_info' | cut -d = -f 2)" >> $GITHUB_ENV
       - name: 下载源码与插件
         run: |
           chmod +x $CLONE_SH
