@@ -1,5 +1,4 @@
 #
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
 # Copyright (C) 2020 KFERMercer <KFER.Mercer@gmail.com>
 # Copyright (c) 2022 hugcabbage <fengsongtianxia@gmail.com>
 #
@@ -21,7 +20,7 @@ on:
         description: '输入release标题'     
         required: true
         default: '****** source for ****** device'
-      content_description:
+      version_description:
         description: '输入版本描述'     
         required: true
         default: '版本：******<br/>1.登陆IP ******，密码******<br/>2.升级内容：内核升级'
@@ -36,15 +35,38 @@ on:
         default: 'false'
         type: boolean
 jobs:
+  change-ver:
+    name: 版本号变动
+    runs-on: ubuntu-latest
+    if: github.event.inputs.build == 'true'
+    outputs:
+      output-ver: ${{ steps.update-ver.outputs.new_ver }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: 升级版本号
+        id: update-ver
+        run: |
+          ORIGINAL_VER=$(sed -n '/current version/p' version.txt | grep -E '[0-9]+.*' -o)
+          NEW_VER=$(python3 update-version.py ${ORIGINAL_VER})
+          sed -i "s/${ORIGINAL_VER}/${NEW_VER}/g" version.txt
+          echo "::set-output name=new_ver::${NEW_VER}"
+          echo "COMMIT_TIME=$(TZ='Asia/Shanghai' date +%Y年%-m月%-d日%H:%M)" >> $GITHUB_ENV
+      - name: 推送
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 版本号更新 ${{env.COMMIT_TIME}}
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
   build_openwrt:
+    needs: change-ver
     name: 固件编译
     runs-on: ubuntu-latest
     if: github.event.inputs.build == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: master
+        uses: actions/checkout@v3
       - name: 环境准备
         run: |
           #sudo rm -rf /usr/share/dotnet /etc/mysql /etc/apt/sources.list.d /usr/local/lib/android /opt/ghc
@@ -85,10 +107,6 @@ jobs:
           df -h
           echo "======================="
           du -h ./ --max-depth=1
-      - name: 获取当前日期
-        run: |
-          echo "TAG_NAME=v2.$(TZ=Asia/Shanghai date +'%-m.%-d-%H%M%S')" >> $GITHUB_ENV
-          echo "RELEASE_PRE=v2.$(TZ=Asia/Shanghai date +'%-m.%-d')" >> $GITHUB_ENV
       - name: 整理固件目录
         run: |
           mkdir -p ./collected_firmware/packages
@@ -105,11 +123,11 @@ jobs:
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
           file: collected_firmware/*
-          tag: ${{ env.TAG_NAME }}
-          release_name: "${{ env.RELEASE_PRE }} ${{ github.event.inputs.release_title }}" 
+          tag: ${{ needs.change-ver.outputs.output-ver }}
+          release_name: "${{ needs.change-ver.outputs.output-ver }} ${{ github.event.inputs.release_title }}" 
           overwrite: true
           prerelease: false
-          body: "******机型******固件<br/>${{ github.event.inputs.content_description }}"
+          body: "******机型******固件<br/>${{ github.event.inputs.version_description }}"
           file_glob: true
       - name: 上传固件到artifact
         if: github.event.inputs.artifact == 'true' || failure()

@@ -1,8 +1,10 @@
 # 使用 GitHub Actions 快速定制编译 OpenWrt 固件
 
-流程文档大量参考[P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt)、[KFERMercer/OpenWrt-CI](https://github.com/KFERMercer/OpenWrt-CI)，十分感谢！
+流程文档参考[KFERMercer/OpenWrt-CI](https://github.com/KFERMercer/OpenWrt-CI)，十分感谢！
 
-预置机型小米4A千兆版、小米CR6608、红米AC2100，默认编译小米4A千兆版。需要其他机型可参考以上，并修改.github/workflows目录、根目录下的“0”开头的模板文件，以作新增机型。
+预置机型小米4A千兆版、小米CR6608、红米AC2100，默认编译小米4A千兆版。
+
+需要其他机型可参考以上，并修改templet目录下的各文件，以作新增机型，[使用教程](templet/instruction.md)。
 
 喜欢的话，Star一下，方便再找。
 
@@ -28,7 +30,7 @@
 
 ### 4. 自定义固件
 
-以小米4A千兆版为例，主要修改三个文本，在preset-models目录中。
+以小米4A千兆版为例，主要修改四个文件，在preset-models目录中。
 
 > `1clone.sh`
 
@@ -36,11 +38,15 @@
 
 > `1modify.sh`
 
-固件初始化设置，修改登录IP、主机名、WiFi名称等。release文本中的IP、密码与固件并无关联，只是作记录，怎么改都可以。
+固件初始化设置，修改登录IP、主机名、WiFi名称等。
 
 > `1.config`
 
 只带luci应用、theme这两部分，流程中会转为.config，并自动补全为完整的。
+
+> `release_content.txt`
+
+此文本仅作release记录，其中的IP、密码与固件并无关联，怎么改都可以。
 
 ### 5. Actions中手动开始编译流程
 
@@ -50,11 +56,11 @@
 
 > 上传到release: 
 
-默认勾选。推荐，空间无限，单文件不能超过2GB。
+默认勾选。推荐，空间无限，单文件不能超过2GB，有内容记录。
 
 > 上传到artifact: 
 
-默认不勾选。不推荐，普通账号的空间只有500MB，存满需要清理才能继续使用。
+默认不勾选。不推荐，无内容记录。
 
 > 版本描述: 
 
