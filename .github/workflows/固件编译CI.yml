@@ -63,10 +63,10 @@ jobs:
           df -h
       - name: 机型选择
         run: |
-          if [ ${{github.event.inputs.model}} == xiaomi-4a-gigabit ]
+          if [ ${{ github.event.inputs.model }} == xiaomi-4a-gigabit ]
           then
             NUMBER=1 ; echo "你选择了小米4A千兆版"
-          elif [ ${{github.event.inputs.model}} == xiaomi-cr6608 ]
+          elif [ ${{ github.event.inputs.model }} == xiaomi-cr6608 ]
           then
             NUMBER=2 ; echo "你选择了小米CR6608"
           else
@@ -88,7 +88,7 @@ jobs:
           ./scripts/feeds install -a
       - name: 修改配置
         run: |
-          if [ ${{github.event.inputs.cpu_overclock}} == true ]
+          if [ ${{ github.event.inputs.cpu_overclock }} == true ]
           then
             sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY_SH
           fi
@@ -130,7 +130,8 @@ jobs:
           echo "TAG_NAME=${CURRENT_TIME}" >> $GITHUB_ENV
           echo "RELEASE_PRE=${CURRENT_TIME%.*}" >> $GITHUB_ENV
       - name: 上传固件到release
-        if: github.event.inputs.release == 'true'
+        id: upload-release
+        if: github.event.inputs.release == 'true' && env.RELEASE_FIRMWARE_VALUE != ''
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
@@ -141,8 +142,10 @@ jobs:
           prerelease: false
           body: "${{ env.ZH_TITLE }}<br/>${{ env.KEY_INFO }}<br/>${{ github.event.inputs.version_description }}"
           file_glob: true
+        env:
+          RELEASE_FIRMWARE_VALUE: ${{ secrets.RELEASE_FIRMWARE }}
       - name: 上传固件到artifact
-        if: github.event.inputs.artifact == 'true' || failure()
+        if: github.event.inputs.artifact == 'true' || steps.upload-release.conclusion == 'skipped'
         uses: actions/upload-artifact@v3
         with:
           name: collected_firmware

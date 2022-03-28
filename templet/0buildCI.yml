@@ -55,7 +55,7 @@ jobs:
       - name: 推送
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 版本号更新 ${{env.COMMIT_TIME}}
+          commit_message: 版本号更新 ${{ env.COMMIT_TIME }}
           commit_user_name: github-actions[bot]
           commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
@@ -118,7 +118,8 @@ jobs:
           cd packages
           zip -r ../packages.zip ./*
       - name: 上传固件到release
-        if: github.event.inputs.release == 'true'
+        id: upload-release
+        if: github.event.inputs.release == 'true' && env.RELEASE_FIRMWARE_VALUE != ''
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
@@ -129,8 +130,10 @@ jobs:
           prerelease: false
           body: "******机型******固件<br/>${{ github.event.inputs.version_description }}"
           file_glob: true
+        env:
+          RELEASE_FIRMWARE_VALUE: ${{ secrets.RELEASE_FIRMWARE }}
       - name: 上传固件到artifact
-        if: github.event.inputs.artifact == 'true' || failure()
+        if: github.event.inputs.artifact == 'true' || steps.upload-release.conclusion == 'skipped'
         uses: actions/upload-artifact@v3
         with:
           name: collected_firmware
