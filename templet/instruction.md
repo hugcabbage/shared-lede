@@ -6,6 +6,8 @@
 
 ### 1. 设置Actions secrets
 
+只上传到artifact，可以跳过此步。
+
 进入GitHub Settings(点头像) → Developer settings → Personal access tokens → Generate new token。
 
 Note随意填，Expiration建议选`No expiration`，Select scopes里勾选`repo`、`workflow`，点Generate token，复制下长串token。

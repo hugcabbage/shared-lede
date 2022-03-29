@@ -24,6 +24,8 @@
 
 ### 3. 设置Actions secrets
 
+只上传到artifact，可以跳过此步。
+
 进入GitHub Settings(点头像) → Developer settings → Personal access tokens → Generate new token，Note随意填，Expiration建议选`No expiration`，Select scopes里勾选`repo`、`workflow`，点Generate token，复制下长串token。
 
 进入你fork的项目shared-lede下，点Settings → Secrets → Actions → New repository secret，Name填`RELEASE_FIRMWARE`，Value填复制的token，点Add secret。
@@ -72,7 +74,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，al
 
 ## 关于小米4A千兆版
 
-1.创建好Actions secrets后，直接运行`Workflow`就能编译出固件。默认插件数量较少，对插件有增、减需要的，到`1.config`中自行选择。若在`1clone.sh`中添加了插件源，在`1.config`要作对应修改，建议先在本地make menuconfig测试。
+1.创建好secret后，直接运行`Workflow`就能编译出固件。默认插件数量较少，对插件有增、减需要的，到`1.config`中自行选择。若在`1clone.sh`中添加了插件源，在`1.config`要作对应修改，建议先在本地make menuconfig测试。
 
 2.该机型需修改分区才能在breed直刷，参考[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
 
