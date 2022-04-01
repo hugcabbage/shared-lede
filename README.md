@@ -32,6 +32,8 @@
 
 ### 4. 自定义固件
 
+什么也不修改，按默认配置，可以跳过此步。
+
 以小米4A千兆版为例，主要修改四个文件，在preset-models目录中。
 
 > `1clone.sh`
@@ -74,7 +76,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，al
 
 ## 关于小米4A千兆版
 
-1.创建好secret后，直接运行`Workflow`就能编译出固件。默认插件数量较少，对插件有增、减需要的，到`1.config`中自行选择。若在`1clone.sh`中添加了插件源，在`1.config`要作对应修改，建议先在本地make menuconfig测试。
+1.直接在Actions中运行`固件编译`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，到`1.config`中自行选择。若在`1clone.sh`中添加了插件源，在`1.config`要作对应修改，建议先在本地make menuconfig测试。
 
 2.该机型需修改分区才能在breed直刷，参考[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
 
