@@ -23,8 +23,14 @@ on:
         type: choice
         options:
         - xiaomi-4a-gigabit
-        - xiaomi-cr6608
+        - xiaomi-3g-v2
+        - xiaomi-ac2100
         - redmi-ac2100
+        - xiaomi-cr6606
+        - xiaomi-cr6608
+        - xiaomi-cr6609
+        - xiaomi-3g
+        - xiaomi-4
       version_description:
         description: '输入版本描述'     
         required: true
@@ -63,21 +69,16 @@ jobs:
           df -h
       - name: 机型选择
         run: |
-          if [ ${{ github.event.inputs.model }} == xiaomi-4a-gigabit ]
-          then
-            NUMBER=1 ; echo "你选择了小米4A千兆版"
-          elif [ ${{ github.event.inputs.model }} == xiaomi-cr6608 ]
-          then
-            NUMBER=2 ; echo "你选择了小米CR6608"
-          else
-            NUMBER=3 ; echo "你选择了红米AC2100"
-          fi
+          cd preset-models ; NUMBER=$(python3 target_select.py ${{ github.event.inputs.model }}) ; cd ..
+          echo "你选择了：${{ github.event.inputs.model }}"
           echo "CLONE_SH=preset-models/${NUMBER}clone.sh" >> $GITHUB_ENV
           echo "MODIFY_SH=preset-models/${NUMBER}modify.sh" >> $GITHUB_ENV
           echo "CONFIG_PA=preset-models/${NUMBER}.config" >> $GITHUB_ENV
-          echo "RELEASE_TITLE=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/P" preset-models/release_content.txt | grep 'release_title' | cut -d = -f 2)" >> $GITHUB_ENV
-          echo "ZH_TITLE=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/P" preset-models/release_content.txt | grep 'zh_title' | cut -d = -f 2)" >> $GITHUB_ENV
-          echo "KEY_INFO=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/P" preset-models/release_content.txt | grep 'key_info' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "RELEASE_TITLE=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep 'release_title' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "ZH_TITLE=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep 'zh_title' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "KEY_INFO<<EOF" >> $GITHUB_ENV
+          sed -n "/${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep -E -v '#|=' >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
       - name: 下载源码与插件
         run: |
           chmod +x $CLONE_SH

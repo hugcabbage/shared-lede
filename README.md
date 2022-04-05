@@ -2,7 +2,7 @@
 
 流程文档参考[KFERMercer/OpenWrt-CI](https://github.com/KFERMercer/OpenWrt-CI)，十分感谢！
 
-预置机型小米4A千兆版、小米CR6608、红米AC2100，默认编译小米4A千兆版。
+预置机型有小米4A千兆版、小米3Gv2、小米CR6606、小米CR6608、小米CR6609、红米AC2100、小米AC2100、小米4、小米3G，默认编译小米4A千兆版。
 
 需要其他机型可参考以上，并修改templet目录下的各文件，以作新增机型，[使用教程](templet/instruction.md)。
 
@@ -73,6 +73,15 @@
 ### 6. 编译完成
 
 Actions流程顺利完成后，去release(或者artifact)下载你的固件，allfiles.zip是所有文件的打包。
+
+## 各机型对应文件说明
+
+|机型|文件|
+|:----:|:----:|
+|小米4A千兆版|1.config、1clone.sh、1modify.sh|
+|小米3Gv2|1-1.config、1clone.sh、1modify.sh|
+|小米4<br/>小米3G<br/>小米CR6606<br/>小米CR6608<br/>小米CR6609|2.config、2clone.sh、2modify.sh|
+|红米AC2100<br/>小米AC2100|3.config、3clone.sh、3modify.sh|
 
 ## 关于小米4A千兆版
 
