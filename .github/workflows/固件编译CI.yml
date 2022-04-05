@@ -36,7 +36,12 @@ on:
         required: true
         default: '升级内容：内核升级，更新应用版本'
       cpu_overclock:
-        description: '超频到1100Mhz'
+        description: '超频到1100Mhz(仅适用于5.10内核)'
+        required: false
+        default: 'false'
+        type: boolean
+      kernel_5_15:
+        description: '使用5.15内核'
         required: false
         default: 'false'
         type: boolean
@@ -74,10 +79,10 @@ jobs:
           echo "CLONE_SH=preset-models/${NUMBER}clone.sh" >> $GITHUB_ENV
           echo "MODIFY_SH=preset-models/${NUMBER}modify.sh" >> $GITHUB_ENV
           echo "CONFIG_PA=preset-models/${NUMBER}.config" >> $GITHUB_ENV
-          echo "RELEASE_TITLE=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep 'release_title' | cut -d = -f 2)" >> $GITHUB_ENV
-          echo "ZH_TITLE=$(sed -n "/${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep 'zh_title' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "RELEASE_TITLE=$(sed -n "/start of ${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep 'release_title' | cut -d = -f 2)" >> $GITHUB_ENV
+          echo "ZH_TITLE=$(sed -n "/start of ${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep 'zh_title' | cut -d = -f 2)" >> $GITHUB_ENV
           echo "KEY_INFO<<EOF" >> $GITHUB_ENV
-          sed -n "/${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep -E -v '#|=' >> $GITHUB_ENV
+          sed -n "/start of ${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep -E -v '#|=' >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - name: 下载源码与插件
         run: |
@@ -89,10 +94,8 @@ jobs:
           ./scripts/feeds install -a
       - name: 修改配置
         run: |
-          if [ ${{ github.event.inputs.cpu_overclock }} == true ]
-          then
-            sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY_SH
-          fi
+          [ ${{ github.event.inputs.cpu_overclock }} == true ] && sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY_SH
+          [ ${{ github.event.inputs.kernel_5_15 }} == true ] && sed -i '/KERNEL_PATCHVER:=5.15/ s/#//' $MODIFY_SH
           chmod +x $MODIFY_SH
           $MODIFY_SH
       - name: 生成.config文件
