@@ -48,9 +48,17 @@
 
 只带luci应用、theme这两部分，流程中会转为.config，并自动补全为完整的。
 
+增减插件修改这个文件即可，以argon主题为例，格式如下：
+
+"CONFIG_PACKAGE_luci-theme-argon=y"   选中编译进固件的是这种
+
+"CONFIG_PACKAGE_luci-theme-argon=m"   选中仅编译ipk插件是这种
+
+"# CONFIG_PACKAGE_luci-theme-argon is not set"  未选中是这种
+
 > `release_content.txt`
 
-此文本仅作release记录，其中的IP、密码与固件并无关联，怎么改都可以。
+此文本仅作release记录，其中的IP、密码与固件并无关联，怎么改都可以，不修改也可以。
 
 ### 5. Actions中手动开始编译流程
 
@@ -91,8 +99,10 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，al
 
 3.带超频方案，默认不启用，方案来自[帖子](https://www.right.com.cn/forum/thread-4042045-1-1.html)。
 
-4.该机型闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。<br/>
-可以去[官方插件库](https://downloads.openwrt.org/snapshots/packages/mips_24kc/packages/)参考各插件大小，下方也列出了几个较大插件的最近版本的体积:<br/>
+4.该机型闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。
+
+可以去[官方插件库](https://downloads.openwrt.org/snapshots/packages/mips_24kc/packages/)参考各插件大小，下方也列出了几个较大插件的最近版本的体积:
+
 UnblockNeteaseMusic-Go_0.2.13 --- 2.05MB<br/>
 luci-app-openclash_0.44.16 --- 2.14MB<br/>
 luci-app-vssr_1.23 --- 2.87MB<br/>
