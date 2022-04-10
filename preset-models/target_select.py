@@ -4,10 +4,10 @@ import sys
 import shutil
 import fileinput
 
-main_targets = ["mi-router-4a-gigabit","mi-router-cr6608","redmi-router-ac2100"]
-main_numbers = ["1","2","3"]
-sub_targets = ["mi-router-cr6606","mi-router-cr6609","mi-router-3g","mi-router-4","mi-router-ac2100","mi-router-3g-v2"]
-sub_numbers = ["2-1","2-2","2-3","2-4","3-1","1-1"]
+main_targets = ["mi-router-4a-gigabit","mi-router-cr6608","redmi-router-ac2100","phicomm_k2p"]
+main_numbers = ["1","2","3","4"]
+sub_targets = ["mi-router-cr6606","mi-router-cr6609","mi-router-3g","mi-router-4","mi-router-3-pro","mi-router-ac2100","mi-router-3g-v2"]
+sub_numbers = ["2-1","2-2","2-3","2-4","2-5","3-1","1-1"]
 
 def get_number():
     i = 1
@@ -27,8 +27,7 @@ def get_number():
 def copy_files(old_num,new_num,old_str,new_str):
     config_files = [".config","clone.sh","modify.sh"]
     for config_file in config_files:
-        if new_num + config_file != "1-1modify.sh":
-            shutil.copyfile(old_num + config_file,new_num + config_file)
+        shutil.copyfile(old_num + config_file,new_num + config_file)
     for line in fileinput.input(new_num + config_files[0], inplace=1):
         line = line.replace(old_str,new_str)
         print(line, end = "")

@@ -57,6 +57,14 @@ zh_title=小米4 openwrt固件
 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 # end of 2-4 model firmware
 -----------------------------------------------------------------------------------------
+# start of 2-5 model firmware
+release_title=openwrt for xiaomi 3 pro
+zh_title=小米3 Pro openwrt固件
+版本：lienol openwrt源码，master分支
+登陆IP 192.168.31.1，密码无
+应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
+# end of 2-5 model firmware
+-----------------------------------------------------------------------------------------
 # start of 3 model firmware
 release_title=openwrt for redmi ac2100
 zh_title=红米AC2100 OpenWrt固件
@@ -72,3 +80,11 @@ zh_title=小米AC2100 OpenWrt固件
 登陆IP 192.168.31.1，密码无
 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 # end of 3-1 model firmware
+-----------------------------------------------------------------------------------------
+# start of 4 model firmware
+release_title=openwrt for phicomm k2p
+zh_title=斐讯K2P OpenWrt固件
+版本：lienol openwrt源码，master分支
+登陆IP 192.168.2.1，密码无
+应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
+# end of 4 model firmware

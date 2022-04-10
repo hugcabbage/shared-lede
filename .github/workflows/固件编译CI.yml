@@ -31,6 +31,8 @@ on:
         - mi-router-cr6609
         - mi-router-3g
         - mi-router-4
+        - mi-router-3-pro
+        - phicomm_k2p
       version_description:
         description: '输入版本描述'     
         required: true
