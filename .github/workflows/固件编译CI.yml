@@ -6,7 +6,7 @@
 #
 #<https://github.com/hugcabbage/shared-lede>
 #
-# 源码采用lean lede或者lienol openwrt main分支
+# 源码采用lean lede或者lienol openwrt master分支
 #
 name: 固件编译
 on:
@@ -111,7 +111,6 @@ jobs:
           rm -rf $(find ./dl/ -size -1024c)
           df -h
       - name: 编译
-        continue-on-error: true
         run: |
           make -j$(nproc) || make -j1 V=s
           echo "======================="
