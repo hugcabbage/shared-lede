@@ -14,3 +14,4 @@ git clone https://github.com/Ausaci/luci-app-nat6-helper.git
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash
 git clone -b packages --single-branch https://github.com/xiaorouji/openwrt-passwall.git
 git clone -b luci --single-branch https://github.com/xiaorouji/openwrt-passwall.git luci-app-passwall
+git clone https://github.com/xiaorouji/openwrt-passwall2.git

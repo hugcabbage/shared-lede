@@ -1,3 +1,7 @@
+app_smartdns=$(opkg find luci-app-smartdns)
+
+[ -n "$app_smartdns" ] && exit 0
+
 #增加smartdns上游服务器
 cat << EOF > /etc/config/smartdns
 config smartdns
@@ -101,3 +105,5 @@ address /netflixdnstest7.com/#6
 address /netflixdnstest8.com/#6
 address /netflixdnstest9.com/#6
 EOF
+
+exit 0
