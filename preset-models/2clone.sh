@@ -6,6 +6,7 @@ mv ./openwrt/* ./
 # 下载自定义插件
 mkdir -p package/myapps
 cd package/myapps
+git clone https://github.com/kenzok8/small-package.git
 git clone https://github.com/jerrykuku/luci-theme-argon.git
 git clone https://github.com/jerrykuku/luci-app-argon-config.git
 git clone https://github.com/jerrykuku/luci-app-vssr.git
