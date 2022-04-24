@@ -38,27 +38,49 @@
 
 以小米4A千兆版为例，主要修改四个文件，在preset-models目录中。
 
-> `1clone.sh`
+> 1clone.sh
 
 固件源码和插件源码，新增插件源时，建议先在本地测试下是否缺依赖。
 
-> `1modify.sh`
+常用的克隆命令如下（克隆理解为下载即可）：
+
+`git clone 链接`
+
+`git clone -b 分支名 链接`
+
+> 1modify.sh
 
 固件初始化设置，修改登录IP、主机名、WiFi名称等。
 
-> `1.config`
+此脚本用到最多的命令是sed，详细用法参见[链接](https://www.runoob.com/linux/linux-comm-sed.html)，这里只简单说明。
+
+比如，下面这条命令就是用来修改管理IP的：
+
+`sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate`
+
+`192.168.1.1`是源码中默认的lan口登录IP，也即初始的；`192.168.31.1`是新的，用来替换初始文本的。
+
+可以看出命令的构成是这样的：
+
+`sed -i 's/原字符串/新字符串/g' 文件路径`
+
+这就可以用来替换掉源码中的特定位置，-i指直接改动文件，s指替换，g指全局。
+
+原字符串记为str1，新字符串记为str2，自定义设置改动str2位置即可，如果你改动了str1，那么命令在源码中就匹配不到东西了，替换也就无效了。
+
+> 1.config
 
 只带luci应用、theme这两部分，流程中会转为.config，并自动补全为完整的。
 
 增减插件修改这个文件即可，以argon主题为例，格式如下：
 
-"CONFIG_PACKAGE_luci-theme-argon=y"   选中编译进固件的是这种
+ `CONFIG_PACKAGE_luci-theme-argon=y`   选中编译进固件的是这种
 
-"CONFIG_PACKAGE_luci-theme-argon=m"   选中仅编译ipk插件是这种
+ `CONFIG_PACKAGE_luci-theme-argon=m`   选中仅编译ipk插件是这种
 
-"# CONFIG_PACKAGE_luci-theme-argon is not set"  未选中是这种
+ `# CONFIG_PACKAGE_luci-theme-argon is not set`  未选中是这种
 
-> `release_content.txt`
+> release_content.txt
 
 此文本仅作release记录，其中的IP、密码与固件并无关联，怎么改都可以，不修改也可以。
 
@@ -84,11 +106,11 @@ lean lede源码中package/lean/mtk-eip93编译会报错，勿用。
 
 > 上传到release: 
 
-默认勾选。推荐，空间无限，单文件不能超过2GB，有内容记录。
+默认勾选。推荐，空间无限，单文件不能超过2GB，有内容记录。 [图示](templet/images/截图2.png)
 
 > 上传到artifact: 
 
-默认不勾选。不推荐，无内容记录。
+默认不勾选。不推荐，无内容记录。 [图示](templet/images/截图1.png)
 
 > 版本描述: 
 
