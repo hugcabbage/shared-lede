@@ -103,7 +103,7 @@ if语句的作用：手动选择了上传artifact，或者当跳过上传release
 
 版本号主要用作上传release时创建tag，因为tag不能重复，设为自动更新更省事。
 
-版本号范围0.0.0 - 0.0.9 - 0.1.0 - 0.9.9 - 1.0.0 - 9.9.9 - 10.0.0。
+版本号范围0.0.0 - 0.0.9 - 0.1.0 - 10.0.0。
 
 > `update-version.py`
 
@@ -121,10 +121,10 @@ if语句的作用：手动选择了上传artifact，或者当跳过上传release
 
 Actions流程顺利完成后，去release(或者artifact)下载你的固件，allfiles.zip是所有文件的打包。
 
-artifact区如下图所示：
-
-![截图1](images/截图1.png)
-
 release区如下图所示：
 
-![截图1](images/截图2.png)
+<img src="images/release_zone.png" width="70%" ></img>
+
+artifact区如下图所示：
+
+<img src="images/artifact_zone.png" width="70%" ></img>

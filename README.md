@@ -68,6 +68,10 @@
 
 原字符串记为str1，新字符串记为str2，自定义设置改动str2位置即可，如果你改动了str1，那么命令在源码中就匹配不到东西了，替换也就无效了。
 
+🎈🎈🎈 引用
+
+各基础命令的用法可参考该[链接](https://github.com/danshui-git/shuoming/blob/master/ming.md)，个人觉得写得很详细，非常适合新手看。当然该作者仓库内还有其他详细的教程，有兴趣的自行查阅。
+
 > 1.config
 
 只带luci应用、theme这两部分，流程中会转为.config，并自动补全为完整的。
@@ -106,11 +110,15 @@ lean lede源码中package/lean/mtk-eip93编译会报错，勿用。
 
 > 上传到release: 
 
-默认勾选。推荐，空间无限，单文件不能超过2GB，有内容记录。 [图示](templet/images/截图2.png)
+默认勾选。推荐，空间无限，单文件不能超过2GB，有内容记录。 release区见下图：
+
+<img src="templet/images/release_zone.png" width="70%" ></img>
 
 > 上传到artifact: 
 
-默认不勾选。不推荐，无内容记录。 [图示](templet/images/截图1.png)
+默认不勾选。不推荐，无内容记录。 artifact区见下图：
+
+<img src="templet/images/artifact_zone.png" width="70%" ></img>
 
 > 版本描述: 
 
@@ -129,15 +137,15 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，al
 |红米AC2100<br/>小米AC2100|3.config、3clone.sh、3modify.sh|
 |斐讯K2P|4.config、4clone.sh、4modify.sh|
 
-## 关于小米4A千兆版
+## 提示
 
-1.直接在Actions中运行`固件编译`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，到`1.config`中自行选择。若在`1clone.sh`中添加了插件源，在`1.config`要作对应修改，建议先在本地make menuconfig测试。
+1.直接在Actions中运行`固件编译`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，到`[数字].config`中自行选择。若在`[数字]clone.sh`中添加了插件源，在`[数字].config`要作对应修改，建议先在本地make menuconfig测试。
 
-2.该机型需修改分区才能在breed直刷，参考[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
+2.超频方案默认不启用，方案来自该[帖子](https://www.right.com.cn/forum/thread-4042045-1-1.html)。
 
-3.带超频方案，默认不启用，方案来自[帖子](https://www.right.com.cn/forum/thread-4042045-1-1.html)。
+3.小米4A千兆版和小米3Gv2需修改分区才能在breed直刷，参考该[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
 
-4.该机型闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。
+4.小米4A千兆版和小米3Gv2闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。
 
 可以去[官方插件库](https://downloads.openwrt.org/snapshots/packages/mips_24kc/packages/)参考各插件大小，下方也列出了几个较大插件的最近版本的体积:
 
