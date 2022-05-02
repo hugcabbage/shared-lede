@@ -1,6 +1,6 @@
 app_smartdns=$(opkg find luci-app-smartdns)
 
-[ -n "$app_smartdns" ] && exit 0
+[ -z "$app_smartdns" ] && exit 0
 
 #增加smartdns上游服务器
 cat << EOF > /etc/config/smartdns
