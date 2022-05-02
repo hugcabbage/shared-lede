@@ -9,7 +9,7 @@ if [ -n "$app_vssr" ]; then
 	uci commit vssr
 
 	# 域名黑名单
-	#[ -e /etc/vssr/black.list ] && echo "网址" >> /etc/vssr/black.lis
+	#[ -e /etc/vssr/black.list ] && echo "网址" >> /etc/vssr/black.list
 fi
 
 exit 0
