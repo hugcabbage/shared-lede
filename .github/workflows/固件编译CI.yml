@@ -1,6 +1,6 @@
 #
 # Copyright (C) 2020 KFERMercer <KFER.Mercer@gmail.com>
-# Copyright (c) 2022 hugcabbage <fengsongtianxia@gmail.com>
+# Copyright (C) 2022 hugcabbage <fengsongtianxia@gmail.com>
 #
 # This is free software, licensed under the MIT License.
 #
@@ -57,6 +57,12 @@ on:
         required: false
         default: 'false'
         type: boolean
+env:
+  TARGET_SE: preset-models/target_select.py
+  RELEASE_CO: preset-models/release_content.yml
+  CLONE_SH: preset-models/temp.clone.sh
+  MODIFY_SH: preset-models/temp.modify.sh
+  CONFIG_PA: preset-models/temp.config
 jobs:
   build_openwrt:
     name: 固件编译
@@ -75,17 +81,14 @@ jobs:
           sudo -E apt-get clean
           df -h
       - name: 机型选择
+        id: select
         run: |
-          cd preset-models ; NUMBER=$(python3 target_select.py ${{ github.event.inputs.model }}) ; cd ..
+          NUMBER=$(python3 $TARGET_SE ${{ github.event.inputs.model }})
           echo "你选择了：${{ github.event.inputs.model }}"
-          echo "CLONE_SH=preset-models/${NUMBER}clone.sh" >> $GITHUB_ENV
-          echo "MODIFY_SH=preset-models/${NUMBER}modify.sh" >> $GITHUB_ENV
-          echo "CONFIG_PA=preset-models/${NUMBER}.config" >> $GITHUB_ENV
-          echo "RELEASE_TITLE=$(sed -n "/start of ${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep 'release_title' | cut -d = -f 2)" >> $GITHUB_ENV
-          echo "ZH_TITLE=$(sed -n "/start of ${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep 'zh_title' | cut -d = -f 2)" >> $GITHUB_ENV
-          echo "KEY_INFO<<EOF" >> $GITHUB_ENV
-          sed -n "/start of ${NUMBER} model/,/end of ${NUMBER} model/p" preset-models/release_content.txt | grep -E -v '#|=' >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          RELEASE_TITLE=$(yq ".model_${NUMBER}.title" $RELEASE_CO)
+          RELEASE_BODY=$(yq ".model_${NUMBER}.body[]" $RELEASE_CO); RELEASE_BODY="${RELEASE_BODY//$'\n'/'%0A'}"; RELEASE_BODY="${RELEASE_BODY//$'\r'/'%0D'}"
+          echo "::set-output name=RELEASE_TITLE::$RELEASE_TITLE"
+          echo "::set-output name=RELEASE_BODY::$RELEASE_BODY"
       - name: 下载源码与插件
         run: |
           chmod +x $CLONE_SH
@@ -131,8 +134,7 @@ jobs:
           zip -r ../packages.zip ./*
       - name: 获取当前日期
         run: |
-          CURRENT_TIME=$(TZ=Asia/Shanghai date +'%y.%-m.%-d.%H%M%S')
-          CURRENT_TIME=${CURRENT_TIME:1}
+          CURRENT_TIME=$(TZ=Asia/Shanghai date +'%y.%-m.%-d.%H%M%S'); CURRENT_TIME=${CURRENT_TIME:1}
           echo "TAG_NAME=${CURRENT_TIME}" >> $GITHUB_ENV
           echo "RELEASE_PRE=${CURRENT_TIME%.*}" >> $GITHUB_ENV
       - name: 上传固件到release
@@ -143,10 +145,12 @@ jobs:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
           file: collected_firmware/*
           tag: ${{ env.TAG_NAME }}
-          release_name: "${{ env.RELEASE_PRE }} ${{ env.RELEASE_TITLE }}" 
+          release_name: ${{ env.RELEASE_PRE }} ${{ steps.select.outputs.RELEASE_TITLE }}
           overwrite: true
           prerelease: false
-          body: "${{ env.ZH_TITLE }}<br/>${{ env.KEY_INFO }}<br/>${{ github.event.inputs.version_description }}"
+          body: |
+            ${{ steps.select.outputs.RELEASE_BODY }}
+            ${{ github.event.inputs.version_description }}
           file_glob: true
         env:
           RELEASE_FIRMWARE_VALUE: ${{ secrets.RELEASE_FIRMWARE }}
