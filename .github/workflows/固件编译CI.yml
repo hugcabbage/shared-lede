@@ -22,17 +22,18 @@ on:
         default: 'xiaomi-4a-gigabit' 
         type: choice
         options:
-        - mi-router-4a-gigabit
-        - mi-router-3g-v2
-        - mi-router-ac2100
-        - redmi-router-ac2100
-        - mi-router-cr6606
-        - mi-router-cr6608
-        - mi-router-cr6609
-        - mi-router-3g
-        - mi-router-4
-        - mi-router-3-pro
-        - phicomm_k2p
+          - mi-router-4a-gigabit
+          - mi-router-3g-v2
+          - mi-router-ac2100
+          - redmi-router-ac2100
+          - redmi-router-ax6s
+          - mi-router-cr6606
+          - mi-router-cr6608
+          - mi-router-cr6609
+          - mi-router-3g
+          - mi-router-4
+          - mi-router-3-pro
+          - phicomm_k2p
       version_description:
         description: '输入版本描述'     
         required: true

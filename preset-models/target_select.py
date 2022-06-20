@@ -7,8 +7,8 @@ import fileinput
 
 os.chdir("preset-models")
 
-main_targets = ["mi-router-4a-gigabit", "mi-router-cr6608", "redmi-router-ac2100", "phicomm_k2p"]
-main_numbers = ["1", "2", "3", "4"]
+main_targets = ["mi-router-4a-gigabit", "mi-router-cr6608", "redmi-router-ac2100", "phicomm_k2p", "redmi-router-ax6s"]
+main_numbers = ["1", "2", "3", "4", "5"]
 sub_targets = ["mi-router-cr6606", "mi-router-cr6609", "mi-router-3g", "mi-router-4", "mi-router-3-pro", "mi-router-ac2100", "mi-router-3g-v2"]
 sub_numbers = ["2-1", "2-2", "2-3", "2-4", "2-5", "3-1", "1-1"]
 

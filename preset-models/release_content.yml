@@ -78,3 +78,10 @@ model_4:
     - 版本：lienol openwrt源码，master分支
     - 登陆IP 192.168.2.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
+model_5:
+  title: openwrt for redmi ax6s
+  body:
+    - 红米AX6S OpenWrt固件
+    - 版本：lienol openwrt源码，master分支
+    - 登陆IP 192.168.31.1，密码无
+    - 应用：ipv6支持组件、argon主题、定时重启、adbyby-plus、adguardhome、ddns、smartdns、turboacc等。
