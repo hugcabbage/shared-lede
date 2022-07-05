@@ -6,9 +6,9 @@
 
 默认编译第一个，即小米4A千兆版。如需要其他机型，在运行workflow界面点开`选择机型`的下拉框，即可手动选择其他机型。
 
-需要其他机型可参考以上，并修改templet目录下的各文件，以作新增机型，[使用教程](templet/instruction.md)。
+如预置机型中没有你需要的，可以使用templet目录下的文件新增机型，[使用教程](templet/instruction.md)。
 
-喜欢的话，Star一下，方便再找。
+喜欢的话，右上角Star一下，方便再找。
 
 ## 使用本项目你需要:
 
@@ -36,11 +36,11 @@
 
 什么也不修改，按默认配置，可以跳过此步。
 
-以小米4A千兆版为例，主要修改四个文件，在preset-models目录中。
+每个机型关联四个文件，在preset-models目录中。
 
-> 1clone.sh
+> [数字]clone.sh
 
-固件源码和插件源码，新增插件源时，建议先在本地测试下是否缺依赖。
+此脚本用来拉取固件源码和扩展插件源码，新增插件源时，建议先在本地测试下是否缺依赖。
 
 常用的克隆命令如下（克隆理解为下载即可）：
 
@@ -48,9 +48,9 @@
 
 `git clone -b 分支名 链接`
 
-> 1modify.sh
+> [数字]modify.sh
 
-固件初始化设置，修改登录IP、主机名、WiFi名称等。
+此脚本用于固件初始化设置，修改登录IP、主机名、WiFi名称等。
 
 此脚本用到最多的命令是sed，详细用法参见[链接](https://www.runoob.com/linux/linux-comm-sed.html)，这里只简单说明。
 
@@ -72,9 +72,11 @@
 
 各基础命令的用法可参考该[链接](https://github.com/danshui-git/shuoming/blob/master/ming.md)，个人觉得写得很详细，非常适合新手看。当然该作者仓库内还有其他详细的教程，有兴趣的自行查阅。
 
-> 1.config
+> [数字].config
 
-只带luci应用、theme这两部分，流程中会转为.config，并自动补全为完整的。
+该文件对应本地编译执行make menuconfig后生成的.config文件。
+
+该文件主要包含luci应用，流程中会自动转为完整的.config。
 
 增减插件修改这个文件即可，以argon主题为例，格式如下：
 
@@ -84,27 +86,25 @@
 
  `# CONFIG_PACKAGE_luci-theme-argon is not set`  未选中是这种
 
-> release_content.txt
+> release_content.yml
 
 此文本仅作release记录，其中的IP、密码与固件并无关联，怎么改都可以，不修改也可以。
 
 ### 5. Actions中手动开始编译流程
 
-选择你的`Workflow`，点击Run workflow，按需填内容，运行即可。
+选择你的`固件编译`这个workflow，再点击`Run workflow`，按需填内容，运行即可。
 
 各选项说明如下:
 
 > 超频到1100Mhz: 
 
-默认不勾选。仅适用于5.10内核，红米AX6S为5.15内核，勿用，其余机型默认皆为5.10内核，可用。
+默认不勾选。仅适用于5.10内核，除红米AX6S外，其余机型默认皆为5.10内核。
 
 > 使用5.15内核: 
 
-默认不勾选。仅适用于lienol源码的机型，除小米4A千兆版和小米3Gv2外，其余都是lienol源码。
+默认不勾选。因lean lede源码中package/lean/mtk-eip93编译会报错，小米4A千兆版和小米3Gv2勿用。
 
-红米AX6S只有5.15内核，勿勾选此项。
-
-lean lede源码中package/lean/mtk-eip93编译会报错，勿用。
+红米AX6S只有5.15内核，不必勾选。
 
 > 选择机型: 
 
@@ -134,7 +134,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 |机型|文件|
 |:----:|:----:|
-|小米4A千兆版<br/>小米3Gv2|1.config、1clone.sh、1modify.sh|
+|小米3Gv2<br/>小米4A千兆版|1.config、1clone.sh、1modify.sh|
 |小米4<br/>小米3G<br/>小米3Pro<br/>小米CR6606<br/>小米CR6608<br/>小米CR6609|2.config、2clone.sh、2modify.sh|
 |红米AC2100<br/>小米AC2100|3.config、3clone.sh、3modify.sh|
 |斐讯K2P|4.config、4clone.sh、4modify.sh|
@@ -151,13 +151,6 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 4.小米4A千兆版和小米3Gv2需修改分区才能在breed直刷，参考该[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
 
 5.小米4A千兆版和小米3Gv2闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。
-
-可以去[官方插件库](https://downloads.openwrt.org/snapshots/packages/mips_24kc/packages/)参考各插件大小，下方也列出了几个较大插件的最近版本的体积:
-
-UnblockNeteaseMusic-Go_0.2.13 --- 2.05MB<br/>
-luci-app-openclash_0.44.16 --- 2.14MB<br/>
-luci-app-vssr_1.23 --- 2.87MB<br/>
-xray-core_1.5.3 --- 5.63MB<br/>
 
 ---
 
