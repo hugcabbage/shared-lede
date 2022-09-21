@@ -10,6 +10,10 @@
 sed -i '/Device\/xiaomi_mi-router-4a-gigabit/,/Mi Router 4A/ s/14848k/16064k/' target/linux/ramips/image/mt7621.mk
 sed -i '/Device\/xiaomi_mi-router-3g-v2/,/mir3g-v2/ s/14848k/16064k/' target/linux/ramips/image/mt7621.mk
 \cp -rf extra-files/mt7621_xiaomi_mi-router-4a-3g-v2.dtsi target/linux/ramips/dts/mt7621_xiaomi_mi-router-4a-3g-v2.dtsi
+#优化smartdns配置
+rm -rf feeds/packages/net/smartdns
+rm -rf package/feeds/packages/net/smartdns
+cp -rf extra-files/smartdns feeds/packages/net
 #复制uci-defaults脚本 
 mkdir -p files/etc/uci-defaults
 cp -f uci-scripts/* files/etc/uci-defaults
