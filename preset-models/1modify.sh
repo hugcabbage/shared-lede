@@ -1,6 +1,6 @@
 #!/bin/sh
 #修改登录IP
-#sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate
 #修改主机名
 #sed -i 's/OpenWrt/Xiaomi-Router/g' package/base-files/files/bin/config_generate
 #修改型号显示
