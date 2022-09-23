@@ -20,5 +20,7 @@ cp -f uci-scripts/* files/etc/uci-defaults
 #修改登录密码为coolxiaomi
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
 #删除一些zzz中的脚本
-ZZZ_SCRIPT="package/default-settings/files/zzz-default-settings"
-[ -e $ZZZ_SCRIPT ] && sed -i -e '/DISTRIB_/d' -e '/footer.htm/d' -e '/admin_status/d' $ZZZ_SCRIPT
+ZZZ_PATH="package/default-settings/files/zzz-default-settings"
+[ -e $ZZZ_PATH ] && sed -i -e '/DISTRIB_/d' -e '/footer.htm/d' -e '/admin_status/d' $ZZZ_PATH
+#替换geodata源
+. extra-files/update-geodata.sh
