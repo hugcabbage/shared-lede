@@ -16,3 +16,4 @@ git clone -b packages https://github.com/xiaorouji/openwrt-passwall.git passwall
 git clone -b luci https://github.com/xiaorouji/openwrt-passwall.git luci-app-passwall
 git clone https://github.com/xiaorouji/openwrt-passwall2.git
 svn co https://github.com/linkease/nas-packages-luci/trunk/luci/luci-app-ddnsto
+svn co https://github.com/linkease/nas-packages/tree/master/network/services/ddnsto
