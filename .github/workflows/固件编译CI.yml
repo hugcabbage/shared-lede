@@ -22,18 +22,18 @@ on:
         default: 'xiaomi-4a-gigabit' 
         type: choice
         options:
-          - mi-router-4a-gigabit
-          - mi-router-3g-v2
-          - mi-router-ac2100
-          - redmi-router-ac2100
-          - redmi-router-ax6s
-          - mi-router-cr6606
-          - mi-router-cr6608
-          - mi-router-cr6609
-          - mi-router-3g
-          - mi-router-4
-          - mi-router-3-pro
-          - phicomm_k2p
+          - 'xiaomi-4a-gigabit'
+          - 'xiaomi-3g-v2'
+          - 'xiaomi-cr6608'
+          - 'xiaomi-cr6606'
+          - 'xiaomi-cr6609'
+          - 'xiaomi-3g'
+          - 'xiaomi-4'
+          - 'xiaomi-3-pro'
+          - 'redmi-ac2100'
+          - 'xiaomi-ac2100'
+          - 'phicomm-k2p'
+          - 'redmi-ax6s'
       version_description:
         description: '输入版本描述'     
         required: true
@@ -88,8 +88,8 @@ jobs:
           echo "你选择了：${{ github.event.inputs.model }}"
           RELEASE_TITLE=$(yq ".model_${NUMBER}.title" $RELEASE_CO)
           RELEASE_BODY=$(yq ".model_${NUMBER}.body[]" $RELEASE_CO); RELEASE_BODY="${RELEASE_BODY//$'\n'/'%0A'}"; RELEASE_BODY="${RELEASE_BODY//$'\r'/'%0D'}"
-          echo "::set-output name=RELEASE_TITLE::$RELEASE_TITLE"
-          echo "::set-output name=RELEASE_BODY::$RELEASE_BODY"
+          echo "RELEASE_TITLE=${RELEASE_TITLE}" >> $GITHUB_OUTPUT
+          echo "RELEASE_BODY=${RELEASE_BODY}" >> $GITHUB_OUTPUT
       - name: 下载源码与插件
         run: |
           chmod +x $CLONE_SH
