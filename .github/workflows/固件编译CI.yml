@@ -22,18 +22,18 @@ on:
         default: 'xiaomi-4a-gigabit' 
         type: choice
         options:
-          - mi-router-4a-gigabit
-          - mi-router-3g-v2
-          - mi-router-ac2100
-          - redmi-router-ac2100
-          - redmi-router-ax6s
-          - mi-router-cr6606
-          - mi-router-cr6608
-          - mi-router-cr6609
-          - mi-router-3g
-          - mi-router-4
-          - mi-router-3-pro
-          - phicomm_k2p
+          - 'xiaomi-4a-gigabit'
+          - 'xiaomi-3g-v2'
+          - 'xiaomi-cr6608'
+          - 'xiaomi-cr6606'
+          - 'xiaomi-cr6609'
+          - 'xiaomi-3g'
+          - 'xiaomi-4'
+          - 'xiaomi-3-pro'
+          - 'redmi-ac2100'
+          - 'xiaomi-ac2100'
+          - 'phicomm-k2p'
+          - 'redmi-ax6s'
       version_description:
         description: '输入版本描述'     
         required: true
@@ -58,12 +58,6 @@ on:
         required: false
         default: 'false'
         type: boolean
-env:
-  TARGET_SE: preset-models/target_select.py
-  RELEASE_CO: preset-models/release_content.yml
-  CLONE_SH: preset-models/temp.clone.sh
-  MODIFY_SH: preset-models/temp.modify.sh
-  CONFIG_PA: preset-models/temp.config
 jobs:
   build_openwrt:
     name: 固件编译
@@ -80,16 +74,21 @@ jobs:
           sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 zip unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf swig libtinfo5
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
+          pip install -r requirements.txt
           df -h
-      - name: 机型选择
-        id: select
+      - name: 读取配置文件
+        id: transit
+        env:
+          TARGET_SE: preset-models/transit.py
         run: |
-          NUMBER=$(python3 $TARGET_SE ${{ github.event.inputs.model }})
-          echo "你选择了：${{ github.event.inputs.model }}"
-          RELEASE_TITLE=$(yq ".model_${NUMBER}.title" $RELEASE_CO)
-          RELEASE_BODY=$(yq ".model_${NUMBER}.body[]" $RELEASE_CO); RELEASE_BODY="${RELEASE_BODY//$'\n'/'%0A'}"; RELEASE_BODY="${RELEASE_BODY//$'\r'/'%0D'}"
-          echo "::set-output name=RELEASE_TITLE::$RELEASE_TITLE"
-          echo "::set-output name=RELEASE_BODY::$RELEASE_BODY"
+          MODEL_NAME=${{ github.event.inputs.model }}; echo "你选择了：$MODEL_NAME"
+          FILEPATHS=($(python3 $TARGET_SE $MODEL_NAME))
+          echo "CLONE_SH=${FILEPATHS[0]}" >> $GITHUB_ENV
+          echo "MODIFY_SH=${FILEPATHS[1]}" >> $GITHUB_ENV
+          echo "CONFIG_PA=${FILEPATHS[2]}" >> $GITHUB_ENV
+          RELEASE_TEXT=${FILEPATHS[3]}
+          echo "RELEASE_TITLE=$(sed -n '1p' $RELEASE_TEXT)" >> $GITHUB_OUTPUT
+          echo 'RELEASE_BODY<<EOF' >> $GITHUB_OUTPUT; sed -n '2,$p' $RELEASE_TEXT >> $GITHUB_OUTPUT; echo 'EOF' >> $GITHUB_OUTPUT
       - name: 下载源码与插件
         run: |
           chmod +x $CLONE_SH
@@ -134,10 +133,11 @@ jobs:
           cd packages
           zip -r ../packages.zip ./*
       - name: 获取当前日期
+        id: time
         run: |
           CURRENT_TIME=$(TZ=Asia/Shanghai date +'%y.%-m.%-d.%H%M%S'); CURRENT_TIME=${CURRENT_TIME:1}
-          echo "TAG_NAME=${CURRENT_TIME}" >> $GITHUB_ENV
-          echo "RELEASE_PRE=${CURRENT_TIME%.*}" >> $GITHUB_ENV
+          echo "TAG_NAME=$CURRENT_TIME" >> $GITHUB_OUTPUT
+          echo "RELEASE_PRE=${CURRENT_TIME%.*}" >> $GITHUB_OUTPUT
       - name: 上传固件到release
         id: upload-release
         if: github.event.inputs.release == 'true' && env.RELEASE_FIRMWARE_VALUE != ''
@@ -145,12 +145,12 @@ jobs:
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
           file: collected_firmware/*
-          tag: ${{ env.TAG_NAME }}
-          release_name: ${{ env.RELEASE_PRE }} ${{ steps.select.outputs.RELEASE_TITLE }}
+          tag: ${{ steps.time.outputs.TAG_NAME }}
+          release_name: ${{ steps.time.outputs.RELEASE_PRE }} ${{ steps.transit.outputs.RELEASE_TITLE }}
           overwrite: true
           prerelease: false
           body: |
-            ${{ steps.select.outputs.RELEASE_BODY }}
+            ${{ steps.transit.outputs.RELEASE_BODY }}
             ${{ github.event.inputs.version_description }}
           file_glob: true
         env:

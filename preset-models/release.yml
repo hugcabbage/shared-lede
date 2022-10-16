@@ -1,87 +1,87 @@
 # This is the release content file.
 # It will be showed in the release.
 
-model_1:
+model_xiaomi-4a-gigabit:
   title: lede for xiaomi 4a gigabit
   body:
     - 小米4A千兆版lede固件
     - 版本：lean lede源码
-    - 登陆IP 192.168.31.1，密码password
+    - 登录IP：192.168.31.1，密码password
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手、smartdns等。
-model_1-1:
+model_xiaomi-3g-v2:
   title: lede for xiaomi 3g v2
   body:
     - 小米3Gv2 lede固件
     - 版本：lean lede源码
-    - 登陆IP 192.168.31.1，密码password
+    - 登录IP：192.168.31.1，密码password
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手、smartdns等。
-model_2:
+model_xiaomi-cr6608:
   title: openwrt for xiaomi cr6608
   body:
     - 小米CR6608 openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_2-1:
+model_xiaomi-cr6606:
   title: openwrt for xiaomi cr6606
   body:
     - 小米CR6606 openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_2-2:
+model_xiaomi-cr6609:
   title: openwrt for xiaomi cr6609
   body:
     - 小米CR6609 openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_2-3:
+model_xiaomi-3g:
   title: openwrt for xiaomi 3g
   body:
     - 小米3G openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_2-4:
+model_xiaomi-4:
   title: openwrt for xiaomi 4
   body:
     - 小米4 openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_2-5:
+model_xiaomi-3-pro:
   title: openwrt for xiaomi 3 pro
   body:
     - 小米3 Pro openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_3:
+model_redmi-ac2100:
   title: openwrt for redmi ac2100
   body:
     - 红米AC2100 OpenWrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_3-1:
+model_xiaomi-ac2100:
   title: openwrt for xiaomi ac2100
   body:
     - 小米AC2100 OpenWrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_4:
+model_phicomm-k2p:
   title: openwrt for phicomm k2p
   body:
     - 斐讯K2P OpenWrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.2.1，密码无
+    - 登录IP：192.168.2.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_5:
+model_redmi-ax6s:
   title: openwrt for redmi ax6s
   body:
     - 红米AX6S OpenWrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登陆IP 192.168.31.1，密码无
+    - 登录IP：192.168.31.1，密码无
     - 应用：ipv6支持组件、argon主题、定时重启、adbyby-plus、adguardhome、ddns、smartdns、turboacc等。
