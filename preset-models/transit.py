@@ -3,10 +3,14 @@
 
 import os
 import sys
-import yaml
 import shutil
-import headers
+
+
+import yaml
 import pandas as pd
+
+
+import headers
 
 
 # model为机型名称, temp为即将用于编译流程中的临时文件前缀
@@ -21,17 +25,19 @@ def produce_temp_workfiles(model: str, temp: str):
     shutil.copyfile(num + 'clone.sh', temp + 'clone.sh')
     shutil.copyfile(num + 'modify.sh', temp + 'modify.sh')
     # 生成临时.config
-    tindex = ()
+    inxall = ()
     with open(num + '.config') as f:
         text = f.readlines()
     for (index, value) in enumerate(text):
-        if 'CONFIG_TARGET' in value:
-            tindex += (index,)
-    if len(tindex) == 0:
+        if value.startswith('CONFIG_TARGET') and '=y' in value:
+            inxall += (index,)
+            if len(inxall) == 3:
+                break
+    if len(inxall) == 0:
         text = header + text
     else:
         for i in range(3):
-            text[tindex[i]] = header[i]
+            text[inxall[i]] = header[i]
     with open(temp.rstrip('.') + '.config', 'w') as f:
         f.writelines(text)
     return
