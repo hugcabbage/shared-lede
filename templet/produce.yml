@@ -1,0 +1,43 @@
+name: produce
+
+on:
+  workflow_dispatch:
+    inputs:
+      overwrite:
+        description: 'overwrite last run'
+        required: true 
+        type: boolean
+      initfile:
+        description: 'init file path'
+        required: true 
+        type: string
+        default: 'templet/init' 
+      destdir:
+        description: 'directory to place output files'
+        required: true 
+        type: string
+        default: 'templet'
+
+jobs:
+  build:
+    env:
+      REPO_PATH: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        path: ${{ env.REPO_PATH }}
+    - name: carry out
+      run: |
+        python ${{ env.REPO_PATH }}/templet/produce.py
+      env:
+        OVERWRITE: ${{ inputs.overwrite }}
+        INITPATH: ${{ env.REPO_PATH }}/${{ inputs.initfile }}
+        DESTDIR: ${{ env.REPO_PATH }}/${{ inputs.destdir }}
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        repository: ${{ env.REPO_PATH }}
+        commit_message: new device added 
+        commit_user_name: github-actions[bot]
+        commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+        commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
