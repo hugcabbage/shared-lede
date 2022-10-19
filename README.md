@@ -10,7 +10,7 @@
 
 默认编译第一个，即小米4A千兆版。如需要其他机型，在运行workflow界面点开`选择机型`的下拉框，即可手动选择其他机型。
 
-如预置机型中没有你需要的，可以使用templet目录下的文件新增机型，[使用教程](templet/instruction.md)。
+如预置机型中没有你需要的，可以使用templet目录下的文件新增机型。
 
 喜欢的话，右上角Star一下，方便再找。
 
@@ -42,7 +42,7 @@
 
 每个机型关联四个文件，在preset-models目录中。
 
-> [数字]clone.sh
+> [数字].clone.sh
 
 此脚本用来拉取固件源码和扩展插件源码，新增插件源时，建议先在本地测试下是否缺依赖。
 
@@ -52,7 +52,7 @@
 
 `git clone -b 分支名 链接`
 
-> [数字]modify.sh
+> [数字].modify.sh
 
 此脚本用于固件初始化设置，修改登录IP、主机名、WiFi名称等。
 
@@ -118,13 +118,13 @@
 
 默认勾选。推荐，空间无限，单文件不能超过2GB，有内容记录。 release区见下图：
 
-<img src="templet/images/release_zone.png" width="70%" ></img>
+<img src="extra-files/images/release_zone.png" width="70%" ></img>
 
 > 上传到artifact: 
 
 默认不勾选。不推荐，无内容记录。 artifact区见下图：
 
-<img src="templet/images/artifact_zone.png" width="70%" ></img>
+<img src="extra-files/images/artifact_zone.png" width="70%" ></img>
 
 > 版本描述: 
 
@@ -146,7 +146,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 ## 提示
 
-1.直接在Actions中运行`固件编译`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，到`[数字].config`中自行选择。若在`[数字]clone.sh`中添加了插件源，在`[数字].config`要作对应修改，建议先在本地make menuconfig测试。
+1.直接在Actions中运行`固件编译`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，到`[数字].config`中自行选择。若在`[数字].clone.sh`中添加了插件源，在`[数字].config`要作对应修改，建议先在本地make menuconfig测试。
 
 2.超频方案默认不启用，方案来自该[帖子](https://www.right.com.cn/forum/thread-4042045-1-1.html)。
 
