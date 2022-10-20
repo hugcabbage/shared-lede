@@ -1,0 +1,78 @@
+name: refresh
+
+on:
+  workflow_dispatch:
+    inputs:
+      configdir:
+        description: 'file(s) directory'
+        required: true 
+        type: string
+        default: 'preset-models'
+      configls:
+        description: '<serial>.config file(s)'
+        required: true 
+        type: string
+        default: '1.config, 2.config, 3.config, 4.config, 5.config'
+
+env:
+  FILEDIR: ${{ inputs.configdir }}
+
+jobs:
+
+  set-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      filels: ${{ steps.set-matrix.outputs.configls }}
+    steps:
+      - id: set-matrix
+        env:
+          CONFIGLS: ${{ inputs.configls }}
+        run: |
+          NEW=${CONFIGLS//' '/''}; NEW=${NEW//','/' '}; NEW=($NEW)
+          array=""
+          for item in ${NEW[@]}
+          do
+              array=$array'"'$item'",'
+          done
+          echo "configls=[$array]" >> $GITHUB_OUTPUT
+
+  refresh:
+    needs: set-matrix
+    runs-on: ubuntu-latest
+    env:
+      FILE: ${{ matrix.file }}
+    strategy:
+      matrix:
+        file: ${{ fromJSON(needs.set-matrix.outputs.filels) }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: carry out
+      run: python3 templet/refresh.py
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.FILE }}
+        path: ${{ env.FILEDIR }}/${{ env.FILE }}*
+
+  commit:
+    needs: refresh
+    runs-on: ubuntu-latest
+    env:
+      ARTIFACTDIR: dlfiles
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v3
+      with:
+        path: ${{ env.ARTIFACTDIR }}
+    - uses: geekyeggo/delete-artifact@v2
+      with:
+          name: '*'
+    - name: move files
+      run: |
+        python3 templet/move.py
+        rm -rf $ARTIFACTDIR
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: .config files refreshed 
+        commit_user_name: github-actions[bot]
+        commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+        commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
