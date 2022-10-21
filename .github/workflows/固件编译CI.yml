@@ -34,6 +34,13 @@ on:
           - 'xiaomi-ac2100'
           - 'phicomm-k2p'
           - 'redmi-ax6s'
+          - 'xiaomi-4a-100m'
+          - 'xiaomi-4c'
+          - 'miwifi-nano'
+          - 'glinet-mt300n-v2'
+          - 'glinet-microuter-n300'
+          - 'miwifi-mini'
+          - 'miwifi-r3'
       version_description:
         description: '输入版本描述'     
         required: true

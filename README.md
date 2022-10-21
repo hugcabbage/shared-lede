@@ -144,7 +144,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 |机型|文件|
 |:----:|:----:|
-|斐讯K2P<br/>小米3Gv2<br/>小米4A千兆版|1.config、1.clone.sh、1.modify.sh|
+|斐讯K2P<br/>小米3Gv2<br/>小米4A千兆版<br/>小米4A百兆版<br/>小米4C<br/>小米WiFi R3<br/>小米WiFi nano<br/>小米WiFi mini<br/>GL.iNet mt300n v2<br/>GL.iNet microuter n300|1.config、1.clone.sh、1.modify.sh|
 |小米4<br/>小米3G<br/>小米3Pro<br/>小米CR6606<br/>小米CR6608<br/>小米CR6609<br/>红米AC2100<br/>小米AC2100|2.config、2.clone.sh、2.modify.sh|
 |红米AX6S|3.config、3.clone.sh、3.modify.sh|
 
