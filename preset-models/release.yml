@@ -15,6 +15,13 @@ model_xiaomi-3g-v2:
     - 版本：lean lede源码
     - 登录信息：IP 192.168.31.1，密码 password
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手、smartdns等。
+model_phicomm-k2p:
+  title: lede for phicomm k2p
+  body:
+    - 斐讯K2P lede固件
+    - 版本：lean lede源码
+    - 登录信息：IP 192.168.31.1，密码 password
+    - 应用：ipv6支持组件、argon主题、定时重启、nat6助手、smartdns等。
 model_xiaomi-cr6608:
   title: openwrt for xiaomi cr6608
   body:
@@ -70,13 +77,6 @@ model_xiaomi-ac2100:
     - 小米AC2100 OpenWrt固件
     - 版本：lienol openwrt源码，master分支
     - 登录信息：IP 192.168.31.1，密码 无
-    - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
-model_phicomm-k2p:
-  title: openwrt for phicomm k2p
-  body:
-    - 斐讯K2P OpenWrt固件
-    - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.2.1，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_redmi-ax6s:
   title: openwrt for redmi ax6s
