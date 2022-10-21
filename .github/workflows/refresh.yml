@@ -12,7 +12,7 @@ on:
         description: '<serial>.config file(s)'
         required: true 
         type: string
-        default: '1.config, 2.config, 3.config, 4.config, 5.config'
+        default: '1.config, 2.config, 3.config'
 
 env:
   FILEDIR: ${{ inputs.configdir }}
