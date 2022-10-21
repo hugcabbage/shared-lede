@@ -33,7 +33,7 @@ def initfile_format(file: str) -> dict:
 # 按链接生成git clone命令
 def produce_git_command(link: str, isbase=False) -> str:
     path = ''
-    link = link.rstrip('@')
+    link = link.strip().rstrip('@')
     # 0个@
     if '@' not in (url := link):
         command = f'git clone --depth 1 {url}'
@@ -55,9 +55,25 @@ def produce_git_command(link: str, isbase=False) -> str:
                 command = f'git clone --depth 1 -b {branch} {url} {path}'
     if isbase:
         if path != '':
+            path = path.rstrip('/')
             command += f' && mv ./{path}/* ./'
         else:
             command += f' openwrt && mv ./openwrt/* ./'
+    return command
+
+
+# 按链接生成svn命令
+def produce_svn_command(link: str) -> str:
+    link = link.strip().rstrip('@')
+    # 0个@
+    if '@' not in (url := link):
+        command = f'svn export {url}'
+    # 1个@
+    else:
+        segment = link.split('@')
+        url = segment[0]
+        path = segment[1]
+        command = f'svn export {url} {path}'
     return command
 
 
@@ -69,13 +85,12 @@ def produce_conf(data: dict, prefix: str):
     for link in data['git-app']:
         appcommands += [f'{produce_git_command(link)}\n']
     for link in data['svn-app']:
-        appcommands += [f'svn export {link}\n']
+        appcommands += [f'{produce_svn_command(link)}\n']
     text1 = [
-        '#!/bin/sh\n',
+        '\n#!/bin/sh\n',
         '# 下载源码\n',
         basecommands,
-        '\n',
-        '# 下载插件\n',
+        '\n# 下载插件\n',
         f'mkdir -p {(path := data["app-path"])} && cd {path}\n'
     ]
     text1 += appcommands
