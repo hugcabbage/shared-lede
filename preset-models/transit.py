@@ -43,8 +43,14 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str):
 def produce_release_text(model: str, release: str, temp: str):
     # 生成临时.release
     with open(release, encoding='utf-8') as f:
-        text = yaml.safe_load(f)['model_' + model]
-    text = pd.Series([text['title']] + text['body']) + '\n'
+        if (m1 := 'model_' + model) in (y1 := yaml.safe_load(f)):
+            text = y1[m1]
+            text = pd.Series([text['title']] + text['body']) + '\n'
+        else:
+            text = [
+                f'{model.replace("-", " ")}\n',
+                '无更多信息，预设请编辑release.yml\n'
+            ]
     with open(temp + '.release', 'w', encoding='utf-8') as f:
         f.writelines(text)
 
