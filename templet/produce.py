@@ -1,8 +1,23 @@
 #!/usr/bin/python3
 import os
+import sys
 import glob
 import shutil
 import subprocess
+
+
+# 获取编号
+def get_serial(directory: str):
+    if (total := len(glob.glob(f'{directory}/*clone.sh'))) == 0:
+        number = '1'
+    else:
+        if os.getenv('OVERWRITE_LAST') == 'true':
+            number = str(total)
+        elif (os1 := os.getenv('OVERWRITE_SPEC')) != '':
+            number = str(os1)
+        else:
+            number = str(total + 1)
+    return number
 
 
 # 格式化文件，返回字典
@@ -87,8 +102,8 @@ def produce_conf(data: dict, prefix: str):
     for link in data['svn-app']:
         appcommands += [f'{produce_svn_command(link)}\n']
     text1 = [
-        '\n#!/bin/sh\n',
-        '# 下载源码\n',
+        '#!/bin/sh\n',
+        '\n# 下载源码\n',
         basecommands,
         '\n# 下载插件\n',
         f'mkdir -p {(path := data["app-path"])} && cd {path}\n'
@@ -99,7 +114,7 @@ def produce_conf(data: dict, prefix: str):
     # 生成modify.sh
     text2 = [
         '#!/bin/sh\n',
-        '# 修改登录IP\n',
+        '\n# 修改登录IP\n',
         'sed -i \'s/192.168.1.1/192.168.31.1/g\' package/base-files/files/bin/config_generate\n'
     ]
     with open(prefix + '.modify.sh', 'w') as f:
@@ -194,19 +209,48 @@ def routine_cmd(clone: str, config: str):
 
 
 if __name__ == '__main__':
-    if not os.path.exists(destdir := os.getenv('DESTDIR', 'templet').rstrip('/')):
-        os.makedirs(destdir)
-    if (total := len(glob.glob(f'{destdir}/*clone.sh'))) == 0:
-        serial = '1'
-    else:
-        if os.getenv('OVERWRITE') == 'true':
-            serial = str(total)
+    destdir = (rp1 := os.getenv('REPO_PATH').rstrip('/')) + '/' + (dd1 := os.getenv('DEPLOYDIR').rstrip('/'))
+    ba1 = f'{destdir}/backups'
+    he1 = f'{destdir}/headers'
+    wf1 = f'{rp1}/.github/workflows'
+    if os.getenv('DELETE_ALL') == 'true':
+        if dd1 != 'templet':
+            shutil.rmtree(destdir, ignore_errors=True)
         else:
-            serial = str(total + 1)
-    initfile = os.getenv('INITPATH', 'templet/init.example')
+            shutil.rmtree(ba1, ignore_errors=True)
+            shutil.rmtree(he1, ignore_errors=True)
+            for item in glob.glob(f'{destdir}/[0-9].*'):
+                os.remove(item)
+        for item in glob.glob(f'{wf1}/[0-9].build*'):
+            os.remove(item)
+        sys.exit()
+    if (ds1 := os.getenv('DELETE_SPEC')) != '':
+        ds1 = ds1.replace(' ', '').rstrip(',').split(',')
+        for root, dirs, files in os.walk(destdir):
+            for name in files:
+                for serial in ds1:
+                    if name.startswith(serial + '.'):
+                        os.remove(os.path.join(root, name))
+                        break
+        for serial in ds1:
+            os.remove(f'{wf1}/{serial}.build.yml')
+        sys.exit()
+    os.makedirs(ba1, exist_ok=True)
+    os.makedirs(he1, exist_ok=True)
+    serial = get_serial(destdir)
+    initfile = rp1 + '/' + os.getenv('INITFILE')
     produce_conf(initfile_format(initfile), serial)
     routine_cmd(serial + '.clone.sh', serial + '.config')
     simplify_config(serial + '.config')
     # 移动文件到目标文件夹，准备commit
     for item in glob.glob(serial + '*'):
-        shutil.move(item, f'{destdir}/{item}')
+        if item.endswith('config.fullbak'):
+            shutil.move(item, f'{ba1}/{item}')
+        elif item.endswith('header.json'):
+            shutil.move(item, f'{he1}/{item}')
+        else:
+            shutil.move(item, f'{destdir}/{item}')
+    shutil.copyfile(f'{rp1}/templet/build.yml.example', by1 := f'{wf1}/{serial}.build.yml')
+    subprocess.run(f"sed -i 's/name: xxxxxx/name: device {serial}/' {by1}", shell=True)
+    subprocess.run(f"sed -i 's/SERIAL_NU: xxxxxx/SERIAL_NU: {serial}/' {by1}", shell=True)
+    subprocess.run(f"sed -i 's/DEPLOYDIR: xxxxxx/DEPLOYDIR: {dd1}/' {by1}", shell=True)

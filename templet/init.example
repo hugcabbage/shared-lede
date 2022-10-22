@@ -1,5 +1,7 @@
-# board, subtarget and device can get by looking up openwrt code
+# board, subtarget and device, you could look them up in openwrt code
 # for example: openwrt/target/linux/ramips/image/mt7621.mk
+
+# device-name is custom, blank don't come
 
 # base uses git way
 # format: <url>@<branch>@<path>; <url>@<branch>; <url>@@<path>; <url>

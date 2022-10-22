@@ -1,0 +1,64 @@
+name: produce
+
+on:
+  workflow_dispatch:
+    inputs:
+      initfile:
+        description: 'init file path'
+        type: string
+        required: false
+        default: 'templet/init'
+      deploydir:
+        description: 'directory to place output files'
+        type: string
+        required: true
+        default: 'produce'
+      overwrite_spec:
+        description: 'overwrite specific run, can only accept single <serial>, like 1'
+        required: false
+        type: string
+      delete_spec:
+        description: 'delete specific run, can accept multiple <serial>, like 1, 2, 3'
+        required: false
+        type: string
+      overwrite_last:
+        description: 'overwrite last run'
+        required: false
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      delete_all:
+        description: 'delete all runs'
+        required: false
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  build:
+    env:
+      REPO_PATH: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        path: ${{ env.REPO_PATH }}
+        token: ${{ secrets.PRODUCE_DEVICE }}
+    - name: carry out
+      run: python ${{ env.REPO_PATH }}/templet/produce.py
+      env:
+        INITFILE: ${{ inputs.initfile }}
+        DEPLOYDIR: ${{ inputs.deploydir }}
+        OVERWRITE_LAST: ${{ inputs.overwrite_last }}
+        OVERWRITE_SPEC: ${{ inputs.overwrite_spec }}
+        DELETE_SPEC: ${{ inputs.delete_spec }}
+        DELETE_ALL: ${{ inputs.delete_all }}
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        repository: ${{ env.REPO_PATH }}
+        commit_message: device deployment changed
+        commit_user_name: github-actions[bot]
+        commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+        commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
