@@ -3,7 +3,7 @@ name: refresh
 on:
   workflow_dispatch:
     inputs:
-      configdir:
+      deploydir:
         description: 'file(s) directory'
         required: true 
         type: string
@@ -15,7 +15,7 @@ on:
         default: '1.config, 2.config, 3.config'
 
 env:
-  FILEDIR: ${{ inputs.configdir }}
+  FILEDIR: ${{ inputs.deploydir }}
 
 jobs:
 
@@ -68,7 +68,7 @@ jobs:
           name: '*'
     - name: move files
       run: |
-        python3 templet/move.py
+        python3 templet/refreshmv.py
         rm -rf $ARTIFACTDIR
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
