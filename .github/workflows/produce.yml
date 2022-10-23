@@ -40,13 +40,16 @@ jobs:
   build:
     env:
       REPO_PATH: test
+      PRODUCE_DEVICE: ${{ secrets.PRODUCE_DEVICE }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      if: env.PRODUCE_DEVICE != ''
       with:
         path: ${{ env.REPO_PATH }}
-        token: ${{ secrets.PRODUCE_DEVICE }}
+        token: ${{ env.PRODUCE_DEVICE }}
     - name: carry out
+      if: env.PRODUCE_DEVICE != ''
       run: python ${{ env.REPO_PATH }}/templet/produce.py
       env:
         INITFILE: ${{ inputs.initfile }}
@@ -56,9 +59,13 @@ jobs:
         DELETE_SPEC: ${{ inputs.delete_spec }}
         DELETE_ALL: ${{ inputs.delete_all }}
     - uses: stefanzweifel/git-auto-commit-action@v4
+      if: env.PRODUCE_DEVICE != ''
       with:
         repository: ${{ env.REPO_PATH }}
         commit_message: device deployment changed
         commit_user_name: github-actions[bot]
         commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
         commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+    - name: lack token print
+      if: env.PRODUCE_DEVICE == ''
+      run: echo 'Have no token, workflow exits!'
