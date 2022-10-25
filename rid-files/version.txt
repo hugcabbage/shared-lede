@@ -1,4 +1,0 @@
-# This is the version file that only applys to templet model.
-# You don't need to change the version.
-# It will be updated automatically during every workflow running.
-current version=0.0.0
