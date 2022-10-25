@@ -16,10 +16,10 @@ on:
         description: '若要编译固件，请输入true'
         required: true
         default: 'true'
+        type: string
       model:
-        description: '选择机型'
+        description: '选择设备'
         required: true
-        default: 'xiaomi-4a-gigabit' 
         type: choice
         options:
           - 'xiaomi-4a-gigabit'
@@ -41,35 +41,33 @@ on:
           - 'glinet-microuter-n300'
           - 'miwifi-mini'
           - 'miwifi-r3'
-      version_description:
+      record:
         description: '输入版本描述'     
-        required: true
+        required: false
         default: '升级内容：内核升级，更新应用版本'
+        type: string
       cpu_overclock:
         description: '超频到1100Mhz(仅适用于5.10内核)'
         required: false
-        default: 'false'
         type: boolean
       kernel_5_15:
         description: '使用5.15内核'
         required: false
-        default: 'false'
         type: boolean
       release:
         description: '上传到release'
         required: false
-        default: 'true'
+        default: true
         type: boolean
       artifact:
         description: '上传到artifact'
         required: false
-        default: 'false'
         type: boolean
 jobs:
   build_openwrt:
     name: 固件编译
     runs-on: ubuntu-latest
-    if: github.event.inputs.build == 'true'
+    if: inputs.build == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -88,7 +86,7 @@ jobs:
         env:
           TARGET_SE: preset-models/transit.py
         run: |
-          MODEL_NAME=${{ github.event.inputs.model }}; echo "你选择了：$MODEL_NAME"
+          MODEL_NAME=${{ inputs.model }}; echo "你选择了：$MODEL_NAME"
           FILEPATHS=($(python3 $TARGET_SE $MODEL_NAME))
           echo "CLONE_SH=${FILEPATHS[0]}" >> $GITHUB_ENV
           echo "MODIFY_SH=${FILEPATHS[1]}" >> $GITHUB_ENV
@@ -106,8 +104,8 @@ jobs:
           ./scripts/feeds install -a
       - name: 修改配置
         run: |
-          [ ${{ github.event.inputs.cpu_overclock }} == true ] && sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY_SH
-          [ ${{ github.event.inputs.kernel_5_15 }} == true ] && sed -i '/KERNEL_PATCHVER:=5.15/ s/#//' $MODIFY_SH
+          ${{ inputs.cpu_overclock }} && sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY_SH
+          ${{ inputs.kernel_5_15 }} && sed -i '/KERNEL_PATCHVER:=5.15/ s/#//' $MODIFY_SH
           chmod +x $MODIFY_SH
           $MODIFY_SH
       - name: 生成.config文件
@@ -147,7 +145,7 @@ jobs:
           echo "RELEASE_PRE=${CURRENT_TIME%.*}" >> $GITHUB_OUTPUT
       - name: 上传固件到release
         id: upload-release
-        if: github.event.inputs.release == 'true' && env.RELEASE_FIRMWARE_VALUE != ''
+        if: inputs.release == 'true' && env.RELEASE_FIRMWARE_VALUE != ''
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
@@ -158,12 +156,12 @@ jobs:
           prerelease: false
           body: |
             ${{ steps.transit.outputs.RELEASE_BODY }}
-            ${{ github.event.inputs.version_description }}
+            ${{ inputs.record }}
           file_glob: true
         env:
           RELEASE_FIRMWARE_VALUE: ${{ secrets.RELEASE_FIRMWARE }}
       - name: 上传固件到artifact
-        if: github.event.inputs.artifact == 'true' || steps.upload-release.conclusion == 'skipped'
+        if: inputs.artifact == 'true' || steps.upload-release.conclusion == 'skipped'
         uses: actions/upload-artifact@v3
         with:
           name: collected_firmware

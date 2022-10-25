@@ -215,7 +215,10 @@ if __name__ == '__main__':
     wf1 = f'{rp1}/.github/workflows'
     if os.getenv('DELETE_ALL') == 'true':
         if dd1 != 'templet':
-            shutil.rmtree(destdir, ignore_errors=True)
+            if (len(glob.glob(f'{destdir}/*clone.sh'))) > 0:
+                shutil.rmtree(destdir, ignore_errors=True)
+            else:
+                sys.exit()
         else:
             shutil.rmtree(ba1, ignore_errors=True)
             shutil.rmtree(he1, ignore_errors=True)
