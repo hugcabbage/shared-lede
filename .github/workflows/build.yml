@@ -71,6 +71,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: 初始空间情况
+        run: |
+          df -h
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -86,8 +90,6 @@ jobs:
             unzip upx xmlto zip zlib1g-dev
           sudo apt-get clean
           pip install -r extra-files/requirements-build.txt
-          echo "======================="
-          df -h
 
       - name: 读取配置
         id: transit
@@ -150,12 +152,6 @@ jobs:
           zip -r ./allfiles.zip ./*
           cd packages
           zip -r ../packages.zip ./*
-          echo "======================="
-          echo "Space usage:"
-          echo "======================="
-          df -h
-          echo "======================="
-          du -h ./ --max-depth=1
 
       - name: 读取release文本
         id: release-text
@@ -202,3 +198,9 @@ jobs:
           path: |
             collected_firmware/
             !collected_firmware/*.zip
+
+      - name: 空间使用情况
+        run: |
+          df -h
+          echo "======================="
+          du -h ./ --max-depth=1

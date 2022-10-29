@@ -40,6 +40,10 @@ jobs:
       DEPLOYDIR: xxxxxx
     steps:
 
+      - name: display initial disk space
+        run: |
+          df -h
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -151,3 +155,9 @@ jobs:
           path: |
             collected_firmware/
             !collected_firmware/*.zip
+
+      - name: display finishing disk space 
+        run: |
+          df -h
+          echo "======================="
+          du -h ./ --max-depth=1
