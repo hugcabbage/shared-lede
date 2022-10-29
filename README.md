@@ -1,9 +1,5 @@
 # 使用 GitHub Actions 快速定制编译 OpenWrt 固件
 
-
-## 🪂🪂 该interim分支修复编译错误，临时使用。
-
-
 流程文档参考[KFERMercer/OpenWrt-CI](https://github.com/KFERMercer/OpenWrt-CI)，十分感谢！
 
 预置机型有小米4A千兆版、小米3Gv2、小米CR6606、小米CR6608、小米CR6609等，详见[表格](#各机型对应文件)。

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # 下载源码
-git clone --depth 1 -b master https://github.com/hugcabbage/openwrt openwrt && mv ./openwrt/* ./
+git clone --depth 1 -b master https://github.com/Lienol/openwrt openwrt && mv ./openwrt/* ./
 
 # 下载插件
 mkdir -p package/supply-packages && cd package/supply-packages
