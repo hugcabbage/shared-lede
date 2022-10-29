@@ -57,15 +57,17 @@ def produce_release_text(model: str, release: str, temp: str):
 
 if __name__ == '__main__':
     os.chdir('preset-models')
-    modelname = sys.argv[1]
+    modelname = os.getenv('MODEL_NAME')
+    temppre = os.getenv('TEMP_PREFIX')
     with open('headers.json') as f:
         hdata = json.load(f)
     if modelname not in hdata:
         print('机型信息错误，请检查')
     else:
-        produce_temp_workfiles(hdata, modelname, temppre := 'temp')
+        produce_temp_workfiles(hdata, modelname, temppre)
         produce_release_text(modelname, 'release.yml', temppre)
         # 输出各临时文件路径
         files = ['.clone.sh', '.modify.sh', '.config', '.release']
+        print('各临时文件路径：')
         for item in files:
             print('preset-models/' + temppre + item)

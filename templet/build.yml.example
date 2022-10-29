@@ -1,12 +1,12 @@
 #
-# Copyright (C) 2020 KFERMercer <KFER.Mercer@gmail.com>
 # Copyright (C) 2022 hugcabbage <fengsongtianxia@gmail.com>
 #
 # This is free software, licensed under the MIT License.
 #
-#<https://github.com/hugcabbage/shared-lede>
+# <https://github.com/hugcabbage/shared-lede>
 #
 name: xxxxxx
+
 on:
   workflow_dispatch:
     inputs:
@@ -14,79 +14,81 @@ on:
         description: 'want to compile? input true'
         required: true
         default: 'true'
+        type: string
       record:
         description: 'input version description'
         required: false
         default: 'details: kernel bumped, application version updated'
+        type: string
       release:
         description: 'upload firmware to release'
         required: false
-        default: 'true'
+        default: true
         type: boolean
       artifact:
         description: 'upload firmware to artifact'
         required: false
-        default: 'false'
+        default: false
         type: boolean
+
 jobs:
-  build_openwrt:
-    runs-on: ubuntu-latest
+  build:
     if: inputs.build == 'true'
+    runs-on: ubuntu-latest
+    env:
+      SERIAL_NU: xxxxxx
+      DEPLOYDIR: xxxxxx
     steps:
+
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: prepare environments
         run: |
-          #sudo rm -rf /usr/share/dotnet /etc/mysql /etc/apt/sources.list.d /usr/local/lib/android /opt/ghc
-          #sudo -E apt-get -y purge ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* php* android*
-          sudo -E apt-get update
-          sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 zip unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf swig libtinfo5
-          sudo -E apt-get -y autoremove --purge
-          sudo -E apt-get clean
+          sudo apt-get update
+          sudo apt-get -y install \
+            antlr3 asciidoc autoconf automake autopoint binutils build-essential \
+            bzip2 device-tree-compiler flex g++-multilib gawk gcc-multilib \
+            gettext git gperf lib32gcc1 libc6-dev-i386 libelf-dev libglib2.0-dev \
+            libncurses5-dev libssl-dev libtinfo5 libtool libz-dev msmtp p7zip \
+            p7zip-full patch python3 qemu-utils subversion swig texinfo uglifyjs \
+            unzip upx xmlto zip zlib1g-dev
+          sudo apt-get clean
+          pip install -r extra-files/requirements-build.txt
+          echo "======================="
           df -h
-      - name: read configuration
-        id: transit
-        env:
-          SERIAL_NU: xxxxxx
-          DEPLOYDIR: xxxxxx
-        run: |
-          echo "CLONE_SH=${DEPLOYDIR}/${SERIAL_NU}.clone.sh" >> $GITHUB_ENV
-          echo "MODIFY_SH=${DEPLOYDIR}/${SERIAL_NU}.modify.sh" >> $GITHUB_ENV
-          echo "CONFIG_PA=${DEPLOYDIR}/${SERIAL_NU}.config" >> $GITHUB_ENV
-          RELEASE_TEXT=${DEPLOYDIR}/${SERIAL_NU}.release.yml
-          echo "RELEASE_TITLE=$(yq '.[].title' $RELEASE_TEXT)" >> $GITHUB_OUTPUT
-          echo 'RELEASE_BODY<<EOF' >> $GITHUB_OUTPUT; yq '.[].body[]' $RELEASE_TEXT >> $GITHUB_OUTPUT; echo 'EOF' >> $GITHUB_OUTPUT
+
       - name: clone sources
         run: |
+          CLONE_SH=${DEPLOYDIR}/${SERIAL_NU}.clone.sh
           chmod +x $CLONE_SH
           $CLONE_SH
+
       - name: update feeds
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+
       - name: modify configuration
         run: |
+          MODIFY_SH=${DEPLOYDIR}/${SERIAL_NU}.modify.sh
           chmod +x $MODIFY_SH
           $MODIFY_SH
-      - name: produce .config
+
+      - name: generate .config
         run: |
-          mv -f $CONFIG_PA ./.config
-          sed -i 's/^[ \t]*//g' ./.config
+          DOT_CONFIG=${DEPLOYDIR}/${SERIAL_NU}.config
+          mv -f $DOT_CONFIG .config
           make defconfig
+
       - name: make download
         run: |
           make download -j8 || make download -j1 V=s
-          rm -rf $(find ./dl/ -size -1024c)
-          df -h
+
       - name: compile
         run: |
           make -j$(nproc) || make -j1 V=s
-          echo "======================="
-          echo "Space usage:"
-          echo "======================="
-          df -h
-          echo "======================="
-          du -h ./ --max-depth=1
+
       - name: pick up files
         run: |
           mkdir -p ./collected_firmware/packages
@@ -97,31 +99,52 @@ jobs:
           zip -r ./allfiles.zip ./*
           cd packages
           zip -r ../packages.zip ./*
-      - name: get time
-        id: time
+          echo "======================="
+          echo "Space usage:"
+          echo "======================="
+          df -h
+          echo "======================="
+          du -h ./ --max-depth=1
+
+      - name: read release text
+        id: release-text
+        if: inputs.release == true && env.RELEASE_FIRMWARE_VALUE != ''
+        env:
+          RELEASE_FIRMWARE_VALUE: ${{ secrets.RELEASE_FIRMWARE }}
         run: |
-          CURRENT_TIME=$(TZ=Asia/Shanghai date +'%y.%-m.%-d.%H%M%S'); CURRENT_TIME=${CURRENT_TIME:1}
-          echo "TAG_NAME=$CURRENT_TIME" >> $GITHUB_OUTPUT
-          echo "RELEASE_PRE=${CURRENT_TIME%.*}" >> $GITHUB_OUTPUT
+          RELEASE_TEXT=${DEPLOYDIR}/${SERIAL_NU}.release.yml
+          echo "RELEASE_TITLE=$(yq '.[].title' $RELEASE_TEXT)" >> $GITHUB_OUTPUT
+          echo 'RELEASE_BODY<<EOF' >> $GITHUB_OUTPUT
+          yq '.[].body[]' $RELEASE_TEXT >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+      - name: calculate tag version
+        id: tag-version
+        if: steps.release-text.conclusion == 'success'
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.RELEASE_FIRMWARE }}
+          dry_run: true
+
       - name: upload firmware to release
-        id: upload-release
-        if: inputs.release == 'true' && env.RELEASE_FIRMWARE_VALUE != ''
+        id: to-release
+        if: steps.release-text.conclusion == 'success'
+        continue-on-error: true
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.RELEASE_FIRMWARE }}
           file: collected_firmware/*
-          tag: ${{ steps.time.outputs.TAG_NAME }}
-          release_name: ${{ steps.time.outputs.RELEASE_PRE }} ${{ steps.transit.outputs.RELEASE_TITLE }}
+          tag: ${{ steps.tag-version.outputs.new_tag }}
+          release_name: ${{ steps.tag-version.outputs.new_version }} ${{ steps.release-text.outputs.RELEASE_TITLE }}
           overwrite: true
           prerelease: false
           body: |
-            ${{ steps.transit.outputs.RELEASE_BODY }}
+            ${{ steps.release-text.outputs.RELEASE_BODY }}
             ${{ inputs.record }}
           file_glob: true
-        env:
-          RELEASE_FIRMWARE_VALUE: ${{ secrets.RELEASE_FIRMWARE }}
+
       - name: upload firmware to artifact
-        if: inputs.artifact == 'true' || steps.upload-release.conclusion == 'skipped'
+        if: inputs.artifact == true || steps.to-release.outcome != 'success'
         uses: actions/upload-artifact@v3
         with:
           name: collected_firmware
