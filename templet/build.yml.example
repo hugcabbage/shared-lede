@@ -58,9 +58,6 @@ jobs:
             p7zip-full patch python3 qemu-utils subversion swig texinfo uglifyjs \
             unzip upx xmlto zip zlib1g-dev
           sudo apt-get clean
-          pip install -r extra-files/requirements-build.txt
-          echo "======================="
-          df -h
 
       - name: clone sources
         run: |
@@ -82,7 +79,7 @@ jobs:
       - name: generate .config
         run: |
           DOT_CONFIG=${DEPLOYDIR}/${SERIAL_NU}.config
-          mv -f $DOT_CONFIG .config
+          mv $DOT_CONFIG .config
           make defconfig
 
       - name: make download
@@ -95,20 +92,14 @@ jobs:
 
       - name: pick up files
         run: |
-          mkdir -p ./collected_firmware/packages
-          rm -rf $(find ./bin/targets/ -type d -name "packages")
-          cp -rf $(find ./bin/targets/ -type f) ./collected_firmware
-          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./collected_firmware/packages
+          mkdir -p collected_firmware/packages
+          rm -rf $(find bin/targets/ -type d -name 'packages')
+          cp $(find bin/targets/ -type f) collected_firmware
+          cp $(find bin/packages/ -type f -name '*.ipk') collected_firmware/packages
           cd collected_firmware
-          zip -r ./allfiles.zip ./*
+          zip -r allfiles.zip *
           cd packages
-          zip -r ../packages.zip ./*
-          echo "======================="
-          echo "Space usage:"
-          echo "======================="
-          df -h
-          echo "======================="
-          du -h ./ --max-depth=1
+          zip -r ../packages.zip *
 
       - name: read release text
         id: release-text
@@ -159,5 +150,5 @@ jobs:
       - name: display finishing disk space 
         run: |
           df -h
-          echo "======================="
-          du -h ./ --max-depth=1
+          echo "----------------------------"
+          du -h --max-depth=1

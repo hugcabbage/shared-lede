@@ -56,9 +56,10 @@ def produce_release_text(model: str, release: str, temp: str):
 
 
 if __name__ == '__main__':
-    os.chdir('preset-models')
+    deploydir = os.getenv('DEPLOYDIR')
     modelname = os.getenv('MODEL_NAME')
     temppre = os.getenv('TEMP_PREFIX')
+    os.chdir(deploydir)
     with open('headers.json') as f:
         hdata = json.load(f)
     if modelname not in hdata:
@@ -66,8 +67,9 @@ if __name__ == '__main__':
     else:
         produce_temp_workfiles(hdata, modelname, temppre)
         produce_release_text(modelname, 'release.yml', temppre)
-        # 输出各临时文件路径
-        files = ['.clone.sh', '.modify.sh', '.config', '.release']
+        # 输出选择的机型与各临时文件路径
+        print('你选择的机型为：' + '\n' + modelname)
         print('各临时文件路径：')
+        files = ['.clone.sh', '.modify.sh', '.config', '.release']
         for item in files:
-            print('preset-models/' + temppre + item)
+            print(f'{deploydir}/{temppre}{item}')
