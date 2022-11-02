@@ -130,6 +130,7 @@ jobs:
           ${{ inputs.lan_ipad != '' }} && \
             sed -i "/lan) ipad=/clan) ipad=\${ipaddr:-\"${{ inputs.lan_ipad }}\"} ;;" \
               package/base-files/files/bin/config_generate
+          :
 
       - name: 生成.config文件
         env:
