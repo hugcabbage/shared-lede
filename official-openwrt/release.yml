@@ -1,0 +1,10 @@
+# This is the release content file.
+# It will be showed in the release.
+
+model_xiaomi-cr6608:
+  title: openwrt for xiaomi cr6608
+  body:
+    - 小米CR6608 openwrt固件
+    - 版本：openwrt源码，openwrt-22.03分支
+    - 登录信息：IP 192.168.1.1，密码 无
+    - 应用：argon主题、ddns、upnp等。

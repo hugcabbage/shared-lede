@@ -1,0 +1,16 @@
+uci -q batch << EOF
+
+set luci.main.lang=zh_cn
+set luci.main.mediaurlbase=/luci-static/argon
+commit luci
+
+set argon.@global[0].bing_background='1'
+commit argon
+
+set system.@system[0].timezone=CST-8
+set system.@system[0].zonename=Asia/Shanghai
+commit system
+
+EOF
+
+exit 0
