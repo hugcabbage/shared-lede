@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TEMP_PREFIX: temp
-      DEPLOYDIR: official-openwrt
+      DEPLOYDIR: preset-openwrt
     steps:
 
       - name: 初始空间情况

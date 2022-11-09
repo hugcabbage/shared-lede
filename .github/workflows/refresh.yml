@@ -7,7 +7,7 @@ on:
         description: 'file(s) directory'
         required: true 
         type: string
-        default: 'preset-models'
+        default: 'preset-main'
       configls:
         description: '<serial>.config file(s)'
         required: true 

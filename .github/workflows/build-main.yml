@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TEMP_PREFIX: temp
-      DEPLOYDIR: preset-models
+      DEPLOYDIR: preset-main
     steps:
 
       - name: 初始空间情况
