@@ -208,7 +208,7 @@ def routine_cmd(clone: str, config: str):
         subprocess.run(cmd, shell=True)
 
 
-if __name__ == '__main__':
+def main():
     destdir = (rp1 := os.getenv('REPO_PATH').rstrip('/')) + '/' + (dd1 := os.getenv('DEPLOYDIR').rstrip('/'))
     ba1 = f'{destdir}/backups'
     he1 = f'{destdir}/headers'
@@ -257,3 +257,7 @@ if __name__ == '__main__':
     subprocess.run(f"sed -i 's/name: xxxxxx/name: device {serial}/' {by1}", shell=True)
     subprocess.run(f"sed -i 's/SERIAL_NU: xxxxxx/SERIAL_NU: {serial}/' {by1}", shell=True)
     subprocess.run(f"sed -i 's/DEPLOYDIR: xxxxxx/DEPLOYDIR: {dd1}/' {by1}", shell=True)
+
+
+if __name__ == '__main__':
+    main()
