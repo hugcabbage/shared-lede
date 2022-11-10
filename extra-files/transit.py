@@ -1,24 +1,22 @@
 #!/usr/bin/python3
 import os
-import sys
 import json
 import shutil
 
 
 import yaml
-import pandas as pd
 
 
 # headers为机型数据, model为机型名称, temp为即将用于编译流程中的临时文件前缀
 def produce_temp_workfiles(headers: dict, model: str, temp: str):
     num = headers[model][0]
+    # 生成临时.config
+    inxall = ()
     header = [
         f'CONFIG_TARGET_{(t1 := headers[model][1])}=y\n',
         f'CONFIG_TARGET_{t1}_{(t2 := headers[model][2])}=y\n',
         f'CONFIG_TARGET_{t1}_{t2}_DEVICE_{headers[model][3]}=y\n'
     ]
-    # 生成临时.config
-    inxall = ()
     with open(num + '.config') as f:
         text = f.readlines()
     for (index, value) in enumerate(text):
@@ -31,14 +29,14 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str):
     else:
         for i in range(3):
             text[inxall[i]] = header[i]
-    with open(temp + '.config', 'w') as f:
+    with open(tc1 := temp + '.config', 'w') as f:
         f.writelines(text)
     # 生成临时clone.sh, modify.sh
     if not os.path.exists(num + '.clone.sh'):
         num = '1'
-    shutil.copyfile(num + '.clone.sh', temp + '.clone.sh')
-    shutil.copyfile(num + '.modify.sh', temp + '.modify.sh')
-    return
+    shutil.copyfile(num + '.clone.sh', tc2 := temp + '.clone.sh')
+    shutil.copyfile(num + '.modify.sh', tm1 := temp + '.modify.sh')
+    return tc1, tc2, tm1
 
 
 # model为机型名称, release为release文档(yaml格式)路径, temp为即将用于编译流程中的临时文件前缀
@@ -46,18 +44,16 @@ def produce_release_text(model: str, release: str, temp: str):
     # 生成临时.release
     with open(release, encoding='utf-8') as f:
         if (m1 := 'model_' + model) in (y1 := yaml.safe_load(f)):
-            text = y1[m1]
-            text = pd.Series([text['title']] + text['body']) + '\n'
+            text = y1[m1]['title'] + '\n' + '\n'.join(y1[m1]['body']) + '\n'
         else:
-            text = [
-                f'{model.replace("-", " ")}\n',
+            text = f'{model.replace("-", " ")}\n' + \
                 '无更多信息，预设请编辑release.yml\n'
-            ]
-    with open(temp + '.release', 'w', encoding='utf-8') as f:
-        f.writelines(text)
+    with open(tr1 := temp + '.release', 'w', encoding='utf-8') as f:
+        f.write(text)
+    return tr1
 
 
-if __name__ == '__main__':
+def main():
     deploydir = os.getenv('DEPLOYDIR')
     modelname = os.getenv('MODEL_NAME')
     temppre = os.getenv('TEMP_PREFIX')
@@ -67,11 +63,15 @@ if __name__ == '__main__':
     if modelname not in hdata:
         print('机型信息错误，请检查')
     else:
-        produce_temp_workfiles(hdata, modelname, temppre)
-        produce_release_text(modelname, 'release.yml', temppre)
+        files = produce_temp_workfiles(hdata, modelname, temppre) + \
+            (produce_release_text(modelname, 'release.yml', temppre),)
         # 输出选择的机型与各临时文件路径
         print('你选择的机型为：' + '\n' + modelname)
         print('各临时文件路径：')
-        files = ['.clone.sh', '.modify.sh', '.config', '.release']
         for item in files:
-            print(f'{deploydir}/{temppre}{item}')
+            print(f'{deploydir}/{item}')
+    return
+
+
+if __name__ == '__main__':
+    main()

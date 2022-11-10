@@ -24,7 +24,7 @@ cp -r extra-files/smartdns feeds/packages/net/
 
 #复制uci-defaults脚本
 mkdir -p files/etc/uci-defaults
-cp uci-scripts/* files/etc/uci-defaults/
+cp $DEPLOYDIR/uci-scripts/* files/etc/uci-defaults/
 
 #切换ramips内核到5.10
 sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.10' target/linux/ramips/Makefile

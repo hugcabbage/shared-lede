@@ -24,7 +24,7 @@ cp -r extra-files/smartdns feeds/packages/net/
 
 #复制uci-defaults脚本
 mkdir -p files/etc/uci-defaults
-cp uci-scripts/* files/etc/uci-defaults/
+cp $DEPLOYDIR/uci-scripts/* files/etc/uci-defaults/
 
 #复制内核5.10版本CPU超频补丁
 #cp extra-files/322-mt7621-fix-cpu-clk-add-clkdev.patch target/linux/ramips/patches-5.10/

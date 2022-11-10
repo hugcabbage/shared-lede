@@ -17,7 +17,7 @@ cp -r extra-files/smartdns feeds/packages/net/
 
 #复制uci-defaults脚本
 mkdir -p files/etc/uci-defaults
-cp uci-scripts/* files/etc/uci-defaults/
+cp $DEPLOYDIR/uci-scripts/* files/etc/uci-defaults/
 
 #设置WIFI
 #sed -i 's/OpenWrt/coolxiaomi/g' package/kernel/mac80211/files/lib/wifi/mac80211.sh
