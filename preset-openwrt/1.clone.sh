@@ -3,11 +3,13 @@
 # 下载源码
 SWITCH_TAG_FLAG=false
 git clone --single-branch -b openwrt-22.03 https://git.openwrt.org/openwrt/openwrt.git
-$SWITCH_TAG_FLAG && cd openwrt
-$SWITCH_TAG_FLAG && LATEST_TAG=$(git tag | awk 'END {print}')
-$SWITCH_TAG_FLAG && git checkout $LATEST_TAG
-$SWITCH_TAG_FLAG && echo "已切换到最近稳定版本$LATEST_TAG"
-$SWITCH_TAG_FLAG && cd ..
+if [ $SWITCH_TAG_FLAG ]; then
+    cd openwrt
+    LATEST_TAG=$(git tag | awk 'END {print}')
+    git checkout $LATEST_TAG
+    echo "已切换到最近稳定版本$LATEST_TAG"
+    cd ..
+fi
 mv ./openwrt/* ./
 
 # 下载插件
