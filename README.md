@@ -2,11 +2,17 @@
 
 流程文档参考[KFERMercer/OpenWrt-CI](https://github.com/KFERMercer/OpenWrt-CI)，十分感谢！
 
+使用的固件源码包括openwrt官方，以及coolsnowwolf、Lienol、immortalwrt维护的版本，详见[表格](#固件源码)。
+
 预置机型有小米4A千兆版、小米3Gv2、小米CR6606、小米CR6608、小米CR6609等，详见[表格](#各机型对应文件)。
 
-默认编译第一个，即小米4A千兆版。如需要其他机型，在运行workflow界面点开`选择机型`的下拉框，即可手动选择其他机型。
+#### 快速生成固件 ---> 点击上方`Actions`，选择左侧流程中的`固件编译`运行，运行完毕即可下载固件。示意如下：
 
-如预置机型中没有你需要的，可以使用templet目录下的文件新增机型。
+<img src="extra-files/images/action_running.gif" width="70%" ></img>
+
+默认编译第一个，即小米4A千兆版。如需要其他机型，在run workflow界面点开`选择机型`的下拉框，即可手动选择其他机型。
+
+如预置机型中没有你需要的，可以使用[templet](templet)目录下的文件新增机型。
 
 喜欢的话，右上角Star一下，方便再找。
 
@@ -136,13 +142,25 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 </details>
 
+## 固件源码
+
+|配置目录|流程名|源码|
+|:----:|:----:|:----:|
+|preset-main|固件编译|大闪存机型用[Lienol/openwrt master分支](https://github.com/Lienol/openwrt/tree/master)<br/>小闪存机型用[coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)|
+|preset-openwrt|固件编译 openwrt 22.03|[openwrt/openwrt openwrt-22.03分支](https://github.com/openwrt/openwrt/tree/openwrt-22.03)|
+|preset-immortalwrt|固件编译 immortalwrt 21.02|[immortalwrt/immortalwrt openwrt-21.02分支](https://github.com/immortalwrt/immortalwrt/tree/openwrt-21.02)|
+
 ## 各机型对应文件
+
+preset-main目录：
 
 |机型|文件|
 |:----:|:----:|
 |斐讯K2P<br/>小米3Gv2<br/>小米4A千兆版<br/>小米4A百兆版<br/>小米4C<br/>小米WiFi R3<br/>小米WiFi nano<br/>小米WiFi mini<br/>GL.iNet mt300n v2<br/>GL.iNet microuter n300|1.config、1.clone.sh、1.modify.sh|
 |小米4<br/>小米3G<br/>小米3Pro<br/>小米CR6606<br/>小米CR6608<br/>小米CR6609<br/>红米AC2100<br/>小米AC2100|2.config、2.clone.sh、2.modify.sh|
 |红米AX6S|3.config、3.clone.sh、3.modify.sh|
+
+preset-openwrt、preset-immortalwrt目录：仅.config预设了两个，序号1开头的用于大闪存机型，序号2开头的用于小闪存机型，其余文件通用。
 
 ## 提示
 
