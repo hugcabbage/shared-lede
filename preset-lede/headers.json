@@ -1,7 +1,7 @@
 {
-  "xiaomi-cr6608": ["1", "ramips", "mt7621", "xiaomi_mi-router-cr6608"],
-  "xiaomi-cr6606": ["1", "ramips", "mt7621", "xiaomi_mi-router-cr6606"],
-  "xiaomi-cr6609": ["1", "ramips", "mt7621", "xiaomi_mi-router-cr6609"],
+  "xiaomi-cr6608": ["1", "ramips", "mt7621", "xiaomi_mi-router-cr660x"],
+  "xiaomi-cr6606": ["1", "ramips", "mt7621", "xiaomi_mi-router-cr660x"],
+  "xiaomi-cr6609": ["1", "ramips", "mt7621", "xiaomi_mi-router-cr660x"],
   "xiaomi-3g": ["1", "ramips", "mt7621", "xiaomi_mi-router-3g"],
   "xiaomi-4": ["1", "ramips", "mt7621", "xiaomi_mi-router-4"],
   "xiaomi-3-pro": ["1", "ramips", "mt7621", "xiaomi_mi-router-3-pro"],
