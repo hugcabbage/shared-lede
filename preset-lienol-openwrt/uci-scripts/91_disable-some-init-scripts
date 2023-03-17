@@ -1,0 +1,12 @@
+[ -e /etc/init.d/ddns ] && /etc/init.d/ddns disable
+[ -e /etc/init.d/openclash ] && /etc/init.d/openclash disable
+[ -e /etc/init.d/smartdns ] && /etc/init.d/smartdns disable
+[ -e /etc/init.d/passwall2 ] && /etc/init.d/passwall2 disable
+[ -e /etc/init.d/passwall2_server ] && /etc/init.d/passwall2_server disable
+[ -e /etc/init.d/passwall ] && /etc/init.d/passwall disable
+[ -e /etc/init.d/passwall_server ] && /etc/init.d/passwall_server disable
+[ -e /etc/init.d/nat6-helper ] && /etc/init.d/nat6-helper disable
+[ -e /etc/init.d/xray ] && /etc/init.d/xray disable
+[ -e /etc/init.d/vssr ] && /etc/init.d/vssr disable
+
+exit 0

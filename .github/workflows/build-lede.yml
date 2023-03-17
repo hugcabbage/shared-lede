@@ -1,13 +1,13 @@
 #
-# Copyright (C) 2022 hugcabbage <fengsongtianxia@gmail.com>
+# Copyright (C) 2022-2023 hugcabbage <fengsongtianxia@gmail.com>
 #
 # This is free software, licensed under the MIT License.
 #
 # <https://github.com/hugcabbage/shared-lede>
 #
-# 源码采用lean lede或者lienol openwrt master分支
+# 源码采用coolsnowwolf lede
 #
-name: 固件编译
+name: 固件编译 lede
 
 on:
   workflow_dispatch:
@@ -71,12 +71,12 @@ on:
 
 jobs:
   build:
-    name: 固件编译
+    name: 固件编译 lede
     if: inputs.build == 'true'
     runs-on: ubuntu-latest
     env:
       TEMP_PREFIX: temp
-      DEPLOYDIR: preset-main
+      DEPLOYDIR: preset-lede
     steps:
 
       - name: 初始空间情况
