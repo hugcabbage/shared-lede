@@ -6,7 +6,7 @@
 
 预置机型有小米4A千兆版、小米3Gv2、小米CR6606、小米CR6608、小米CR6609等，详见[表格](#各机型对应文件)。
 
-#### 快速生成固件 ---> 登陆GitHub，fork此仓库，点击上方`Actions`，选择左侧流程中的`固件编译`运行，运行完毕即可下载固件。示意如下：
+#### 快速生成固件 ---> 登陆GitHub，fork此仓库，点击上方`Actions`，选择左侧流程中的`固件编译 XXX`运行，运行完毕即可下载固件。示意如下：
 
 <img src="extra-files/images/action_running.gif" width="70%" ></img>
 
@@ -46,7 +46,7 @@
 
 什么也不修改，按默认配置，可以跳过此步。
 
-每个机型关联四个文件，在preset-main目录中。
+每个机型关联四个文件，在preset-xxx目录中。
 
 > [数字].clone.sh
 
@@ -102,7 +102,7 @@
 
 ### 5. Actions中手动开始编译流程
 
-选择你的`固件编译`这个workflow，再点击`Run workflow`，按需填内容，运行即可。
+选择你需要的`固件编译 XXX`workflow，再点击`Run workflow`，按需填内容，运行即可。
 
 各选项说明如下:
 
@@ -122,13 +122,13 @@
 
 > 上传到release: 
 
-默认勾选。推荐，空间无限，单文件不能超过2GB，有内容记录。 release区见下图：
+默认勾选。单文件不能超过2GB，可添加内容记录。 release区见下图：
 
 <img src="extra-files/images/release_zone.png" width="70%" ></img>
 
 > 上传到artifact: 
 
-默认不勾选。不推荐，无内容记录。 artifact区见下图：
+默认不勾选。artifact区见下图：
 
 <img src="extra-files/images/artifact_zone.png" width="70%" ></img>
 
@@ -225,7 +225,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 ## 提示
 
-1.直接在Actions中运行`固件编译`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，到`[数字].config`中自行选择。若在`[数字].clone.sh`中添加了插件源，在`[数字].config`要作对应修改，建议先在本地make menuconfig测试。
+1.直接在Actions中运行`固件编译 XXX`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，到`[数字].config`中自行选择。若在`[数字].clone.sh`中添加了插件源，在`[数字].config`要作对应修改，建议先在本地make menuconfig测试。
 
 2.超频方案默认不启用，方案来自该[帖子](https://www.right.com.cn/forum/thread-4042045-1-1.html)。
 
