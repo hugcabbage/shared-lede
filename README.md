@@ -146,7 +146,8 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 |配置目录|流程名|源码|
 |:----:|:----:|:----:|
-|preset-main|固件编译|大闪存机型用[Lienol/openwrt master分支](https://github.com/Lienol/openwrt/tree/master)<br/>小闪存机型用[coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)|
+|preset-lede|固件编译 lede|[coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)|
+|preset-lienol-openwrt|固件编译 lienol openwrt|[Lienol/openwrt master分支](https://github.com/Lienol/openwrt/tree/master)|
 |preset-openwrt|固件编译 openwrt 22.03|[openwrt/openwrt openwrt-22.03分支](https://github.com/openwrt/openwrt/tree/openwrt-22.03)|
 |preset-immortalwrt|固件编译 immortalwrt 21.02|[immortalwrt/immortalwrt openwrt-21.02分支](https://github.com/immortalwrt/immortalwrt/tree/openwrt-21.02)|
 
@@ -156,14 +157,40 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 <thead>
   <tr>
     <th>机型</th>
-    <th>preset-main</th>
-    <th>preset-openwrt<br>preset-immortalwrt</th>
+    <th>preset-lede<br>preset-lienol-openwrt<br>preset-openwrt<br>preset-immortalwrt</th>
   </tr>
 </thead>
 <tbody align="center">
   <tr>
+    <td>小米4</td>
+    <td rowspan="9">1.config<br>1.clone.sh<br>1.modify.sh</td>
+  </tr>
+  <tr>
+    <td>小米3G</td>
+  </tr>
+  <tr>
+    <td>小米3Pro</td>
+  </tr>
+  <tr>
+    <td>小米CR6606</td>
+  </tr>
+  <tr>
+    <td>小米CR6608</td>
+  </tr>
+  <tr>
+    <td>小米CR6609</td>
+  </tr>
+  <tr>
+    <td>红米AC2100</td>
+  </tr>
+  <tr>
+    <td>小米AC2100</td>
+  </tr>
+  <tr>
+    <td>红米AX6S</td>
+  </tr>
+  <tr>
     <td>斐讯K2P</td>
-    <td rowspan="10">1.config<br>1.clone.sh<br>1.modify.sh</td>
     <td rowspan="10">2.config<br>1.clone.sh<br>1.modify.sh</td>
   </tr>
   <tr>
@@ -192,36 +219,6 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
   </tr>
   <tr>
     <td>GL.iNet microuter n300</td>
-  </tr>
-  <tr>
-    <td>小米4</td>
-    <td rowspan="8">2.config<br>2.clone.sh<br>2.modify.sh</td>
-    <td rowspan="9">1.config<br>1.clone.sh<br>1.modify.sh</td>
-  </tr>
-  <tr>
-    <td>小米3G</td>
-  </tr>
-  <tr>
-    <td>小米3Pro</td>
-  </tr>
-  <tr>
-    <td>小米CR6606</td>
-  </tr>
-  <tr>
-    <td>小米CR6608</td>
-  </tr>
-  <tr>
-    <td>小米CR6609</td>
-  </tr>
-  <tr>
-    <td>红米AC2100</td>
-  </tr>
-  <tr>
-    <td>小米AC2100</td>
-  </tr>
-  <tr>
-    <td>红米AX6S</td>
-    <td>3.config<br>3.clone.sh<br>3.modify.sh</td>
   </tr>
 </tbody>
 </table>

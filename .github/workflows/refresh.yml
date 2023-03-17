@@ -7,12 +7,12 @@ on:
         description: 'file(s) directory'
         required: true 
         type: string
-        default: 'preset-main'
+        default: 'preset-lede'
       configls:
         description: '<serial>.config file(s)'
         required: true 
         type: string
-        default: '1.config, 2.config, 3.config'
+        default: '1.config, 2.config'
 
 env:
   FILEDIR: ${{ inputs.deploydir }}

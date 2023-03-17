@@ -3,7 +3,7 @@
 # 下载源码
 SWITCH_TAG_FLAG=false
 git clone --single-branch -b openwrt-22.03 https://git.openwrt.org/openwrt/openwrt.git
-if [ $SWITCH_TAG_FLAG ]; then
+if $SWITCH_TAG_FLAG; then
     cd openwrt
     LATEST_TAG=$(git tag | awk 'END {print}')
     git checkout $LATEST_TAG
