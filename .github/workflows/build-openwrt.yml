@@ -5,9 +5,9 @@
 #
 # <https://github.com/hugcabbage/shared-lede>
 #
-# 源码采用openwrt openwrt-22.03分支
+# 源码采用openwrt openwrt-23.05分支
 #
-name: 固件编译 openwrt 22.03
+name: 固件编译 openwrt 23.05
 
 on:
   workflow_dispatch:

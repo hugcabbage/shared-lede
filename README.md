@@ -148,7 +148,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 |:----:|:----:|:----:|
 |preset-lede|固件编译 lede|[coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)|
 |preset-lienol-openwrt|固件编译 lienol openwrt|[Lienol/openwrt master分支](https://github.com/Lienol/openwrt/tree/master)|
-|preset-openwrt|固件编译 openwrt 22.03|[openwrt/openwrt openwrt-22.03分支](https://github.com/openwrt/openwrt/tree/openwrt-22.03)|
+|preset-openwrt|固件编译 openwrt 23.05|[openwrt/openwrt openwrt-23.05分支](https://github.com/openwrt/openwrt/tree/openwrt-23.05)|
 |preset-immortalwrt|固件编译 immortalwrt 21.02|[immortalwrt/immortalwrt openwrt-21.02分支](https://github.com/immortalwrt/immortalwrt/tree/openwrt-21.02)|
 
 ## 各机型对应文件
