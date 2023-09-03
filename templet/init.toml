@@ -1,0 +1,40 @@
+# device_name is a custom string to use for workflow name
+
+# board, subtarget and device, you could look them up in openwrt code
+# for example: openwrt/target/linux/ramips/image/mt7621.mk
+
+# base source uses git way, <path> is a custom path to store the code
+# format: <url>@<branch>@<path>; <url>@<branch>; <url>@@<path>; <url>
+
+# app source uses git or svn way, <path> is a custom path to store the code
+# git format: same as base source
+# svn format: <url>@<path>; <url>
+
+device_name = "redmi ac2100"
+
+board = "ramips"
+subtarget = "mt7621"
+device = "xiaomi_redmi-router-ac2100"
+
+base_name = "ExOpenWrt"
+base_version = "beta from main branch"
+base = "https://github.com/openwrt/openwrt.git@main"
+
+app_path = "package/supply-packages"
+
+git_app = [
+  "https://github.com/jerrykuku/luci-theme-argon.git",
+  "https://github.com/jerrykuku/luci-app-argon-config.git",
+  "https://github.com/jerrykuku/luci-app-vssr.git",
+  "https://github.com/jerrykuku/lua-maxminddb.git",
+  "https://github.com/Ausaci/luci-app-nat6-helper.git",
+  "https://github.com/xiaorouji/openwrt-passwall.git@packages@pw-dependencies"
+]
+
+svn_app = [
+  "https://github.com/xiaorouji/openwrt-passwall/branches/luci/luci-app-passwall",
+  "https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2",
+  "https://github.com/vernesong/OpenClash/trunk/luci-app-openclash"
+]
+
+login_ip = "192.168.31.1"

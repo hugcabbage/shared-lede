@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022 hugcabbage <fengsongtianxia@gmail.com>
+# Copyright (C) 2022-2023 hugcabbage <fengsongtianxia@gmail.com>
 #
 # This is free software, licensed under the MIT License.
 #
@@ -31,6 +31,9 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: write
+
 jobs:
   build:
     if: inputs.build == 'true'
@@ -50,13 +53,7 @@ jobs:
       - name: prepare environments
         run: |
           sudo apt-get update
-          sudo apt-get -y install \
-            antlr3 asciidoc autoconf automake autopoint binutils build-essential \
-            bzip2 device-tree-compiler flex g++-multilib gawk gcc-multilib \
-            gettext git gperf lib32gcc1 libc6-dev-i386 libelf-dev libglib2.0-dev \
-            libncurses5-dev libssl-dev libtinfo5 libtool libz-dev msmtp p7zip \
-            p7zip-full patch python3 qemu-utils subversion swig texinfo uglifyjs \
-            unzip upx xmlto zip zlib1g-dev
+          sudo apt-get -y install gcc-multilib gettext libncurses5-dev
           sudo apt-get clean
 
       - name: clone sources
@@ -103,22 +100,24 @@ jobs:
 
       - name: read release text
         id: release-text
-        if: inputs.release == true && env.RELEASE_FIRMWARE_VALUE != ''
-        env:
-          RELEASE_FIRMWARE_VALUE: ${{ secrets.RELEASE_FIRMWARE }}
+        if: inputs.release == true
         run: |
-          RELEASE_TEXT=${DEPLOYDIR}/${SERIAL_NU}.release.yml
-          echo "RELEASE_TITLE=$(yq '.[].title' $RELEASE_TEXT)" >> $GITHUB_OUTPUT
-          echo 'RELEASE_BODY<<EOF' >> $GITHUB_OUTPUT
-          yq '.[].body[]' $RELEASE_TEXT >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          cp ${DEPLOYDIR}/${SERIAL_NU}.release.md release.tmp
+          rt=$(head -n 1 release.tmp)
+          rt="${rt#*# }"
+          echo "RELEASE_TITLE=$rt" >> $GITHUB_OUTPUT
+          rb=$(sed -n '3,$p' release.tmp)
+          rb="${rb//'%'/'%25'}"
+          rb="${rb//$'\n'/'%0A'}"
+          rb="${rb//$'\r'/'%0D'}"
+          echo "RELEASE_BODY=$rb" >> $GITHUB_OUTPUT
 
       - name: calculate tag version
         id: tag-version
         if: steps.release-text.conclusion == 'success'
         uses: mathieudutour/github-tag-action@v6.1
         with:
-          github_token: ${{ secrets.RELEASE_FIRMWARE }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
 
       - name: upload firmware to release
@@ -127,7 +126,7 @@ jobs:
         continue-on-error: true
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.RELEASE_FIRMWARE }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: collected_firmware/*
           tag: ${{ steps.tag-version.outputs.new_tag }}
           release_name: ${{ steps.tag-version.outputs.new_version }} ${{ steps.release-text.outputs.RELEASE_TITLE }}
@@ -135,6 +134,7 @@ jobs:
           prerelease: false
           body: |
             ${{ steps.release-text.outputs.RELEASE_BODY }}
+            
             ${{ inputs.record }}
           file_glob: true
 

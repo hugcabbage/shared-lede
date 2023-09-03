@@ -15,9 +15,9 @@ sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_genera
 #sed -i 's/Xiaomi Mi Router CR660x/Xiaomi CR660x/g' target/linux/ramips/dts/mt7621_xiaomi_mi-router-cr6606.dts
 
 #复制smartdns配置
-rm -rf feeds/packages/net/smartdns
-rm -rf package/feeds/packages/net/smartdns
-cp -r extra-files/smartdns feeds/packages/net/
+#rm -rf feeds/packages/net/smartdns
+#rm -rf package/feeds/packages/net/smartdns
+#cp -r extra-files/smartdns feeds/packages/net/
 
 #复制uci-defaults脚本
 mkdir -p files/etc/uci-defaults

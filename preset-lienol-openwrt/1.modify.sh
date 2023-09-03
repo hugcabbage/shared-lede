@@ -20,9 +20,9 @@ rm -rf feeds/packages/net/xray-core
 rm -rf package/feeds/packages/xray-core
 
 #复制smartdns配置
-rm -rf feeds/packages/net/smartdns
-rm -rf package/feeds/packages/net/smartdns
-cp -r extra-files/smartdns feeds/packages/net/
+#rm -rf feeds/packages/net/smartdns
+#rm -rf package/feeds/packages/net/smartdns
+#cp -r extra-files/smartdns feeds/packages/net/
 
 #复制uci-defaults脚本
 mkdir -p files/etc/uci-defaults

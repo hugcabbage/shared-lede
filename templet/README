@@ -1,5 +1,0 @@
-1.复制此目录下的init.example，重命名为init，并按需修改文件内容。
-
-2.添加一个名为PRODUCE_DEVICE的secret，值为包含workflow范围的token。具体步骤可参考README.md相关内容。
-
-3.Actions运行produce流程，流程完毕（如果不出错的话）相关配置文件会回传到仓库。

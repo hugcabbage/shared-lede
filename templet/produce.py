@@ -20,29 +20,12 @@ def get_serial(directory: str):
     return number
 
 
-# 格式化文件，返回字典
-def initfile_format(file: str) -> dict:
-    data = {
-        'board': '',
-        'subtarget': '',
-        'device': '',
-        'device-name': '',
-        'base': '',
-        'app-path': '',
-        'git-app': [],
-        'svn-app': []
-    }
-    with open(file) as f:
-        for line in f:
-            for key in list(data.keys())[:6]:
-                if line.startswith(key + ':='):
-                    data[key] = line.split(':=')[1].strip()
-                    break
-            for key in list(data.keys())[6:]:
-                if line.startswith(key + ':='):
-                    data[key] += [line.split(':=')[1].strip()]
-                    break
-    return data
+# 按链接提取应用名
+def extract_app_name(links: list) -> list:
+    apps = []
+    for link in links:
+        apps += [f'* {link.split("@")[0].split("/")[-1].rstrip(".git")}\n']
+    return apps
 
 
 # 按链接生成git clone命令
@@ -95,18 +78,18 @@ def produce_svn_command(link: str) -> str:
 # 生成模板化配置文件
 def produce_conf(data: dict, prefix: str):
     # 生成clone.sh
-    basecommands = produce_git_command(data["base"], True) + '\n'
+    basecommands = produce_git_command(data['base'], True) + '\n'
     appcommands = []
-    for link in data['git-app']:
+    for link in data['git_app']:
         appcommands += [f'{produce_git_command(link)}\n']
-    for link in data['svn-app']:
+    for link in data['svn_app']:
         appcommands += [f'{produce_svn_command(link)}\n']
     text1 = [
         '#!/bin/sh\n',
-        '\n# 下载源码\n',
+        '\n# download base code\n',
         basecommands,
-        '\n# 下载插件\n',
-        f'mkdir -p {(path := data["app-path"])} && cd {path}\n'
+        '\n# download app codes\n',
+        f'mkdir -p {(path := data["app_path"])} && cd {path}\n'
     ]
     text1 += appcommands
     with open(prefix + '.clone.sh', 'w') as f:
@@ -114,8 +97,8 @@ def produce_conf(data: dict, prefix: str):
     # 生成modify.sh
     text2 = [
         '#!/bin/sh\n',
-        '\n# 修改登录IP\n',
-        'sed -i \'s/192.168.1.1/192.168.31.1/g\' package/base-files/files/bin/config_generate\n'
+        '\n# modify login IP\n',
+        f'sed -i \'s/192.168.1.1/{data["login_ip"]}/g\' package/base-files/files/bin/config_generate\n'
     ]
     with open(prefix + '.modify.sh', 'w') as f:
         f.writelines(text2)
@@ -127,26 +110,17 @@ def produce_conf(data: dict, prefix: str):
     ]
     with open(prefix + '.config', 'w') as f:
         f.writelines(text3)
-    # 生成header.json
+    # 生成release.md
     text4 = [
-        '{\n',
-        f'  "{(t4 := data["device-name"])}": ["{prefix}", "{t1}", "{t2}", "{t3}"]\n',
-        '}\n'
-    ]
-    with open(prefix + '.header.json', 'w') as f:
+        f'## {data["base_name"]} for {data["device_name"]}\n',
+        f'\nversion：{data["base_version"]}\n',
+        '\nlogin info：\n',
+        f'* IP {data["login_ip"]}\n',
+        '* password default\n',
+        '\napplications：\n'
+    ] + extract_app_name(data['git_app']) + extract_app_name(data['svn_app'])
+    with open(prefix + '.release.md', 'w') as f:
         f.writelines(text4)
-    # 生成release.yml
-    text5 = [
-        f'model_{t4}:\n',
-        '  title: <source> for <device>\n',
-        '  body:\n',
-        '    - <设备><源码>固件\n',
-        '    - 版本：xxx\n',
-        '    - 登陆信息：<IP>，<密码>\n',
-        '    - 应用：xxx\n'
-    ]
-    with open(prefix + '.release.yml', 'w') as f:
-        f.writelines(text5)
 
 
 # 简化.config，仅保留应用和主题
@@ -211,7 +185,6 @@ def routine_cmd(clone: str, config: str):
 def main():
     destdir = (rp1 := os.getenv('REPO_PATH').rstrip('/')) + '/' + (dd1 := os.getenv('DEPLOYDIR').rstrip('/'))
     ba1 = f'{destdir}/backups'
-    he1 = f'{destdir}/headers'
     wf1 = f'{rp1}/.github/workflows'
     if os.getenv('DELETE_ALL') == 'true':
         if dd1 != 'templet':
@@ -221,10 +194,9 @@ def main():
                 sys.exit()
         else:
             shutil.rmtree(ba1, ignore_errors=True)
-            shutil.rmtree(he1, ignore_errors=True)
             for item in glob.glob(f'{destdir}/[0-9].*'):
                 os.remove(item)
-        for item in glob.glob(f'{wf1}/[0-9].build*'):
+        for item in glob.glob(f'{wf1}/{dd1}-[0-9]*'):
             os.remove(item)
         sys.exit()
     if (ds1 := os.getenv('DELETE_SPEC')) != '':
@@ -236,25 +208,24 @@ def main():
                         os.remove(os.path.join(root, name))
                         break
         for serial in ds1:
-            os.remove(f'{wf1}/{serial}.build.yml')
+            os.remove(f'{wf1}/{dd1}-{serial}*')
         sys.exit()
     os.makedirs(ba1, exist_ok=True)
-    os.makedirs(he1, exist_ok=True)
     serial = get_serial(destdir)
     initfile = rp1 + '/' + os.getenv('INITFILE')
-    produce_conf(initfile_format(initfile), serial)
+    with open(initfile) as f:
+        import toml
+        produce_conf(tl1 := toml.load(f), serial)
     routine_cmd(serial + '.clone.sh', serial + '.config')
     simplify_config(serial + '.config')
     # 移动文件到目标文件夹，准备commit
     for item in glob.glob(serial + '*'):
         if item.endswith('config.fullbak'):
             shutil.move(item, f'{ba1}/{item}')
-        elif item.endswith('header.json'):
-            shutil.move(item, f'{he1}/{item}')
         else:
             shutil.move(item, f'{destdir}/{item}')
-    shutil.copyfile(f'{rp1}/templet/build.yml.example', by1 := f'{wf1}/{serial}.build.yml')
-    subprocess.run(f"sed -i 's/name: xxxxxx/name: device {serial}/' {by1}", shell=True)
+    shutil.copyfile(f'{rp1}/templet/build.yml', by1 := f"{wf1}/{dd1}-{serial}-{tl1['device_name'].replace(' ', '-')}.yml")
+    subprocess.run(f"sed -i 's/name: xxxxxx/name: {dd1} {tl1['device_name']}/' {by1}", shell=True)
     subprocess.run(f"sed -i 's/SERIAL_NU: xxxxxx/SERIAL_NU: {serial}/' {by1}", shell=True)
     subprocess.run(f"sed -i 's/DEPLOYDIR: xxxxxx/DEPLOYDIR: {dd1}/' {by1}", shell=True)
 

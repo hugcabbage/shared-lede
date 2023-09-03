@@ -14,6 +14,9 @@ on:
         type: string
         default: '1.config, 2.config'
 
+permissions:
+  contents: write
+
 env:
   FILEDIR: ${{ inputs.deploydir }}
 
@@ -24,6 +27,9 @@ jobs:
     outputs:
       filels: ${{ steps.set-matrix.outputs.configls }}
     steps:
+
+      - uses: actions/checkout@v3
+
       - id: set-matrix
         env:
           CONFIGLS: ${{ inputs.configls }}
@@ -32,7 +38,9 @@ jobs:
           array=""
           for item in ${NEW[@]}
           do
-              array=$array'"'$item'",'
+              if [ -e "$FILEDIR/$item" ]; then
+                 array=$array'"'$item'",'
+              fi
           done
           echo "configls=[$array]" >> $GITHUB_OUTPUT
 
@@ -45,9 +53,12 @@ jobs:
       matrix:
         file: ${{ fromJSON(needs.set-matrix.outputs.filels) }}
     steps:
+
     - uses: actions/checkout@v3
+
     - name: carry out
-      run: python3 templet/refresh.py
+      run: python3 extra-files/refresh.py
+
     - uses: actions/upload-artifact@v3
       with:
         name: ${{ env.FILE }}
@@ -59,17 +70,22 @@ jobs:
     env:
       ARTIFACTDIR: dlfiles
     steps:
+
     - uses: actions/checkout@v3
+
     - uses: actions/download-artifact@v3
       with:
         path: ${{ env.ARTIFACTDIR }}
+
     - uses: geekyeggo/delete-artifact@v2
       with:
           name: '*'
+
     - name: move files
       run: |
-        python3 templet/refreshmv.py
+        python3 extra-files/refreshmv.py
         rm -rf $ARTIFACTDIR
+
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: .config files refreshed 

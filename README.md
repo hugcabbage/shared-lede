@@ -34,15 +34,7 @@
 
 ### 2. fork [hugcabbage/shared-lede](https://github.com/hugcabbage/shared-lede)
 
-### 3. 设置Actions secrets
-
-只上传到artifact，可以跳过此步。
-
-进入GitHub Settings(点头像) → Developer settings → Personal access tokens → Generate new token，Note随意填，Expiration建议选`No expiration`，Select scopes里勾选`repo`、`workflow`，点Generate token，复制下长串token。
-
-进入你fork的项目shared-lede下，点Settings → Secrets → Actions → New repository secret，Name填`RELEASE_FIRMWARE`，Value填复制的token，点Add secret。
-
-### 4. 自定义固件
+### 3. 自定义固件
 
 什么也不修改，按默认配置，可以跳过此步。
 
@@ -108,9 +100,13 @@
 
 > 超频到1100Mhz: 
 
+仅`固件编译 lede`有此选项。
+
 默认不勾选。仅适用于5.10内核，除红米AX6S外，其余机型默认皆为5.10内核。
 
 > 使用5.15内核: 
+
+仅`固件编译 lede`有此选项。
 
 默认不勾选。因lean lede源码中package/lean/mtk-eip93编译会报错，小米4A千兆版和小米3Gv2勿用。
 
@@ -229,11 +225,9 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 2.超频方案默认不启用，方案来自该[帖子](https://www.right.com.cn/forum/thread-4042045-1-1.html)。
 
-3.红米AX6S只有5.15内核，勿框选“超频到1100Mhz”、“使用5.15内核”两项。
+3.小米4A千兆版和小米3Gv2需修改分区才能在breed直刷，参考该[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
 
-4.小米4A千兆版和小米3Gv2需修改分区才能在breed直刷，参考该[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
-
-5.小米4A千兆版和小米3Gv2闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。
+4.小米4A千兆版和小米3Gv2闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。
 
 ---
 
