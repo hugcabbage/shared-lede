@@ -42,4 +42,5 @@ sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.10' target/linux/ramips/Makefile
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
 
 #替换geodata源
+GEODIR='package/supply-packages/small/v2ray-geodata'
 . extra-files/update-geodata.sh

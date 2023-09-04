@@ -1,6 +1,6 @@
 #!/bin/sh
 
-GEODIR='package/supply-packages/pw-dependencies/v2ray-geodata'
+[ -z "$GEODIR" ] && GEODIR='package/supply-packages/pw-dependencies/v2ray-geodata'
 
 LATEST_VER=$(curl -fs https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases/latest | jq -r .'tag_name')
 
