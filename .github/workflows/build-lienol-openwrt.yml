@@ -23,6 +23,7 @@ on:
         type: choice
         options:
           - 'xiaomi-4a-gigabit'
+          - 'xiaomi-4a-gigabit-v2'
           - 'xiaomi-3g-v2'
           - 'xiaomi-cr6608'
           - 'xiaomi-cr6606'

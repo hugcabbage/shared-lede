@@ -9,6 +9,7 @@
   "xiaomi-ac2100": ["1", "ramips", "mt7621", "xiaomi_mi-router-ac2100"],
   "redmi-ax6s": ["1", "mediatek", "mt7622", "xiaomi_redmi-router-ax6s"],
   "xiaomi-4a-gigabit": ["2", "ramips", "mt7621", "xiaomi_mi-router-4a-gigabit"],
+  "xiaomi-4a-gigabit-v2": ["2", "ramips", "mt7621", "xiaomi_mi-router-4a-gigabit-v2"],
   "xiaomi-3g-v2": ["2", "ramips", "mt7621", "xiaomi_mi-router-3g-v2"],
   "phicomm-k2p": ["2", "ramips", "mt7621", "phicomm_k2p"],
   "xiaomi-4a-100m": ["2", "ramips", "mt76x8", "xiaomi_mi-router-4a-100m"],

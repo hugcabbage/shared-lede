@@ -114,7 +114,7 @@
 
 > 选择机型: 
 
-默认为小米4A千兆版。点开下拉框，可以选择不同的机型。
+点开下拉框，可以选择不同的机型。
 
 > 上传到release: 
 
@@ -196,6 +196,9 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
     <td>小米4A千兆版</td>
   </tr>
   <tr>
+    <td>小米4A千兆版v2</td>
+  </tr>
+  <tr>
     <td>小米4A百兆版</td>
   </tr>
   <tr>
@@ -227,7 +230,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 3.小米4A千兆版和小米3Gv2需修改分区才能在breed直刷，参考该[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
 
-4.小米4A千兆版和小米3Gv2闪存小，若编译插件太多，包体积超出16064K，则不会生成sysupgrade.bin。
+4.小米4A千兆版和小米3Gv2闪存小(仅16MB)，若编译插件太多，包体积超出闪存上限，则不会生成sysupgrade.bin。
 
 ---
 
