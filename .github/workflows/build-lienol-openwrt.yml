@@ -110,10 +110,6 @@ jobs:
         env:
           MODIFY_SH: ${{ env.DEPLOYDIR }}/${{ env.TEMP_PREFIX }}.modify.sh
         run: |
-          ${{ inputs.cpu_overclock }} && \
-            sed -i '/fix-cpu-clk-add-clkdev/ s/#//' $MODIFY_SH
-          ${{ inputs.kernel_5_15 }} && \
-            sed -i '/KERNEL_PATCHVER:=5.15/ s/#//' $MODIFY_SH
           chmod +x $MODIFY_SH
           $MODIFY_SH
           ${{ inputs.lan_ipad != '' }} && \
