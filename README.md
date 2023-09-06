@@ -10,7 +10,7 @@
 
 <img src="extra-files/images/action_running.gif" width="70%" ></img>
 
-默认编译第一个，即小米4A千兆版。如需要其他机型，在run workflow界面点开`选择设备`的下拉框，即可手动选择其他机型。
+选择机型：在run workflow界面点开`选择设备`的下拉框，即可手动选择机型。
 
 如预置机型中没有你需要的，可以使用[templet](templet)目录下的文件新增机型。
 
@@ -108,7 +108,7 @@
 
 仅`固件编译 lede`有此选项。
 
-默认不勾选。因lean lede源码中package/lean/mtk-eip93编译会报错，小米4A千兆版和小米3Gv2勿用。
+默认不勾选。lean lede源码勾选此项时，编译小米4A千兆版和小米3Gv2时会报错，勿用。
 
 红米AX6S只有5.15内核，不必勾选。
 
@@ -187,7 +187,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
   </tr>
   <tr>
     <td>斐讯K2P</td>
-    <td rowspan="10">2.config<br>1.clone.sh<br>1.modify.sh</td>
+    <td rowspan="11">2.config<br>1.clone.sh<br>1.modify.sh</td>
   </tr>
   <tr>
     <td>小米3Gv2</td>
@@ -228,7 +228,7 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 2.超频方案默认不启用，方案来自该[帖子](https://www.right.com.cn/forum/thread-4042045-1-1.html)。
 
-3.小米4A千兆版和小米3Gv2需修改分区才能在breed直刷，参考该[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好。
+3.小米4A千兆版和小米3Gv2需修改分区才能在breed直刷，参考该[帖子](https://www.right.com.cn/forum/thread-4052254-1-1.html)，本项目中已修改好，见脚本[modify-xiaomi-router-4a-3g-v2.sh](extra-files/modify-xiaomi-router-4a-3g-v2.sh)。
 
 4.小米4A千兆版和小米3Gv2闪存小(仅16MB)，若编译插件太多，包体积超出闪存上限，则不会生成sysupgrade.bin。
 
@@ -236,6 +236,6 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 ## 最后
 
-不准备出什么详细的教程，自己摸索吧。
+无特别详细的教程，自己摸索吧。
 
 如有问题，请利用庞大的网络知识库，能快速解决你的问题。
