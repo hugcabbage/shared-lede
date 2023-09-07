@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #修改登录IP
-sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate
+#sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate
 
 #修改主机名
 #sed -i 's/OpenWrt/Xiaomi-Router/g' package/base-files/files/bin/config_generate
@@ -21,7 +21,7 @@ sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_genera
 
 #复制uci-defaults脚本
 mkdir -p files/etc/uci-defaults
-cp $DEPLOYDIR/uci-scripts/* files/etc/uci-defaults/
+cp $(dirname $0)/uci-scripts/* files/etc/uci-defaults/
 
 #切换ramips内核到5.10
 sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.10' target/linux/ramips/Makefile
@@ -42,5 +42,5 @@ sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.10' target/linux/ramips/Makefile
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
 
 #替换geodata源
-GEODIR='package/supply-packages/small/v2ray-geodata'
+GEODIR=package/supply-packages/small/v2ray-geodata
 . extra-files/update-geodata.sh

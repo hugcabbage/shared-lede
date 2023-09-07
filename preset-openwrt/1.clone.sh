@@ -21,3 +21,5 @@ git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config.git
 git clone --depth 1 https://github.com/yichya/luci-app-xray.git
 git clone --depth 1 -b packages https://github.com/xiaorouji/openwrt-passwall.git pw-dependencies
 svn export https://github.com/xiaorouji/openwrt-passwall/branches/luci/luci-app-passwall
+svn export https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2
+svn export https://github.com/vernesong/OpenClash/trunk/luci-app-openclash

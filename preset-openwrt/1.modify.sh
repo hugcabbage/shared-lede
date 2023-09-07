@@ -5,7 +5,7 @@
 
 #复制uci-defaults脚本
 mkdir -p files/etc/uci-defaults
-cp $DEPLOYDIR/uci-scripts/* files/etc/uci-defaults/
+cp $(dirname $0)/uci-scripts/* files/etc/uci-defaults/
 
 #更改默认包
 sed -i 's/dnsmasq/dnsmasq-full/g' include/target.mk

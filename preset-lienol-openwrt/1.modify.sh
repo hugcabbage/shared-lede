@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #修改登录IP
-sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate
+#sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate
 
 #修改主机名
 #sed -i 's/OpenWrt/Xiaomi-Router/g' package/base-files/files/bin/config_generate
@@ -26,7 +26,7 @@ rm -rf package/feeds/packages/xray-core
 
 #复制uci-defaults脚本
 mkdir -p files/etc/uci-defaults
-cp $DEPLOYDIR/uci-scripts/* files/etc/uci-defaults/
+cp $(dirname $0)/uci-scripts/* files/etc/uci-defaults/
 
 #设置WIFI
 #sed -i 's/OpenWrt/coolxiaomi/g' package/kernel/mac80211/files/lib/wifi/mac80211.sh
@@ -37,7 +37,7 @@ cp $DEPLOYDIR/uci-scripts/* files/etc/uci-defaults/
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
 
 #删除一些zzz中的命令
-ZZZ_PATH='package/default-settings/files/zzz-default-settings'
+ZZZ_PATH=package/default-settings/files/zzz-default-settings
 sed -i -e '/DISTRIB_/d' -e '/footer.htm/d' -e '/admin_status/d' $ZZZ_PATH
 
 #替换geodata源
