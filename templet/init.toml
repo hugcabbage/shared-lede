@@ -10,6 +10,8 @@
 # git format: same as base source
 # svn format: <url>@<path>; <url>
 
+# device_name, board, subtarget, device, base_name, base_version, base are required
+
 device_name = "netgear r7450"
 
 board = "ramips"

@@ -80,26 +80,52 @@ def produce_conf(data: dict, prefix: str) -> bool:
     # 生成clone.sh
     basecommands = produce_git_command(ba := data['base'], True) + '\n'
     appcommands = []
-    for link in data['git_app']:
-        appcommands += [f'{produce_git_command(link)}\n']
-    for link in data['svn_app']:
-        appcommands += [f'{produce_svn_command(link)}\n']
+    try:
+        for link in data['git_app']:
+            appcommands += [f'{produce_git_command(link)}\n']
+        ga = True
+    except KeyError:
+        ga = False
+    try:
+        for link in data['svn_app']:
+            appcommands += [f'{produce_svn_command(link)}\n']
+        sa = True
+    except KeyError:
+        sa = False
+    dla = []
+    if ga or sa:
+        try:
+            if (path := data["app_path"]).startswith('package/') or path == 'package':
+                pass
+            else:
+                print('app_path未在package目录内')
+                sys.exit()
+            dla = [
+                '\n# download app codes\n',
+                f'mkdir -p {path} && cd {path}\n'
+                ]
+        except KeyError:
+            print('app源已存在，但缺少app_path')
+            sys.exit()
     text1 = [
         '#!/bin/sh\n',
         '\n# download base code\n',
-        basecommands,
-        '\n# download app codes\n',
-        f'mkdir -p {(path := data["app_path"])} && cd {path}\n'
-    ]
+        basecommands
+    ] + dla
     text1 += appcommands
     with open(prefix + '.clone.sh', 'w') as f:
         f.writelines(text1)
     # 生成modify.sh
     text2 = [
         '#!/bin/sh\n',
-        '\n# modify login IP\n',
-        f'sed -i \'s/192.168.1.1/{data["login_ip"]}/g\' package/base-files/files/bin/config_generate\n'
+        '\n# modify login IP\n'
     ]
+    try:
+        text2.append(f'sed -i \'s/192.168.1.1/{data["login_ip"]}/g\' package/base-files/files/bin/config_generate\n')
+        li = True
+    except KeyError:
+        text2.append('# sed -i \'s/192.168.1.1/192.168.51.1/g\' package/base-files/files/bin/config_generate\n')
+        li = False
     if 'openwrt/openwrt' in ba:
         text2 += [
             '\n# turn on wireless\n',
@@ -126,10 +152,18 @@ def produce_conf(data: dict, prefix: str) -> bool:
         f'## {data["base_name"]} for {data["device_name"]}\n',
         f'\nversion：{data["base_version"]}\n',
         '\nlogin info：\n',
-        f'* IP {data["login_ip"]}\n',
-        '* password default\n',
-        '\napplications：\n'
-    ] + extract_app_name(data['git_app']) + extract_app_name(data['svn_app'])
+        '* password default\n'
+    ]
+    if li:
+        text4.insert(3, f'* IP {data["login_ip"]}\n')
+    else:
+        text4.insert(3, '* IP default\n')
+    if ga or sa:
+        text4.append('\napplications：\n')
+        if ga:
+            text4 += extract_app_name(data['git_app'])
+        if sa:
+            text4 += extract_app_name(data['svn_app'])
     with open(prefix + '.release.md', 'w') as f:
         f.writelines(text4)
     return offi
@@ -215,7 +249,8 @@ def main():
                         os.remove(os.path.join(root, name))
                         break
         for serial in ds1:
-            os.remove(f'{wf1}/{dd1}-{serial}*')
+            for item in glob.glob(f'{wf1}/{dd1}-{serial}*'):
+                os.remove(item)
         sys.exit()
     os.makedirs(ba1, exist_ok=True)
     serial = get_serial(destdir)
@@ -226,6 +261,9 @@ def main():
     routine_cmd(serial + '.clone.sh', serial + '.config')
     simplify_config(serial + '.config', offi)
     # 移动文件到目标文件夹，准备commit
+    if os.getenv('OVERWRITE_LAST') == 'true':
+        for item in glob.glob(f'{wf1}/{dd1}-{serial}*'):
+            os.remove(item)
     for item in glob.glob(serial + '*'):
         if item.endswith('config.fullbak'):
             shutil.move(item, f'{ba1}/{item}')
