@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 env:
-  FILEDIR: ${{ inputs.deploydir }}
+  DEPLOYDIR: ${{ inputs.deploydir }}
 
 jobs:
 
@@ -38,7 +38,7 @@ jobs:
           array=""
           for item in ${NEW[@]}
           do
-              if [ -e "$FILEDIR/$item" ]; then
+              if [ -e "$DEPLOYDIR/$item" ]; then
                  array=$array'"'$item'",'
               fi
           done
@@ -62,7 +62,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{ env.FILE }}
-        path: ${{ env.FILEDIR }}/${{ env.FILE }}*
+        path: ${{ env.DEPLOYDIR }}/${{ env.FILE }}*
 
   commit:
     needs: refresh

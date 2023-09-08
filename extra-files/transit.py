@@ -57,10 +57,10 @@ def produce_release_text(model: str, release: str, temp: str):
 
 
 def main():
-    deploydir = os.getenv('DEPLOYDIR')
+    destdir = os.getenv('DEPLOYDIR')
     modelname = os.getenv('MODEL_NAME')
     temppre = os.getenv('TEMP_PREFIX')
-    os.chdir(deploydir)
+    os.chdir(destdir)
     with open('headers.json') as f:
         hdata = json.load(f)
     if modelname not in hdata:
@@ -72,7 +72,7 @@ def main():
         print('你选择的机型为：' + '\n' + modelname)
         print('各临时文件路径：')
         for item in files:
-            print(f'{deploydir}/{item}')
+            print(f'{destdir}/{item}')
     return
 
 

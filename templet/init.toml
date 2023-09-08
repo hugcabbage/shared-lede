@@ -10,15 +10,15 @@
 # git format: same as base source
 # svn format: <url>@<path>; <url>
 
-device_name = "redmi ac2100"
+device_name = "netgear r7450"
 
 board = "ramips"
 subtarget = "mt7621"
-device = "xiaomi_redmi-router-ac2100"
+device = "netgear_r7450"
 
 base_name = "ExOpenWrt"
 base_version = "beta from main branch"
-base = "https://github.com/openwrt/openwrt.git@main"
+base = "https://git.openwrt.org/openwrt/openwrt.git@main"
 
 app_path = "package/supply-packages"
 
@@ -37,4 +37,4 @@ svn_app = [
   "https://github.com/vernesong/OpenClash/trunk/luci-app-openclash"
 ]
 
-login_ip = "192.168.31.1"
+login_ip = "192.168.51.1"

@@ -7,7 +7,7 @@ import subprocess
 
 
 # 获取编号
-def get_serial(directory: str):
+def get_serial(directory: str) -> str:
     if (total := len(glob.glob(f'{directory}/*clone.sh'))) == 0:
         number = '1'
     else:
@@ -76,9 +76,9 @@ def produce_svn_command(link: str) -> str:
 
 
 # 生成模板化配置文件
-def produce_conf(data: dict, prefix: str):
+def produce_conf(data: dict, prefix: str) -> bool:
     # 生成clone.sh
-    basecommands = produce_git_command(data['base'], True) + '\n'
+    basecommands = produce_git_command(ba := data['base'], True) + '\n'
     appcommands = []
     for link in data['git_app']:
         appcommands += [f'{produce_git_command(link)}\n']
@@ -100,6 +100,17 @@ def produce_conf(data: dict, prefix: str):
         '\n# modify login IP\n',
         f'sed -i \'s/192.168.1.1/{data["login_ip"]}/g\' package/base-files/files/bin/config_generate\n'
     ]
+    if 'openwrt/openwrt' in ba:
+        text2 += [
+            '\n# turn on wireless\n',
+            'mkdir -p files/etc/uci-defaults\n',
+            'cp preset-openwrt/uci-scripts/17_wireless files/etc/uci-defaults/\n',
+            '\n# modify default package(s)\n',
+            "sed -i 's/dnsmasq/dnsmasq-full/g' include/target.mk\n"
+        ]
+        offi = True
+    else:
+        offi = False
     with open(prefix + '.modify.sh', 'w') as f:
         f.writelines(text2)
     # 生成.config
@@ -121,53 +132,49 @@ def produce_conf(data: dict, prefix: str):
     ] + extract_app_name(data['git_app']) + extract_app_name(data['svn_app'])
     with open(prefix + '.release.md', 'w') as f:
         f.writelines(text4)
+    return offi
 
 
 # 简化.config，仅保留应用和主题
-def simplify_config(file: str, backup=True):
+def simplify_config(file: str, isofficial: bool, backup=True):
     inxheader = ()
     inxapp = ()
     inxtheme = ()
-    addflag = True
+    header_flag = True
     with open(file) as f:
         text = f.readlines()
     if backup:
         with open(file + '.fullbak', 'w') as f:
             f.writelines(text)
     for (index, value) in enumerate(text):
-        if value.startswith('CONFIG_TARGET') and '=y' in value and addflag:
+        if value.startswith('CONFIG_TARGET') and '=y' in value and header_flag:
             inxheader += (index,)
             if len(inxheader) == 3:
-                addflag = False
-        elif value.startswith('# 3. Applications'):
+                header_flag = False
+        elif '. Applications' in value:
             inxapp += (index,)
-        elif value.startswith('# end of 3. Applications'):
-            inxapp += (index,)
-        elif value.startswith('# 4. Themes'):
+        elif '. Themes' in value:
             inxtheme += (index,)
-        elif value.startswith('# end of 4. Themes'):
-            inxtheme += (index,)
-    header = []
+    header = ['# Target\n']
     for i in inxheader:
         header += [text[i]]
-    text = header + text[inxapp[0]:inxapp[1]] + text[inxtheme[0]:inxtheme[1]]
+    addition = [
+        '# Collections\n',
+        'CONFIG_PACKAGE_luci=y\n',
+        '\n# Translations\n',
+        'CONFIG_LUCI_LANG_zh_Hans=y\n'
+    ]
+    apps = list(filter(lambda x: x.strip('#\n') and '# Configuration' not in x and '# end of' not in x, text[inxapp[0]:inxapp[1]]))
+    apps = list(map(lambda x: '# Applications\n' if '. Applications' in x else x, apps))
+    themes = list(filter(lambda x: x.strip('#\n') and '# end of' not in x, text[inxtheme[0]:inxtheme[1]]))
+    themes = list(map(lambda x: '# Themes\n' if '. Themes' in x else x, themes))
+    for part in header, addition, apps, themes:
+        part.append('\n')
+    if not isofficial:
+        addition.clear()
+    text = header + addition + apps + themes
     with open(file, 'w') as f:
         f.writelines(text)
-    sedcommands = [
-        f"sed -i '/^$/d' {file}",
-        f"sed -i '/^#$/d' {file}",
-        f"sed -i '/# Configuration/d' {file}",
-        f"sed -i '/# end of 3. Applications/d' {file}",
-        f"sed -i '/# end of 4. Themes/d' {file}",
-        f"sed -i '/# end of Configuration/d' {file}",
-        f"sed -i 's/3. Applications/Applications/g' {file}",
-        f"sed -i 's/4. Themes/Themes/g' {file}",
-        f"sed -i '1i # Target' {file}",
-        f"sed -i '/# Applications/i \n' {file}",
-        f"sed -i '/# Themes/i \n' {file}"
-    ]
-    for cmd in sedcommands:
-        subprocess.run(cmd, shell=True)
 
 
 # 执行终端命令，形参为各文件路径
@@ -215,9 +222,9 @@ def main():
     initfile = rp1 + '/' + os.getenv('INITFILE')
     with open(initfile) as f:
         import toml
-        produce_conf(tl1 := toml.load(f), serial)
+        offi = produce_conf(tl1 := toml.load(f), serial)
     routine_cmd(serial + '.clone.sh', serial + '.config')
-    simplify_config(serial + '.config')
+    simplify_config(serial + '.config', offi)
     # 移动文件到目标文件夹，准备commit
     for item in glob.glob(serial + '*'):
         if item.endswith('config.fullbak'):

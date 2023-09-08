@@ -13,7 +13,7 @@ def move_multi_files(src, dest):
 
 if __name__ == '__main__':
     srcdir = os.getenv('ARTIFACTDIR').rstrip('/') + '/'
-    destdir = os.getenv('FILEDIR').rstrip('/') + '/'
+    destdir = os.getenv('DEPLOYDIR').rstrip('/') + '/'
     move_multi_files(srcdir, destdir)
     if not os.path.exists(d1 := destdir + 'backups'):
         os.makedirs(d1)
