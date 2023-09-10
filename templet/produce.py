@@ -202,7 +202,7 @@ def simplify_config(file: str, isofficial: bool, backup=True):
     apps = list(map(lambda x: '# Applications\n' if '. Applications' in x else x, apps))
     themes = list(filter(lambda x: x.strip('#\n') and '# end of' not in x, text[inxtheme[0]:inxtheme[1]]))
     themes = list(map(lambda x: '# Themes\n' if '. Themes' in x else x, themes))
-    for part in header, addition, apps, themes:
+    for part in header, addition, apps:
         part.append('\n')
     if not isofficial:
         addition.clear()

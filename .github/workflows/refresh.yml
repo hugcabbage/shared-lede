@@ -17,41 +17,47 @@ on:
 permissions:
   contents: write
 
-env:
-  DEPLOYDIR: ${{ inputs.deploydir }}
-
 jobs:
 
   set-matrix:
     runs-on: ubuntu-latest
     outputs:
-      filels: ${{ steps.set-matrix.outputs.configls }}
+      configls: ${{ steps.set-matrix.outputs.configls }}
+      deploydir: ${{ steps.set-matrix.outputs.deploydir }}
     steps:
 
       - uses: actions/checkout@v3
-
-      - id: set-matrix
-        env:
-          CONFIGLS: ${{ inputs.configls }}
-        run: |
-          NEW=${CONFIGLS//' '/''}; NEW=${NEW//','/' '}; NEW=($NEW)
-          array=""
-          for item in ${NEW[@]}
-          do
-              if [ -e "$DEPLOYDIR/$item" ]; then
-                 array=$array'"'$item'",'
-              fi
-          done
-          echo "configls=[$array]" >> $GITHUB_OUTPUT
+      
+      - id: set-matrix        
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            let configls = [];
+            let cLs = "${{ inputs.configls }}".replaceAll(' ', '').split(',');
+            let deploydir = "${{ inputs.deploydir }}".trim();
+            if (deploydir.endsWith('/')) deploydir = deploydir.slice(0, -1);
+            for (i=0; i<cLs.length; i++) {
+                try {
+                    fs.accessSync(deploydir + '/' + cLs[i]);
+                    configls.push(cLs[i]);
+                }
+                catch (err) {
+                    console.log(cLs[i] + ' does not exist!');
+                }
+            }
+            core.setOutput("configls", JSON.stringify(configls));
+            core.setOutput("deploydir", deploydir);
 
   refresh:
     needs: set-matrix
     runs-on: ubuntu-latest
     env:
+      DEPLOYDIR: ${{ needs.set-matrix.outputs.deploydir }}
       FILE: ${{ matrix.file }}
     strategy:
-      matrix:
-        file: ${{ fromJSON(needs.set-matrix.outputs.filels) }}
+      matrix: 
+        file: ${{ fromJSON(needs.set-matrix.outputs.configls) }}
     steps:
 
     - uses: actions/checkout@v3
@@ -61,30 +67,21 @@ jobs:
 
     - uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.FILE }}
-        path: ${{ env.DEPLOYDIR }}/${{ env.FILE }}*
+        name: ${{ env.DEPLOYDIR }}
+        path: ${{ env.DEPLOYDIR }}
 
   commit:
     needs: refresh
     runs-on: ubuntu-latest
-    env:
-      ARTIFACTDIR: dlfiles
     steps:
 
     - uses: actions/checkout@v3
 
     - uses: actions/download-artifact@v3
-      with:
-        path: ${{ env.ARTIFACTDIR }}
-
+      
     - uses: geekyeggo/delete-artifact@v2
       with:
           name: '*'
-
-    - name: move files
-      run: |
-        python3 extra-files/refreshmv.py
-        rm -rf $ARTIFACTDIR
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
