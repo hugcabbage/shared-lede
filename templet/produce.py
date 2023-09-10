@@ -170,7 +170,7 @@ def produce_conf(data: dict, prefix: str) -> bool:
 
 
 # 简化.config，仅保留应用和主题
-def simplify_config(file: str, isofficial: bool, backup=True):
+def simplify_config(file: str, *, isoffi=False, backup=True, remain_text=None):
     inxheader = ()
     inxapp = ()
     inxtheme = ()
@@ -204,8 +204,10 @@ def simplify_config(file: str, isofficial: bool, backup=True):
     themes = list(map(lambda x: '# Themes\n' if '. Themes' in x else x, themes))
     for part in header, addition, apps:
         part.append('\n')
-    if not isofficial:
+    if not isoffi:
         addition.clear()
+    if remain_text:
+        addition = remain_text
     text = header + addition + apps + themes
     with open(file, 'w') as f:
         f.writelines(text)
@@ -259,7 +261,7 @@ def main():
         import toml
         offi = produce_conf(tl1 := toml.load(f), serial)
     routine_cmd(serial + '.clone.sh', serial + '.config')
-    simplify_config(serial + '.config', offi)
+    simplify_config(serial + '.config', isoffi=offi)
     # 移动文件到目标文件夹，准备commit
     if os.getenv('OVERWRITE_LAST') == 'true':
         for item in glob.glob(f'{wf1}/{dd1}-{serial}*'):
