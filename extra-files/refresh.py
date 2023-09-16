@@ -15,30 +15,22 @@ if __name__ == '__main__':
     fclone = fconfig.split('.')[0] + '.clone.sh'
     if not os.path.exists(fc1 := f'{destdir}/{fclone}'):
         fc1 = f'{destdir}/1.clone.sh'
-    with open(fc1) as f:
-        text1 = f.readlines()
-    for t in text1:
-        if 'openwrt/openwrt' in t:
-            offi = True
-            break
-    else:
-        offi = False
     with open(fc2 := f'{destdir}/{fconfig}') as f:
-        text2 = f.readlines()
+        text1 = f.readlines()
     i = 0
-    for t in text2:
+    for t in text1:
         if 'CONFIG_TARGET_' in t and 'DEVICE' in t:
             s = i + 1
         elif '# Applications' in t:
             e = i
             break
         i += 1
-    for t in text2[s:e]:
+    for t in text1[s:e]:
         if t.strip():
             break
         else:
             s += 1
-    extra_t = text2[s:e]
+    extra_t = text1[s:e]
     produce.routine_cmd(fc1, fc2)
     produce.simplify_config(fc2, remain_text=extra_t)
     # 移动.fullbak到backups目录
