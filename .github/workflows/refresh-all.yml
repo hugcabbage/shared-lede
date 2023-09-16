@@ -1,0 +1,53 @@
+name: refresh all
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYDIR: ${{ matrix.deploydir }}
+      FILE: ${{ matrix.dotconfig }}
+    strategy:
+      fail-fast: false
+      matrix:
+        deploydir: [preset-lede, preset-openwrt, preset-immortalwrt, preset-lienol-openwrt]
+        dotconfig: [1.config, 2.config]
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - name: carry out
+      run: python3 extra-files/refresh.py
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.DEPLOYDIR }}
+        path: ${{ env.DEPLOYDIR }}
+
+  commit:
+    if: always()
+    needs: refresh
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - uses: actions/download-artifact@v3
+    
+    - uses: actions/download-artifact@v3
+      
+    - uses: geekyeggo/delete-artifact@v2
+      with:
+          name: '*'
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: refresh .config files 
+        commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>

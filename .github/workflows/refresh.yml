@@ -8,7 +8,7 @@ on:
         required: true 
         type: string
         default: 'preset-lede'
-      configls:
+      dotconfig:
         description: '<serial>.config file(s)'
         required: true 
         type: string
@@ -22,7 +22,7 @@ jobs:
   set-matrix:
     runs-on: ubuntu-latest
     outputs:
-      configls: ${{ steps.set-matrix.outputs.configls }}
+      dotconfig: ${{ steps.set-matrix.outputs.dotconfig }}
       deploydir: ${{ steps.set-matrix.outputs.deploydir }}
     steps:
 
@@ -33,20 +33,20 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let configls = [];
-            let cLs = "${{ inputs.configls }}".replaceAll(' ', '').split(',');
+            let dotconfig = [];
+            let cLs = "${{ inputs.dotconfig }}".replaceAll(' ', '').split(',');
             let deploydir = "${{ inputs.deploydir }}".trim();
             if (deploydir.endsWith('/')) deploydir = deploydir.slice(0, -1);
             for (i=0; i<cLs.length; i++) {
                 try {
                     fs.accessSync(deploydir + '/' + cLs[i]);
-                    configls.push(cLs[i]);
+                    dotconfig.push(cLs[i]);
                 }
                 catch (err) {
                     console.log(cLs[i] + ' does not exist!');
                 }
             }
-            core.setOutput("configls", JSON.stringify(configls));
+            core.setOutput("dotconfig", JSON.stringify(dotconfig));
             core.setOutput("deploydir", deploydir);
 
   refresh:
@@ -57,7 +57,7 @@ jobs:
       FILE: ${{ matrix.file }}
     strategy:
       matrix: 
-        file: ${{ fromJSON(needs.set-matrix.outputs.configls) }}
+        file: ${{ fromJSON(needs.set-matrix.outputs.dotconfig) }}
     steps:
 
     - uses: actions/checkout@v3
@@ -85,5 +85,5 @@ jobs:
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: .config files refreshed 
+        commit_message: refresh .config files 
         commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
