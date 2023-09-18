@@ -5,11 +5,10 @@ import glob
 import shutil
 
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)) + '/templet')
-import produce
+from tools import routine_cmd, simplify
 
 
-if __name__ == '__main__':
+def main():
     destdir = os.getenv('DEPLOYDIR').strip().rstrip('/')
     fconfig = os.getenv('FILE').strip()
     fclone = fconfig.split('.')[0] + '.clone.sh'
@@ -30,9 +29,17 @@ if __name__ == '__main__':
             break
         else:
             s += 1
-    extra_t = text1[s:e]
-    produce.routine_cmd(fc1, fc2)
-    produce.simplify_config(fc2, remain_text=extra_t)
+    for t in reversed(text1[s:e]):
+        if t.strip():
+            break
+        else:
+            e -= 1
+    if s == e:
+        extra_t = None
+    else:
+        extra_t = text1[s:e]
+    routine_cmd.gen_dot_config(fc1, fc2)
+    simplify.simplify_config(fc2, remain_text=extra_t)
     # 移动.fullbak到backups目录
     if not os.path.exists(d1 := f'{destdir}/backups'):
         os.makedirs(d1)
@@ -41,3 +48,8 @@ if __name__ == '__main__':
     for item in glob.glob(f'{destdir}/**', recursive=True):
         if not os.path.isdir(item) and fconfig not in item:
             os.remove(item)
+
+
+if __name__ == '__main__':
+    main()
+

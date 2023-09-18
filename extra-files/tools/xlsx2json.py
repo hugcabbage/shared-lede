@@ -27,4 +27,7 @@ def dict_to_json(dict, file_name):
 
 
 if __name__ == '__main__':
-    dict_to_json(xlsx_to_dict('headers.xlsx'), 'headers.json')
+    import sys
+    file_xlsx = sys.argv[1]
+    file_json = file_xlsx.replace('.xlsx', '.json')
+    dict_to_json(xlsx_to_dict(file_xlsx), file_json)

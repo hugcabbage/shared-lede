@@ -6,19 +6,19 @@ model_xiaomi-4a-gigabit:
   body:
     - 小米4A千兆版lede固件
     - 版本：lean lede源码
-    - 登录信息：IP 192.168.31.1，密码 password
+    - 登录信息：IP 默认，密码 password
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手、smartdns等。
 model_xiaomi-3g-v2:
   title: lede for xiaomi 3g v2
   body:
     - 小米3Gv2 lede固件
     - 版本：lean lede源码
-    - 登录信息：IP 192.168.31.1，密码 password
+    - 登录信息：IP 默认，密码 password
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手、smartdns等。
 model_phicomm-k2p:
   title: lede for phicomm k2p
   body:
     - 斐讯K2P lede固件
     - 版本：lean lede源码
-    - 登录信息：IP 192.168.31.1，密码 password
+    - 登录信息：IP 默认，密码 password
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手、smartdns等。

@@ -6,61 +6,61 @@ model_xiaomi-cr6608:
   body:
     - 小米CR6608 openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_xiaomi-cr6606:
   title: openwrt for xiaomi cr6606
   body:
     - 小米CR6606 openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_xiaomi-cr6609:
   title: openwrt for xiaomi cr6609
   body:
     - 小米CR6609 openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_xiaomi-3g:
   title: openwrt for xiaomi 3g
   body:
     - 小米3G openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_xiaomi-4:
   title: openwrt for xiaomi 4
   body:
     - 小米4 openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_xiaomi-3-pro:
   title: openwrt for xiaomi 3 pro
   body:
     - 小米3 Pro openwrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_redmi-ac2100:
   title: openwrt for redmi ac2100
   body:
     - 红米AC2100 OpenWrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_xiaomi-ac2100:
   title: openwrt for xiaomi ac2100
   body:
     - 小米AC2100 OpenWrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。
 model_redmi-ax6s:
   title: openwrt for redmi ax6s
   body:
     - 红米AX6S OpenWrt固件
     - 版本：lienol openwrt源码，master分支
-    - 登录信息：IP 192.168.31.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：ipv6支持组件、argon主题、定时重启、nat6助手等。

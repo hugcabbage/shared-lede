@@ -61,7 +61,7 @@ jobs:
       if: env.PRODUCE_DEVICE != ''
       with:
         repository: ${{ env.REPO_PATH }}
-        commit_message: device deployment changed
+        commit_message: change device deployment
         commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
 
     - name: lack token print

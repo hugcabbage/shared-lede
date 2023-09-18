@@ -7,8 +7,11 @@ import shutil
 import yaml
 
 
+from tools.crypt import crypt_root
+
+
 # headers为机型数据, model为机型名称, temp为即将用于编译流程中的临时文件前缀
-def produce_temp_workfiles(headers: dict, model: str, temp: str):
+def produce_temp_workfiles(headers: dict, model: str, temp: str , * , loginip=None, loginpwd=None):
     num = headers[model][0]
     # 生成临时.config
     inxall = ()
@@ -31,14 +34,20 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str):
             text[inxall[i]] = header[i]
     with open(tc1 := temp + '.config', 'w') as f:
         f.writelines(text)
-    # 生成临时clone.sh, modify.sh
+    # 生成临时clone.sh
     if not os.path.exists(num + '.clone.sh'):
         num = '1'
     shutil.copyfile(num + '.clone.sh', tc2 := temp + '.clone.sh')
+    # 生成临时modify.sh
     shutil.copyfile(num + '.modify.sh', tm1 := temp + '.modify.sh')
-    if model == 'xiaomi-4a-gigabit' or model == 'xiaomi-3g-v2' or model == 'xiaomi-4a-gigabit-v2':
-        with open(tm1, 'a') as f:
+    with open(tm1, 'a') as f:
+        if model == 'xiaomi-4a-gigabit' or model == 'xiaomi-3g-v2' or model == 'xiaomi-4a-gigabit-v2':
             f.write('\n. extra-files/modify-xiaomi-router-4a-3g-v2.sh\n')
+        if loginip:
+            new = 'lan) ipad=${ipaddr:-"' + loginip + '"} ;;'
+            f.write(f"\nsed -i '/lan) ipad=/c{new}' package/base-files/files/bin/config_generate\n")
+        if loginpwd:
+            f.write(f"\nsed -i '/root/c{crypt_root(loginpwd)}' package/base-files/files/etc/shadow\n")
     return tc1, tc2, tm1
 
 
@@ -60,13 +69,21 @@ def main():
     destdir = os.getenv('DEPLOYDIR')
     modelname = os.getenv('MODEL_NAME')
     temppre = os.getenv('TEMP_PREFIX')
+    try:
+        lip = os.getenv('LOGIN_IP').strip()
+    except:
+        lip = None
+    try:
+        lpwd = os.getenv('LOGIN_PWD').strip()
+    except:
+        lpwd = None
     os.chdir(destdir)
     with open('headers.json') as f:
         hdata = json.load(f)
     if modelname not in hdata:
         print('机型信息错误，请检查')
     else:
-        files = produce_temp_workfiles(hdata, modelname, temppre) + \
+        files = produce_temp_workfiles(hdata, modelname, temppre, loginip=lip, loginpwd=lpwd) + \
             (produce_release_text(modelname, 'release.yml', temppre),)
         # 输出选择的机型与各临时文件路径
         print('你选择的机型为：' + '\n' + modelname)

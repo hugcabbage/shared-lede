@@ -6,5 +6,5 @@ model_xiaomi-cr6608:
   body:
     - 小米CR6608 immortalwrt固件
     - 版本：immortalwrt源码，openwrt-21.02分支
-    - 登录信息：IP 192.168.1.1，密码 无
+    - 登录信息：IP 默认，密码 无
     - 应用：argon主题、ddns、upnp等。

@@ -39,4 +39,5 @@ svn_app = [
   "https://github.com/vernesong/OpenClash/trunk/luci-app-openclash"
 ]
 
-login_ip = "192.168.51.1"
+login_ip = "192.168.91.1"
+login_pwd = "00009999"

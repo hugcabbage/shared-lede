@@ -1,0 +1,22 @@
+name: clean workflow runs
+
+on:
+  workflow_dispatch:
+    inputs:
+      period:
+        description: "the amount of days to hold"
+        default: "0"
+        required: false
+      repo:
+        required: false
+
+jobs:
+  clean-logs:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: dmvict/clean-workflow-runs@v1
+        with:
+          save_period: ${{ inputs.period}}
+          save_min_runs_number: 0

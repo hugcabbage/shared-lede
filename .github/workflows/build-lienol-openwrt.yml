@@ -47,6 +47,11 @@ on:
         required: false
         default: ''
         type: string
+      login_pwd:
+        description: '设置初始登陆密码(会覆盖modify脚本中的设置)'
+        required: false
+        default: ''
+        type: string
       record:
         description: '输入版本描述'     
         required: false
@@ -92,6 +97,8 @@ jobs:
       - name: 读取配置
         env:
           MODEL_NAME: ${{ inputs.model }}
+          LOGIN_IP: ${{ inputs.lan_ipad }}
+          LOGIN_PWD: ${{ inputs.login_pwd }}
         run: |
           python3 extra-files/transit.py
 
@@ -113,10 +120,6 @@ jobs:
         run: |
           chmod +x $MODIFY_SH
           $MODIFY_SH
-          ${{ inputs.lan_ipad != '' }} && \
-            sed -i "/lan) ipad=/clan) ipad=\${ipaddr:-\"${{ inputs.lan_ipad }}\"} ;;" \
-              package/base-files/files/bin/config_generate
-          :
 
       - name: 生成.config文件
         env:
