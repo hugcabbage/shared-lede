@@ -1,0 +1,11 @@
+uci -q batch << EOF
+
+set wireless.@wifi-device[0].disabled='0'
+set wireless.@wifi-iface[0].channel='auto'
+set wireless.@wifi-device[1].disabled='0'
+set wireless.@wifi-iface[1].channel='auto'
+commit wireless
+
+EOF
+
+exit 0
