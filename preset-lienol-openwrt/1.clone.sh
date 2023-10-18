@@ -1,10 +1,12 @@
 #!/bin/sh
 
-# 下载源码
-git clone --depth 1 -b main https://github.com/Lienol/openwrt openwrt && mv ./openwrt/* ./
+# download base code
+CODE_DIR=_firmware_code
+git clone --depth 1 -b main https://github.com/Lienol/openwrt $CODE_DIR
+mv ./$CODE_DIR/* ./
 
-# 下载插件
-mkdir -p package/supply-packages && cd package/supply-packages
+# download app codes
+mkdir -p package/_supply_packages && cd package/_supply_packages
 git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon.git
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config.git
 git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr.git

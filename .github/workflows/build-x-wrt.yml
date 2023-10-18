@@ -5,9 +5,9 @@
 #
 # <https://github.com/hugcabbage/shared-lede>
 #
-# The firmware code comes from openwrt openwrt-23.05 branch
+# The firmware code comes from x-wrt master branch
 #
-name: build openwrt 23.05
+name: build x-wrt
 
 on:
   workflow_dispatch:

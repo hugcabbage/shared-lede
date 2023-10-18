@@ -34,11 +34,11 @@ jobs:
   produce:
     runs-on: ubuntu-latest
     env:
-      REPO_PATH: test
+      REPO_PATH: _pro
       PRODUCE_DEVICE: ${{ secrets.PRODUCE_DEVICE }}
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       if: env.PRODUCE_DEVICE != ''
       with:
         path: ${{ env.REPO_PATH }}
@@ -46,18 +46,21 @@ jobs:
 
     - name: carry out
       if: env.PRODUCE_DEVICE != ''
-      run: |
-        pip3 install -r ${{ env.REPO_PATH }}/templet/requirements.txt
-        python ${{ env.REPO_PATH }}/templet/produce.py
       env:
         INITFILE: ${{ inputs.initfile }}
-        DEPLOYDIR: ${{ inputs.deploydir }}
+        DEPLOY_DIR: ${{ inputs.deploydir }}
         OVERWRITE_LAST: ${{ inputs.overwrite_last }}
         OVERWRITE_SPEC: ${{ inputs.overwrite_spec }}
         DELETE_SPEC: ${{ inputs.delete_spec }}
         DELETE_ALL: ${{ inputs.delete_all }}
+        REQUIREMENTS: ${{ env.REPO_PATH }}/templet/requirements.txt
+        PRODUCE_PY: ${{ env.REPO_PATH }}/templet/produce.py
+      run: |
+        pip3 install -r $REQUIREMENTS
+        chmod +x $PRODUCE_PY
+        $PRODUCE_PY
 
-    - uses: stefanzweifel/git-auto-commit-action@v4
+    - uses: stefanzweifel/git-auto-commit-action@v5
       if: env.PRODUCE_DEVICE != ''
       with:
         repository: ${{ env.REPO_PATH }}

@@ -1,50 +1,52 @@
 #!/usr/bin/python3
 import os
-import sys
 import glob
 import shutil
 
 
-from tools import routine_cmd, simplify
+from tools.process_text import simplify_config
+from tools.routine_cmd import gen_dot_config
 
 
 def main():
-    destdir = os.getenv('DEPLOYDIR').strip().rstrip('/')
-    fconfig = os.getenv('FILE').strip()
+    destdir = os.getenv('DEPLOY_DIR').strip().rstrip('/')
+    fconfig = os.getenv('DOT_CONFIG').strip()
     fclone = fconfig.split('.')[0] + '.clone.sh'
-    if not os.path.exists(fc1 := f'{destdir}/{fclone}'):
-        fc1 = f'{destdir}/1.clone.sh'
-    with open(fc2 := f'{destdir}/{fconfig}') as f:
-        text1 = f.readlines()
+
+    if not os.path.exists(fce := f'{destdir}/{fclone}'):
+        fce = f'{destdir}/1.clone.sh'
+
+    with open(fcg := f'{destdir}/{fconfig}', encoding='utf-8') as f:
+        text = f.readlines()
     i = 0
-    for t in text1:
-        if 'CONFIG_TARGET_' in t and 'DEVICE' in t:
+    s = 0
+    e = 0
+    for line in text:
+        if all(x in line for x in ('CONFIG_TARGET_', 'DEVICE')):
             s = i + 1
-        elif '# Applications' in t:
+        elif '# Applications' in line:
             e = i
             break
         i += 1
-    for t in text1[s:e]:
-        if t.strip():
+    for line in text[s:e]:
+        if line.strip():
             break
-        else:
-            s += 1
-    for t in reversed(text1[s:e]):
-        if t.strip():
+        s += 1
+    for line in reversed(text[s:e]):
+        if line.strip():
             break
-        else:
-            e -= 1
-    if s == e:
-        extra_t = None
-    else:
-        extra_t = text1[s:e]
-    routine_cmd.gen_dot_config(fc1, fc2)
-    simplify.simplify_config(fc2, remain_text=extra_t)
-    # 移动.fullbak到backups目录
+        e -= 1
+    extra_t = None if s == e else text[s:e]
+
+    gen_dot_config(fce, fcg)
+    simplify_config(fcg, remain_text=extra_t)
+
+    # Move .fullbak to the backups directory
     if not os.path.exists(d1 := f'{destdir}/backups'):
         os.makedirs(d1)
-    shutil.move(f'{fc2}.fullbak', f'{d1}/{fconfig}.fullbak')
-    # 仅保留本次刷新的.config和.config.fullbak
+    shutil.move(f'{fcg}.fullbak', f'{d1}/{fconfig}.fullbak')
+
+    # Only retain .config and .config.fullbak this time refresh
     for item in glob.glob(f'{destdir}/**', recursive=True):
         if not os.path.isdir(item) and fconfig not in item:
             os.remove(item)
@@ -52,4 +54,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

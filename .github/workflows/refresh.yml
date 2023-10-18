@@ -26,7 +26,7 @@ jobs:
       deploydir: ${{ steps.set-matrix.outputs.deploydir }}
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - id: set-matrix        
         uses: actions/github-script@v6
@@ -53,29 +53,33 @@ jobs:
     needs: set-matrix
     runs-on: ubuntu-latest
     env:
-      DEPLOYDIR: ${{ needs.set-matrix.outputs.deploydir }}
-      FILE: ${{ matrix.file }}
+      DEPLOY_DIR: ${{ needs.set-matrix.outputs.deploydir }}
+      DOT_CONFIG: ${{ matrix.dotconfig }}
     strategy:
       matrix: 
-        file: ${{ fromJSON(needs.set-matrix.outputs.dotconfig) }}
+        dotconfig: ${{ fromJSON(needs.set-matrix.outputs.dotconfig) }}
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: carry out
-      run: python3 extra-files/refresh.py
+      env:
+        REFRESH_PY: extra-files/refresh.py
+      run: |
+        chmod +x $REFRESH_PY
+        $REFRESH_PY
 
     - uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.DEPLOYDIR }}
-        path: ${{ env.DEPLOYDIR }}
+        name: ${{ env.DEPLOY_DIR }}
+        path: ${{ env.DEPLOY_DIR }}
 
   commit:
     needs: refresh
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - uses: actions/download-artifact@v3
       
@@ -83,7 +87,7 @@ jobs:
       with:
           name: '*'
 
-    - uses: stefanzweifel/git-auto-commit-action@v4
+    - uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: refresh .config files 
         commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>

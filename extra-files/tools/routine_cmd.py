@@ -1,6 +1,11 @@
-# 执行终端命令，形参为各文件路径
+import subprocess
+
+
 def gen_dot_config(clone: str, config: str):
-    import subprocess
+    """Execute the terminal command,
+    the shape parameters are the file path of each file
+    """
+
     commands = [
         f'chmod +x {clone} && ./{clone}',
         './scripts/feeds update -a && ./scripts/feeds install -a',
