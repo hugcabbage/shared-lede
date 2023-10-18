@@ -22,7 +22,7 @@ base_name = "ExOpenWrt"
 base_version = "beta from main branch"
 base = "https://git.openwrt.org/openwrt/openwrt.git@main"
 
-app_path = "package/supply-packages"
+app_path = "package/_supply_packages"
 
 git_app = [
   "https://github.com/jerrykuku/luci-theme-argon.git",

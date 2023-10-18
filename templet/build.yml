@@ -10,11 +10,6 @@ name: xxxxxx
 on:
   workflow_dispatch:
     inputs:
-      build:
-        description: 'want to compile? input true'
-        required: true
-        default: 'true'
-        type: string
       record:
         description: 'input version description'
         required: false
@@ -35,20 +30,22 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    if: inputs.build == 'true'
+  to-build:
     runs-on: ubuntu-latest
     env:
       SERIAL_NU: xxxxxx
-      DEPLOYDIR: xxxxxx
+      DEPLOY_DIR: xxxxxx
+      EXTRA_STR: _some
     steps:
 
       - name: display initial disk space
         run: |
           df -h
 
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.EXTRA_STR }}
 
       - name: prepare environments
         run: |
@@ -58,7 +55,7 @@ jobs:
 
       - name: clone sources
         run: |
-          CLONE_SH=${DEPLOYDIR}/${SERIAL_NU}.clone.sh
+          CLONE_SH=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.clone.sh
           chmod +x $CLONE_SH
           $CLONE_SH
 
@@ -69,13 +66,13 @@ jobs:
 
       - name: modify configuration
         run: |
-          MODIFY_SH=${DEPLOYDIR}/${SERIAL_NU}.modify.sh
+          MODIFY_SH=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.modify.sh
           chmod +x $MODIFY_SH
           $MODIFY_SH
 
       - name: generate .config
         run: |
-          DOT_CONFIG=${DEPLOYDIR}/${SERIAL_NU}.config
+          DOT_CONFIG=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.config
           mv $DOT_CONFIG .config
           make defconfig
 
@@ -89,11 +86,11 @@ jobs:
 
       - name: pick up files
         run: |
-          mkdir -p collected_firmware/packages
+          mkdir -p _collected_firmware/packages
           rm -rf $(find bin/targets/ -type d -name 'packages')
-          cp $(find bin/targets/ -type f) collected_firmware
-          cp $(find bin/packages/ -type f -name '*.ipk') collected_firmware/packages
-          cd collected_firmware
+          cp $(find bin/targets/ -type f) _collected_firmware
+          cp $(find bin/packages/ -type f -name '*.ipk') _collected_firmware/packages
+          cd _collected_firmware
           zip -r allfiles.zip *
           cd packages
           zip -r ../packages.zip *
@@ -102,7 +99,7 @@ jobs:
         id: release-text
         if: inputs.release == true
         run: |
-          cp ${DEPLOYDIR}/${SERIAL_NU}.release.md release.tmp
+          cp ${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.release.md release.tmp
           rt=$(head -n 1 release.tmp)
           rt="${rt#*# }"
           echo "RELEASE_TITLE=$rt" >> $GITHUB_OUTPUT
@@ -113,12 +110,11 @@ jobs:
           echo "RELEASE_BODY=$rb" >> $GITHUB_OUTPUT
 
       - name: calculate tag version
-        id: tag-version
-        if: steps.release-text.conclusion == 'success'
-        uses: mathieudutour/github-tag-action@v6.1
+        id: calculate-version
+        if: inputs.release == true
+        uses: hugcabbage/next-version@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: true
+          repo_path: ${{ env.EXTRA_STR }}
 
       - name: upload firmware to release
         id: to-release
@@ -126,15 +122,13 @@ jobs:
         continue-on-error: true
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: collected_firmware/*
-          tag: ${{ steps.tag-version.outputs.new_tag }}
-          release_name: ${{ steps.tag-version.outputs.new_version }} ${{ steps.release-text.outputs.RELEASE_TITLE }}
+          file: _collected_firmware/*
+          tag: ${{ steps.calculate-version.outputs.version }}
+          release_name: ${{ steps.calculate-version.outputs.version }} ${{ steps.release-text.outputs.RELEASE_TITLE }}
           overwrite: true
           prerelease: false
           body: |
             ${{ steps.release-text.outputs.RELEASE_BODY }}
-            
             ${{ inputs.record }}
           file_glob: true
 
@@ -144,8 +138,8 @@ jobs:
         with:
           name: collected_firmware
           path: |
-            collected_firmware/
-            !collected_firmware/*.zip
+            _collected_firmware/
+            !_collected_firmware/*.zip
 
       - name: display finishing disk space 
         run: |
