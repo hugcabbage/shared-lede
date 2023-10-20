@@ -78,7 +78,7 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd
     )
     with open(tm1, 'a', encoding='utf-8') as f:
         if model in spmodel:
-            f.write('\n. extra-files/modify-xiaomi-router-4a-3g-v2.sh\n')
+            f.write('\n. $(dirname $0)/../extra-files/modify-xiaomi-router-4a-3g-v2.sh\n')
         if ip:
             new = 'lan) ipad=${ipaddr:-"' + ip + '"} ;;'
             f.write(

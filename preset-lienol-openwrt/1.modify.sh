@@ -22,7 +22,7 @@ rm -rf package/feeds/packages/xray-core
 # copy smartdns configuration
 #rm -rf feeds/packages/net/smartdns
 #rm -rf package/feeds/packages/net/smartdns
-#cp -r extra-files/smartdns feeds/packages/net/
+#cp -r $(dirname $0)/../extra-files/smartdns feeds/packages/net/
 
 # copy uci-defaults script(s)
 mkdir -p files/etc/uci-defaults
@@ -41,4 +41,4 @@ ZZZ_PATH=package/default-settings/files/zzz-default-settings
 sed -i -e '/DISTRIB_/d' -e '/footer.htm/d' -e '/admin_status/d' $ZZZ_PATH
 
 # replace geodata source
-. extra-files/update-geodata.sh
+. $(dirname $0)/../extra-files/update-geodata.sh

@@ -17,7 +17,7 @@
 # copy smartdns configuration
 #rm -rf feeds/packages/net/smartdns
 #rm -rf package/feeds/packages/net/smartdns
-#cp -r extra-files/smartdns feeds/packages/net/
+#cp -r $(dirname $0)/../extra-files/smartdns feeds/packages/net/
 
 # copy uci-defaults script(s)
 mkdir -p files/etc/uci-defaults
@@ -30,7 +30,7 @@ sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.10' target/linux/ramips/Makefile
 #sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.15' target/linux/ramips/Makefile
 
 # copy kernel 5.10 version CPU overclocking patch
-#cp extra-files/322-mt7621-fix-cpu-clk-add-clkdev.patch target/linux/ramips/patches-5.10/
+#cp $(dirname $0)/../extra-files/322-mt7621-fix-cpu-clk-add-clkdev.patch target/linux/ramips/patches-5.10/
 
 # set up WiFi
 #sed -i 's/OpenWrt/coolxiaomi/g' package/kernel/mac80211/files/lib/wifi/mac80211.sh
@@ -43,4 +43,4 @@ sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.10' target/linux/ramips/Makefile
 
 # replace geodata source
 GEODIR=package/_supply_packages/small/v2ray-geodata
-. extra-files/update-geodata.sh
+. $(dirname $0)/../extra-files/update-geodata.sh
