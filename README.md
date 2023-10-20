@@ -2,7 +2,7 @@
 
 流程文档参考[KFERMercer/OpenWrt-CI](https://github.com/KFERMercer/OpenWrt-CI)，十分感谢！
 
-使用的固件源码包括openwrt官方，以及coolsnowwolf、Lienol、immortalwrt维护的版本，详见[表格](#固件源码)。
+使用的固件源码包括openwrt官方，以及coolsnowwolf、Lienol、immortalwrt、x-wrt维护的版本，详见[表格](#固件源码)。
 
 预置机型有小米4A千兆版、小米3Gv2、小米CR6606、小米CR6608、小米CR6609等，详见[表格](#各机型对应文件)。
 
@@ -137,10 +137,10 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 |配置目录|流程名|源码|
 |:----:|:----:|:----:|
 |preset-lede|build lede|[coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)|
-|preset-lienol-openwrt|build lienol openwrt|[Lienol/openwrt master分支](https://github.com/Lienol/openwrt/tree/master)|
-|preset-openwrt|build openwrt 23.05|[openwrt/openwrt openwrt-23.05分支](https://github.com/openwrt/openwrt/tree/openwrt-23.05)|
-|preset-immortalwrt|build immortalwrt 21.02|[immortalwrt/immortalwrt openwrt-21.02分支](https://github.com/immortalwrt/immortalwrt/tree/openwrt-21.02)|
-|preset-x-wrt|build x-wrt|[x-wrt/x-wrt master分支](https://github.com/x-wrt/x-wrt/tree/master)|
+|preset-lienol-openwrt|build lienol openwrt|[Lienol/openwrt master](https://github.com/Lienol/openwrt/tree/master)|
+|preset-openwrt|build openwrt 23.05|[openwrt/openwrt openwrt-23.05](https://github.com/openwrt/openwrt/tree/openwrt-23.05)|
+|preset-immortalwrt|build immortalwrt 21.02|[immortalwrt/immortalwrt openwrt-21.02](https://github.com/immortalwrt/immortalwrt/tree/openwrt-21.02)|
+|preset-x-wrt|build x-wrt|[x-wrt/x-wrt master](https://github.com/x-wrt/x-wrt/tree/master)|
 
 ## 各机型对应文件
 
