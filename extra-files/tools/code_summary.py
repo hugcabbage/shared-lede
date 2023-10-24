@@ -49,12 +49,12 @@ class CodeSummary:
 
 
     def get_profiles(self):
-        """example:
+        """Get some configuration values from the .config file
+        Example:
         CONFIG_TARGET_BOARD="ramips"
         CONFIG_TARGET_SUBTARGET="mt7621"
         CONFIG_TARGET_PROFILE="DEVICE_xiaomi_mi-router-cr6608"
         CONFIG_TARGET_ARCH_PACKAGES="mipsel_24kc"
-        Get these configuration values in the .config file
         """
 
         file = self.config
@@ -99,7 +99,7 @@ class CodeSummary:
                 code_from = code_[0] + '/' + code_[1]
 
         code_commit_log = subprocess.run(
-            'git log -1 --pretty=format:%aI%n%h%n%D',
+            'git log -1 --pretty=format:%cI%n%h%n%D',
             shell=True,
             capture_output=True,
             text=True).stdout.strip().split('\n')
@@ -159,8 +159,8 @@ class CodeSummary:
         )
 
     def __login_ip(self):
-        """Read the ip address from the config_generate file,
-        For example, the example string 'lan) ipad=${ipaddr:-"192.168.15.1"} ;;'
+        """Read the ip address from the config_generate file
+        The example string 'lan) ipad=${ipaddr:-"192.168.15.1"} ;;'
         """
 
         file = self.generate
@@ -177,10 +177,10 @@ class CodeSummary:
         return ip
 
     def __login_user(self):
-        """Find the 'config login' line from the rpcd.config file,
-        and read the content under it
-        Take the username from the example string 'option username 'root''
-        Take the password id from the example string 'option password '$p$root'
+        """Locate the 'config login' line from rpcd.config
+        Then read the next few lines
+        Get the username from the example string 'option username 'root '
+        Get the password id from the example string 'option password '$p$root'
         """
 
         file = self.rpcd
@@ -194,11 +194,14 @@ class CodeSummary:
                 elif 'option password' in line:
                     password_id = line.split()[-1].strip("'")[3:]
                     break
-        return username, password_id
+        try:
+            return username, password_id
+        except UnboundLocalError:
+            return 'not set', 'not set'
 
     def __login_pwd(self, password_id):
-        """Read lines starting with the example string 'root' from the shadow file
-        And intercept the content after the first ':' in the example string 'root:::0:99999:7:::'
+        """Read the line starting with the example string 'root' from the 'shadow' file
+        Truncate the part after the first ':' in the example string 'root:: 0:99999:7:::'
         """
 
         file = self.shadow
@@ -209,9 +212,9 @@ class CodeSummary:
                     break
         try:
             if pwd_value == '::0:99999:7:::':
-                password = ''
+                password = 'blank'
             else:
                 password = 'customized by you'
         except UnboundLocalError:
-            password = ''
+            password = 'not set'
         return password

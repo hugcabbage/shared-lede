@@ -23,7 +23,7 @@ def get_code_dir(clone_sh):
 
 
 def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd=None) -> dict:
-    """ Generate temporary working files, convenient workflow calls
+    """Generate temporary work files to make workflow easy to call
     headers is the model data
     model is a model name
     temp is the prefix for temporary files in the compilation process

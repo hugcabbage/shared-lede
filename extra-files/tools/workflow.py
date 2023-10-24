@@ -1,4 +1,4 @@
-"""The file from https://github.com/jannekem/run-python-script-action/blob/main/dist/util.py"""
+"""The file comes from https://github.com/jannekem/run-python-script-action/blob/main/dist/util.py"""
 import os
 
 
