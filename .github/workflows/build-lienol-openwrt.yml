@@ -107,7 +107,7 @@ jobs:
 
       - name: clone sources
         env:
-          CLONE_SH: ${{ env.DEPLOY_DIR }}/${{ env.TEMP_PREFIX }}.clone.sh
+          CLONE_SH: ${{ steps.prepare-deployment.outputs.clone_sh }}
         run: |
           chmod +x $CLONE_SH
           $CLONE_SH
