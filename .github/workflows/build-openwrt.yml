@@ -77,16 +77,16 @@ jobs:
       EXTRA_STR: _some
     steps:
 
-      - name: display initial disk space
+      - name: Display initial disk space
         run: |
           df -h
 
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           path: ${{ env.EXTRA_STR }}
 
-      - name: prepare environments
+      - name: Prepare environments
         env:
           REQUIREMENTS: ${{ env.EXTRA_STR }}/extra-files/requirements-transit.txt
         run: |
@@ -95,7 +95,7 @@ jobs:
           sudo apt-get clean
           pip3 install -r $REQUIREMENTS
 
-      - name: prepare deployment
+      - name: Prepare deployment
         id: prepare-deployment
         env:
           MODEL_NAME: ${{ inputs.model }}
@@ -109,41 +109,41 @@ jobs:
           chmod +x $TRANSIT_PY
           $TRANSIT_PY
 
-      - name: clone sources
+      - name: Clone sources
         env:
           CLONE_SH: ${{ steps.prepare-deployment.outputs.clone_sh }}
         run: |
           chmod +x $CLONE_SH
           $CLONE_SH
 
-      - name: update feeds
+      - name: Update feeds
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: modify configuration
+      - name: Modify configuration
         env:
           MODIFY_SH: ${{ steps.prepare-deployment.outputs.modify_sh }}
         run: |
           chmod +x $MODIFY_SH
           $MODIFY_SH
 
-      - name: generate .config
+      - name: Generate .config
         env:
           DOT_CONFIG: ${{ steps.prepare-deployment.outputs.dot_config }}
         run: |
           mv $DOT_CONFIG .config
           make defconfig
 
-      - name: make download
+      - name: Make download
         run: |
           make download -j8 || make download -j1 V=s
 
-      - name: compile
+      - name: Compile
         run: |
           make -j$(nproc) || make -j1 V=s
 
-      - name: pick up files
+      - name: Pick up files
         run: |
           mkdir -p _collected_firmware/packages
           rm -rf $(find bin/targets/ -type d -name 'packages')
@@ -154,7 +154,7 @@ jobs:
           cd packages
           zip -r ../packages.zip *
 
-      - name: generate summary
+      - name: Generate summary
         id: generate-summary
         env:
           MODEL_NAME: ${{ inputs.model }}
@@ -164,14 +164,14 @@ jobs:
           chmod +x $TRANSIT_PY
           $TRANSIT_PY
 
-      - name: calculate tag version
+      - name: Calculate tag version
         id: calculate-version
         if: inputs.release == true
         uses: hugcabbage/next-version@v1
         with:
           repo_path: ${{ env.EXTRA_STR }}
 
-      - name: upload firmware to release
+      - name: Upload firmware to release
         id: to-release
         if: steps.calculate-version.conclusion == 'success' && inputs.release == true
         continue-on-error: true
@@ -187,7 +187,7 @@ jobs:
             ${{ steps.generate-summary.outputs.summary }}
           file_glob: true
 
-      - name: upload firmware to artifact
+      - name: Upload firmware to artifact
         if: inputs.artifact == true || steps.to-release.outcome != 'success'
         uses: actions/upload-artifact@v3
         with:
@@ -196,7 +196,7 @@ jobs:
             _collected_firmware/
             !_collected_firmware/*.zip
 
-      - name: display finishing disk space
+      - name: Display finishing disk space
         run: |
           df -h
           echo "----------------------------"

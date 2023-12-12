@@ -30,7 +30,7 @@ jobs:
 
     - uses: actions/checkout@v4
 
-    - name: carry out
+    - name: Carry out
       env:
         REFRESH_PY: extra-files/refresh.py
       run: |

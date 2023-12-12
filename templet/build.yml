@@ -38,53 +38,53 @@ jobs:
       EXTRA_STR: _some
     steps:
 
-      - name: display initial disk space
+      - name: Display initial disk space
         run: |
           df -h
 
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           path: ${{ env.EXTRA_STR }}
 
-      - name: prepare environments
+      - name: Prepare environments
         run: |
           sudo apt-get update
           sudo apt-get -y install gcc-multilib gettext libncurses5-dev
           sudo apt-get clean
 
-      - name: clone sources
+      - name: Clone sources
         run: |
           CLONE_SH=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.clone.sh
           chmod +x $CLONE_SH
           $CLONE_SH
 
-      - name: update feeds
+      - name: Update feeds
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: modify configuration
+      - name: Modify configuration
         run: |
           MODIFY_SH=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.modify.sh
           chmod +x $MODIFY_SH
           $MODIFY_SH
 
-      - name: generate .config
+      - name: Generate .config
         run: |
           DOT_CONFIG=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.config
           mv $DOT_CONFIG .config
           make defconfig
 
-      - name: make download
+      - name: Make download
         run: |
           make download -j8 || make download -j1 V=s
 
-      - name: compile
+      - name: Compile
         run: |
           make -j$(nproc) || make -j1 V=s
 
-      - name: pick up files
+      - name: Pick up files
         run: |
           mkdir -p _collected_firmware/packages
           rm -rf $(find bin/targets/ -type d -name 'packages')
@@ -95,7 +95,7 @@ jobs:
           cd packages
           zip -r ../packages.zip *
 
-      - name: read release text
+      - name: Read release text
         id: release-text
         if: inputs.release == true
         run: |
@@ -109,14 +109,14 @@ jobs:
           rb="${rb//$'\r'/'%0D'}"
           echo "RELEASE_BODY=$rb" >> $GITHUB_OUTPUT
 
-      - name: calculate tag version
+      - name: Calculate tag version
         id: calculate-version
         if: inputs.release == true
         uses: hugcabbage/next-version@v1
         with:
           repo_path: ${{ env.EXTRA_STR }}
 
-      - name: upload firmware to release
+      - name: Upload firmware to release
         id: to-release
         if: steps.release-text.conclusion == 'success'
         continue-on-error: true
@@ -132,7 +132,7 @@ jobs:
             ${{ inputs.record }}
           file_glob: true
 
-      - name: upload firmware to artifact
+      - name: Upload firmware to artifact
         if: inputs.artifact == true || steps.to-release.outcome != 'success'
         uses: actions/upload-artifact@v3
         with:
@@ -141,7 +141,7 @@ jobs:
             _collected_firmware/
             !_collected_firmware/*.zip
 
-      - name: display finishing disk space 
+      - name: Display finishing disk space 
         run: |
           df -h
           echo "----------------------------"

@@ -44,7 +44,7 @@ jobs:
         path: ${{ env.REPO_PATH }}
         token: ${{ env.PRODUCE_DEVICE }}
 
-    - name: carry out
+    - name: Carry out
       if: env.PRODUCE_DEVICE != ''
       env:
         INITFILE: ${{ inputs.initfile }}
@@ -67,7 +67,7 @@ jobs:
         commit_message: change device deployment
         commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
 
-    - name: lack token print
+    - name: Lack token print
       if: env.PRODUCE_DEVICE == ''
       run: echo 'Have no token, workflow exits!'
       
