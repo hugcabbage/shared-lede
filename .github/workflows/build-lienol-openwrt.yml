@@ -99,7 +99,7 @@ jobs:
           LOGIN_PWD: ${{ inputs.login_pwd }}
           SWITCH_TAG: ${{ inputs.switch_tag }}
           TEMP_PREFIX: ${{ env.EXTRA_STR }}
-          DEPLOY_DIR: ${{ env.EXTRA_STR }}/preset-openwrt
+          DEPLOY_DIR: ${{ env.EXTRA_STR }}/preset-lienol-openwrt
           TRANSIT_PY: ${{ env.EXTRA_STR }}/extra-files/transit.py
         run: |
           chmod +x $TRANSIT_PY
