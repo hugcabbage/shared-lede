@@ -115,7 +115,7 @@ class CodeSummary:
                 code_branch.append(r[6:])
             elif r.startswith('tag:'):
                 code_tag.append(r[4:])
-            elif '/' in r or r == 'HEAD':
+            elif '/' in r or r == 'HEAD' or r == 'grafted':
                 pass
             else:
                 code_branch.append(r)
