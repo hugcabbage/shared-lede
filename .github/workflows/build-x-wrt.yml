@@ -5,7 +5,7 @@
 #
 # <https://github.com/hugcabbage/shared-lede>
 #
-# The firmware code comes from x-wrt master branch
+# The firmware code comes from x-wrt
 #
 name: build x-wrt
 
@@ -37,6 +37,10 @@ on:
           - 'glinet-microuter-n300'
           - 'miwifi-mini'
           - 'miwifi-r3'
+      latest_tag:
+        description: '切换到最近稳定版本'
+        required: false
+        type: boolean
       lan_ipad:
         description: '设置LAN口IP地址(会覆盖modify脚本中的设置)'
         required: false
@@ -52,10 +56,6 @@ on:
         required: false
         default: '升级内容：内核升级，更新应用版本'
         type: string
-      switch_tag:
-        description: '切换到最近稳定版本'
-        required: false
-        type: boolean
       release:
         description: '上传到release'
         required: false
@@ -99,9 +99,9 @@ jobs:
         id: prepare-deployment
         env:
           MODEL_NAME: ${{ inputs.model }}
+          LATEST_TAG: ${{ inputs.latest_tag }}
           LOGIN_IP: ${{ inputs.lan_ipad }}
           LOGIN_PWD: ${{ inputs.login_pwd }}
-          SWITCH_TAG: ${{ inputs.switch_tag }}
           TEMP_PREFIX: ${{ env.EXTRA_STR }}
           DEPLOY_DIR: ${{ env.EXTRA_STR }}/preset-x-wrt
           TRANSIT_PY: ${{ env.EXTRA_STR }}/extra-files/transit.py

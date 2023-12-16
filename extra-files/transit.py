@@ -3,6 +3,7 @@ import os
 import glob
 import json
 import shutil
+import requests
 
 
 from tools.code_summary import CodeSummary
@@ -37,7 +38,7 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd
     header = [
         f'CONFIG_TARGET_{(t1 := headers[model][1])}=y\n',
         f'CONFIG_TARGET_{t1}_{(t2 := headers[model][2])}=y\n',
-        f'CONFIG_TARGET_{t1}_{t2}_DEVICE_{headers[model][3]}=y\n'
+        f'CONFIG_TARGET_{t1}_{t2}_DEVICE_{(t3 := headers[model][3])}=y\n'
     ]
     with open(num + '.config', encoding='utf-8') as f:
         text = f.readlines()
@@ -60,11 +61,23 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd
         num = '1'
     with open(num + '.clone.sh', encoding='utf-8') as f:
         text = f.readlines()
-        if os.getenv('SWITCH_TAG') == 'true':
-            for i, line in enumerate(text.copy()):
-                if line.startswith('SWITCH_TAG_FLAG='):
-                    text[i] = 'SWITCH_TAG_FLAG=true\n'
-                    break
+        for i, line in enumerate(text.copy()):
+            if line.startswith('CODE_URL=') and (bn := os.getenv('BRANCH_NAME')):
+                code_ = line.split('=')[-1].strip().removeprefix('https://github.com/').removesuffix('.git')
+                subtarget_mk_url = f'https://raw.githubusercontent.com/{code_}/{bn}/target/linux/{t1}/image/{t2}.mk'
+                device_define_str = f'define Device/{t3}'
+                if device_define_str not in requests.get(subtarget_mk_url, timeout=5).text:
+                    print(f'{bn} branch does not support this model, and the branch retains the default value in clone.sh')
+                    can_switch_branch = False
+                else:
+                    can_switch_branch = True
+            elif line.startswith('CODE_BRANCH=') and can_switch_branch:
+                text[i] = 'CODE_BRANCH=' + bn + '\n'
+            elif line.startswith('SWITCH_LATEST_TAG=') and os.getenv('LATEST_TAG') == 'true':
+                text[i] = 'SWITCH_LATEST_TAG=true\n'
+                break
+            elif i >= 10:
+                break
     with open(tc2 := temp + '.clone.sh', 'w', encoding='utf-8') as f:
         f.writelines(text)
     files['clone_sh'] = tc2

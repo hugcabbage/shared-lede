@@ -137,10 +137,10 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 |配置目录|流程名|源码|
 |:----:|:----:|:----:|
 |preset-lede|build lede|[coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)|
-|preset-lienol-openwrt|build lienol openwrt|[Lienol/openwrt master](https://github.com/Lienol/openwrt/tree/master)|
-|preset-openwrt|build openwrt 23.05|[openwrt/openwrt openwrt-23.05](https://github.com/openwrt/openwrt/tree/openwrt-23.05)|
-|preset-immortalwrt|build immortalwrt 21.02|[immortalwrt/immortalwrt openwrt-21.02](https://github.com/immortalwrt/immortalwrt/tree/openwrt-21.02)|
-|preset-x-wrt|build x-wrt|[x-wrt/x-wrt master](https://github.com/x-wrt/x-wrt/tree/master)|
+|preset-lienol-openwrt|build lienol openwrt|[Lienol/openwrt](https://github.com/Lienol/openwrt)|
+|preset-openwrt|build openwrt|[openwrt/openwrt](https://github.com/openwrt/openwrt)|
+|preset-immortalwrt|build immortalwrt|[immortalwrt/immortalwrt](https://github.com/immortalwrt/immortalwrt)|
+|preset-x-wrt|build x-wrt|[x-wrt/x-wrt](https://github.com/x-wrt/x-wrt)|
 
 ## 各机型对应文件
 

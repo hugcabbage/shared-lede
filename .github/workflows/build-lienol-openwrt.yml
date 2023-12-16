@@ -5,7 +5,7 @@
 #
 # <https://github.com/hugcabbage/shared-lede>
 #
-# The firmware code comes from lienol openwrt master branch
+# The firmware code comes from lienol openwrt
 #
 name: build lienol openwrt
 
@@ -17,17 +17,17 @@ on:
         required: true
         type: choice
         options:
-          - 'xiaomi-4a-gigabit'
-          - 'xiaomi-4a-gigabit-v2'
-          - 'xiaomi-3g-v2'
           - 'xiaomi-cr6608'
           - 'xiaomi-cr6606'
           - 'xiaomi-cr6609'
+          - 'redmi-ac2100'
+          - 'xiaomi-ac2100'
+          - 'xiaomi-4a-gigabit'
+          - 'xiaomi-4a-gigabit-v2'
+          - 'xiaomi-3g-v2'
           - 'xiaomi-3g'
           - 'xiaomi-4'
           - 'xiaomi-3-pro'
-          - 'redmi-ac2100'
-          - 'xiaomi-ac2100'
           - 'phicomm-k2p'
           - 'redmi-ax6s'
           - 'xiaomi-4a-100m'
@@ -37,6 +37,15 @@ on:
           - 'glinet-microuter-n300'
           - 'miwifi-mini'
           - 'miwifi-r3'
+      branch:
+        description: '选择版本'
+        required: true
+        type: choice
+        options:
+          - 'openwrt-23.05'
+          - 'openwrt-22.03'
+          - 'openwrt-21.02'
+          - 'main'
       lan_ipad:
         description: '设置LAN口IP地址(会覆盖modify脚本中的设置)'
         required: false
@@ -95,9 +104,9 @@ jobs:
         id: prepare-deployment
         env:
           MODEL_NAME: ${{ inputs.model }}
+          BRANCH_NAME: ${{ inputs.branch }}
           LOGIN_IP: ${{ inputs.lan_ipad }}
           LOGIN_PWD: ${{ inputs.login_pwd }}
-          SWITCH_TAG: ${{ inputs.switch_tag }}
           TEMP_PREFIX: ${{ env.EXTRA_STR }}
           DEPLOY_DIR: ${{ env.EXTRA_STR }}/preset-lienol-openwrt
           TRANSIT_PY: ${{ env.EXTRA_STR }}/extra-files/transit.py
