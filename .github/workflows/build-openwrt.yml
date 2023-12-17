@@ -165,6 +165,7 @@ jobs:
           zip -r ../packages.zip *
 
       - name: Generate summary
+        continue-on-error: true
         id: generate-summary
         env:
           MODEL_NAME: ${{ inputs.model }}
