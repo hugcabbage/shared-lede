@@ -61,16 +61,16 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd
         num = '1'
     with open(num + '.clone.sh', encoding='utf-8') as f:
         text = f.readlines()
+        can_switch_branch = False
         for i, line in enumerate(text.copy()):
             if line.startswith('CODE_URL=') and (bn := os.getenv('BRANCH_NAME')):
                 code_ = line.split('=')[-1].strip().removeprefix('https://github.com/').removesuffix('.git')
                 subtarget_mk_url = f'https://raw.githubusercontent.com/{code_}/{bn}/target/linux/{t1}/image/{t2}.mk'
                 device_define_str = f'define Device/{t3}'
-                if device_define_str not in requests.get(subtarget_mk_url, timeout=5).text:
-                    print(f'{bn} branch does not support this model, and the branch retains the default value in clone.sh')
-                    can_switch_branch = False
-                else:
+                if device_define_str in requests.get(subtarget_mk_url, timeout=5).text:
                     can_switch_branch = True
+                else:
+                    print(f'{bn} branch does not support this model, and the branch retains the default value in clone.sh')
             elif line.startswith('CODE_BRANCH=') and can_switch_branch:
                 text[i] = 'CODE_BRANCH=' + bn + '\n'
             elif line.startswith('SWITCH_LATEST_TAG=') and os.getenv('LATEST_TAG') == 'true':

@@ -15,7 +15,10 @@ def mlength(seq) -> int:
         else:
             lengths.append(len(str(item)))
 
-    return max(lengths)
+    try:
+        return max(lengths)
+    except ValueError:
+        return 0
 
 
 def rectangles(*lists) -> tuple[list, list]:
