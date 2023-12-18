@@ -121,17 +121,15 @@ def xlsx_to_dict(file) -> dict:
     return dict_data
 
 
-def dict_to_json(dict_data, file):
+def dict_to_json(data: dict) -> str:
     """convert dict data to json file, apply to header.json"""
 
-    json_str = json.dumps(dict_data, indent=2)
+    json_str = json.dumps(data, indent=2)
 
     # make key and value be one line
     json_str = json_str.replace('[\n    ', '[').replace(
         ',\n    ', ', ').replace('"\n  ', '"')
-    with open(file, 'w', encoding='utf-8') as f:
-        f.write(json_str)
-    print('json file saved')
+    return json_str
 
 
 def simplify_config(file: str, *, backup=True, remain_text=None):
