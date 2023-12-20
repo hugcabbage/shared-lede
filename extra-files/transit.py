@@ -4,6 +4,7 @@ import glob
 import json
 import shutil
 import requests
+from urllib.parse import urlparse
 
 
 from tools.code_summary import CodeSummary
@@ -21,6 +22,17 @@ def get_code_dir(clone_sh):
     j = text[i:].index('\n')
     codedir = text[i:][:j].split('=')[1]
     return codedir
+
+
+def check_device_support_single(url, define_str):
+    r = requests.get(url, timeout=3)
+    if define_str in r.text:
+        return True
+    elif url.endswith('.mk'):
+        url = url.rsplit('/', 1)[0] + '/Makefile'
+        return check_device_support_single(url, define_str)
+    else:
+        return False
 
 
 def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd=None) -> dict:
@@ -64,10 +76,10 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd
         can_switch_branch = False
         for i, line in enumerate(text.copy()):
             if line.startswith('CODE_URL=') and (bn := os.getenv('BRANCH_NAME')):
-                code_ = line.split('=')[-1].strip().removeprefix('https://github.com/').removesuffix('.git')
+                code_ = urlparse(line.split('=')[-1].strip()).path[1:].removesuffix('.git')
                 subtarget_mk_url = f'https://raw.githubusercontent.com/{code_}/{bn}/target/linux/{t1}/image/{t2}.mk'
                 device_define_str = f'define Device/{t3}'
-                if device_define_str in requests.get(subtarget_mk_url, timeout=5).text:
+                if check_device_support_single(subtarget_mk_url, device_define_str):
                     can_switch_branch = True
                 else:
                     print(f'{bn} branch does not support this model, and the branch retains the default value in clone.sh')

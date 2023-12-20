@@ -1,4 +1,4 @@
-name: refresh
+name: renew
 
 on:
   workflow_dispatch:
@@ -49,7 +49,7 @@ jobs:
             core.setOutput("dotconfig", JSON.stringify(dotconfig));
             core.setOutput("deploydir", deploydir);
 
-  refresh:
+  renew:
     needs: set-matrix
     runs-on: ubuntu-latest
     env:
@@ -64,10 +64,10 @@ jobs:
 
     - name: Carry out
       env:
-        REFRESH_PY: extra-files/refresh.py
+        RENEW_PY: extra-files/renew.py
       run: |
-        chmod +x $REFRESH_PY
-        $REFRESH_PY
+        chmod +x $RENEW_PY
+        $RENEW_PY
 
     - uses: actions/upload-artifact@v3
       with:
@@ -75,7 +75,7 @@ jobs:
         path: ${{ env.DEPLOY_DIR }}
 
   commit:
-    needs: refresh
+    needs: renew
     runs-on: ubuntu-latest
     steps:
 
@@ -89,5 +89,5 @@ jobs:
 
     - uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: refresh .config files 
+        commit_message: renew .config files 
         commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>

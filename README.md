@@ -142,80 +142,13 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 |preset-immortalwrt|build immortalwrt|[immortalwrt/immortalwrt](https://github.com/immortalwrt/immortalwrt)|
 |preset-x-wrt|build x-wrt|[x-wrt/x-wrt](https://github.com/x-wrt/x-wrt)|
 
-## 各机型对应文件
+## 机型
 
-<table>
-<thead>
-  <tr>
-    <th>机型</th>
-    <th>配置目录下的关联文件</th>
-  </tr>
-</thead>
-<tbody align="center">
-  <tr>
-    <td>小米4</td>
-    <td rowspan="9">1.config<br>1.clone.sh<br>1.modify.sh</td>
-  </tr>
-  <tr>
-    <td>小米3G</td>
-  </tr>
-  <tr>
-    <td>小米3Pro</td>
-  </tr>
-  <tr>
-    <td>小米CR6606</td>
-  </tr>
-  <tr>
-    <td>小米CR6608</td>
-  </tr>
-  <tr>
-    <td>小米CR6609</td>
-  </tr>
-  <tr>
-    <td>红米AC2100</td>
-  </tr>
-  <tr>
-    <td>小米AC2100</td>
-  </tr>
-  <tr>
-    <td>红米AX6S</td>
-  </tr>
-  <tr>
-    <td>斐讯K2P</td>
-    <td rowspan="11">2.config<br>1.clone.sh<br>1.modify.sh</td>
-  </tr>
-  <tr>
-    <td>小米3Gv2</td>
-  </tr>
-  <tr>
-    <td>小米4A千兆版</td>
-  </tr>
-  <tr>
-    <td>小米4A千兆版v2</td>
-  </tr>
-  <tr>
-    <td>小米4A百兆版</td>
-  </tr>
-  <tr>
-    <td>小米4C</td>
-  </tr>
-  <tr>
-    <td>小米WiFi R3</td>
-  </tr>
-  <tr>
-    <td>小米WiFi nano</td>
-  </tr>
-  <tr>
-    <td>小米WiFi mini</td>
-  </tr>
-  <tr>
-    <td>GL.iNet mt300n v2</td>
-  </tr>
-  <tr>
-    <td>GL.iNet microuter n300</td>
-  </tr>
-</tbody>
-</table>
+全部机型信息可查看文件`preset-*/headers.json`，各配置目录略有不同，如[preset-openwrt/headers.json](preset-openwrt/headers.json)。
+
+序号标1的为大闪存机型，对应配置文件1.config、1.clone.sh、1.modify.sh；
+
+序号标2的为小闪存机型，对应配置文件2.config、1.clone.sh、1.modify.sh。
 
 ## 提示
 
