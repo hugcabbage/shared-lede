@@ -35,7 +35,7 @@ def check_device_support_single(url, define_str):
         return False
 
 
-def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd=None) -> dict:
+def produce_temp_workfiles(headers: dict, model: str, temp: str, *, branch=None, ltag=None, ip=None, pwd=None) -> dict:
     """Generate temporary work files to make workflow easy to call
     headers is the model data
     model is a model name
@@ -75,17 +75,17 @@ def produce_temp_workfiles(headers: dict, model: str, temp: str, *, ip=None, pwd
         text = f.readlines()
         can_switch_branch = False
         for i, line in enumerate(text.copy()):
-            if line.startswith('CODE_URL=') and (bn := os.getenv('BRANCH_NAME')):
+            if line.startswith('CODE_URL=') and branch:
                 code_ = urlparse(line.split('=')[-1].strip()).path[1:].removesuffix('.git')
-                subtarget_mk_url = f'https://raw.githubusercontent.com/{code_}/{bn}/target/linux/{t1}/image/{t2}.mk'
+                subtarget_mk_url = f'https://raw.githubusercontent.com/{code_}/{branch}/target/linux/{t1}/image/{t2}.mk'
                 device_define_str = f'define Device/{t3}'
                 if check_device_support_single(subtarget_mk_url, device_define_str):
                     can_switch_branch = True
                 else:
-                    print(f'{bn} branch does not support this model, and the branch retains the default value in clone.sh')
+                    print(f'{branch} branch does not support this model, and the branch retains the default value in clone.sh')
             elif line.startswith('CODE_BRANCH=') and can_switch_branch:
-                text[i] = 'CODE_BRANCH=' + bn + '\n'
-            elif line.startswith('SWITCH_LATEST_TAG=') and os.getenv('LATEST_TAG') == 'true':
+                text[i] = 'CODE_BRANCH=' + branch + '\n'
+            elif line.startswith('SWITCH_LATEST_TAG=') and ltag == 'true':
                 text[i] = 'SWITCH_LATEST_TAG=true\n'
                 break
             elif i >= 10:
@@ -120,6 +120,8 @@ def main():
     destdir = os.getenv('DEPLOY_DIR')
     temppre = os.getenv('TEMP_PREFIX')
     modelname = os.getenv('MODEL_NAME')
+    branchname = os.getenv('BRANCH_NAME')
+    latesttag = os.getenv('LATEST_TAG')
     loginip = os.getenv('LOGIN_IP').strip()
     loginpwd = os.getenv('LOGIN_PWD').strip()
 
@@ -127,7 +129,7 @@ def main():
     with open('headers.json', encoding='utf-8') as f:
         hdata = json.load(f)
     files = produce_temp_workfiles(
-        hdata, modelname, temppre, ip=loginip, pwd=loginpwd)
+        hdata, modelname, temppre, branch=branchname, ltag=latesttag, ip=loginip, pwd=loginpwd)
 
     print(f'The model you choose is:\n{modelname}')
     print('Temporary file paths:')
