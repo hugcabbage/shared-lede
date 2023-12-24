@@ -14,7 +14,7 @@ if $SWITCH_LATEST_TAG; then
     else
         git checkout $LATEST_TAG_HASH
         LATEST_TAG=$(git describe --tags $LATEST_TAG_HASH)
-        echo "The code has been switched to the latest stable version$LATEST_TAG"
+        echo "The code has been switched to the latest stable version $LATEST_TAG"
     fi
     cd ..
 fi

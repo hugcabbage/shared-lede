@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 class CodeSummary:
     """Get some information about code and make a simple summary"""
+
     code_from: str
     code_branch: list
     code_tag: list
@@ -46,7 +47,6 @@ class CodeSummary:
             'profile': profiles[2],
             'arch_packages': profiles[3]
         }
-
 
     def get_profiles(self):
         """Get some configuration values from the .config file

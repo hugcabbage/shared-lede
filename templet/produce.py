@@ -1,12 +1,10 @@
 #!/usr/bin/python3
-import os
-import sys
 import glob
+import os
 import shutil
-
+import sys
 
 import toml
-
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)) + '/extra-files')
 from tools.crypt_text import crypt_str
@@ -127,10 +125,10 @@ def produce_conf(data: dict, prefix: str) -> bool:
             print('app source has existed, but the lack app_path')
             sys.exit()
     text1 = [
-        '#!/bin/sh\n',
-        '\n# download base code\n',
-        basecommands
-    ] + dla
+                '#!/bin/sh\n',
+                '\n# download base code\n',
+                basecommands
+            ] + dla
     text1 += appcommands
     with open(prefix + '.clone.sh', 'w', encoding='utf-8') as f:
         f.writelines(text1)
@@ -223,7 +221,7 @@ def produce_conf(data: dict, prefix: str) -> bool:
 
 def main():
     destdir = (rp1 := os.getenv('REPO_PATH').rstrip('/')) + \
-        '/' + (dd1 := os.getenv('DEPLOY_DIR').rstrip('/'))
+              '/' + (dd1 := os.getenv('DEPLOY_DIR').rstrip('/'))
     ba1 = f'{destdir}/backups'
     wf1 = f'{rp1}/.github/workflows'
     if os.getenv('DELETE_ALL') == 'true':

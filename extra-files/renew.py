@@ -1,9 +1,11 @@
 #!/usr/bin/python3
-import os
 import glob
+import os
 import shutil
 
-
+from tools.process_text import generate_header
+from tools.process_text import get_remain_text
+from tools.process_text import modify_config_header
 from tools.process_text import simplify_config
 from tools.routine_cmd import gen_dot_config
 
@@ -13,38 +15,19 @@ def main():
     fconfig = os.getenv('DOT_CONFIG').strip()
     fclone = fconfig.split('.')[0] + '.clone.sh'
 
-    if not os.path.exists(fce := f'{destdir}/{fclone}'):
-        fce = f'{destdir}/1.clone.sh'
+    fce = f'{destdir}/{fclone}' if os.path.exists(f'{destdir}/{fclone}') else f'{destdir}/1.clone.sh'
+    fcg = f'{destdir}/{fconfig}'
+    rt = get_remain_text(fcg)
 
-    with open(fcg := f'{destdir}/{fconfig}', encoding='utf-8') as f:
-        text = f.readlines()
-    i = 0
-    s = 0
-    e = 0
-    for line in text:
-        if all(x in line for x in ('CONFIG_TARGET_', 'DEVICE')):
-            s = i + 1
-        elif '# Applications' in line:
-            e = i
-            break
-        i += 1
-    for line in text[s:e]:
-        if line.strip():
-            break
-        s += 1
-    for line in reversed(text[s:e]):
-        if line.strip():
-            break
-        e -= 1
-    extra_t = None if s == e else text[s:e]
+    sample = {'xiaomi-ac2100': ['xx', 'ramips', 'mt7621', 'xiaomi_mi-router-ac2100']}
+    modify_config_header(fcg, generate_header(sample, 'xiaomi-ac2100'))
 
     gen_dot_config(fce, fcg)
-    simplify_config(fcg, remain_text=extra_t)
+    simplify_config(fcg, remain_text=rt)
 
     # Move .fullbak to the backups directory
-    if not os.path.exists(d1 := f'{destdir}/backups'):
-        os.makedirs(d1)
-    shutil.move(f'{fcg}.fullbak', f'{d1}/{fconfig}.fullbak')
+    os.makedirs(bas := f'{destdir}/backups', exist_ok=True)
+    shutil.move(f'{fcg}.fullbak', f'{bas}/{fconfig}.fullbak')
 
     # Only .config and .config.fullbak of this renew are kept
     for item in glob.glob(f'{destdir}/**', recursive=True):

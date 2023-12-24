@@ -1,7 +1,9 @@
 """Text processing"""
-import os
-import sys
 import json
+import os
+import re
+import shutil
+import sys
 
 
 def mlength(seq) -> int:
@@ -47,7 +49,7 @@ def to_markdown_table(*lists) -> str:
     header = '|' + '|'.join(str(lst[0]).center(col_widths[i])
                             for i, lst in enumerate(lists)) + '|\n'
     separator = '|' + \
-        '|'.join('-' * (col_widths[i]) for i in range(len(lists))) + '|\n'
+                '|'.join('-' * (col_widths[i]) for i in range(len(lists))) + '|\n'
 
     # Create table content
     rows = ''
@@ -67,7 +69,7 @@ def to_markdown_table(*lists) -> str:
     return header + separator + rows
 
 
-def manifest_to_lists(file: str) -> tuple[list, list]:
+def manifest_to_lists(file) -> tuple[list, list]:
     """Convert manifest file into two lists"""
 
     if not os.path.isfile(file):
@@ -132,44 +134,114 @@ def dict_to_json(data: dict) -> str:
     return json_str
 
 
-def simplify_config(file: str, *, backup=True, remain_text=None):
+def get_remain_text(config) -> list:
+    with open(config, encoding='utf-8') as f:
+        text = f.readlines()
+
+    s, e = 0, 0
+    for i, line in enumerate(text):
+        if all(x in line for x in ('CONFIG_TARGET_', 'DEVICE')):
+            s = i + 1
+        elif '# Applications' in line:
+            e = i
+            break
+    while not text[s].strip():
+        s += 1
+    while not text[e - 1].strip():
+        e -= 1
+
+    return text[s:e]
+
+
+def generate_header(headers: dict, model: str) -> list:
+    t1, t2, t3 = headers[model][1:4]
+    header = [
+        f'CONFIG_TARGET_{t1}=y\n',
+        f'CONFIG_TARGET_{t1}_{t2}=y\n',
+        f'CONFIG_TARGET_{t1}_{t2}_DEVICE_{t3}=y\n'
+    ]
+    return header
+
+
+def get_header_index(config) -> list:
+    h_index = []
+    with open(config, encoding='utf-8') as f:
+        for i, line in enumerate(f):
+            if line.startswith('CONFIG_TARGET') and line.endswith('=y\n'):
+                h_index.append(i)
+                if len(h_index) == 3:
+                    break
+            if i > 500:
+                break
+    return h_index
+
+
+def modify_config_header(config, header: list, new_file=None):
+    """Replace or add header"""
+
+    h_index = get_header_index(config)
+    with open(config, 'r+', encoding='utf-8') as f:
+        content = f.readlines()
+        if h_index:
+            for i in range(3):
+                content[h_index[i]] = header[i]
+        else:
+            content[0:0] = header
+        if not new_file:
+            f.seek(0, 0)
+            f.writelines(content)
+            return
+    with open(new_file, 'w', encoding='utf-8') as f:
+        f.writelines(content)
+
+
+def simplify_config(config, *, backup=True, remain_text: list = None, keep_header=False):
     """Simplify .config file, keep only applications and themes"""
 
-    inxheader = ()
-    inxapp = ()
-    inxtheme = ()
-    header_flag = True
-    with open(file, encoding='utf-8') as f:
-        text = f.readlines()
     if backup:
-        with open(file + '.fullbak', 'w', encoding='utf-8') as f:
-            f.writelines(text)
-    for (index, value) in enumerate(text):
-        if value.startswith('CONFIG_TARGET') and '=y' in value and header_flag:
-            inxheader += (index,)
-            if len(inxheader) == 3:
-                header_flag = False
-        elif '. Applications' in value:
-            inxapp += (index,)
-        elif '. Themes' in value:
-            inxtheme += (index,)
-    header = ['# Target\n']
-    for i in inxheader:
-        header += [text[i]]
-    apps = list(filter(lambda x: x.strip(
-        '#\n') and '# Configuration' not in x and '# end of' not in x, text[inxapp[0]:inxapp[1]]))
-    apps = list(
-        map(lambda x: '# Applications\n' if '. Applications' in x else x, apps))
-    themes = list(filter(lambda x: x.strip('#\n')
-                  and '# end of' not in x, text[inxtheme[0]:inxtheme[1]]))
-    themes = list(
-        map(lambda x: '# Themes\n' if '. Themes' in x else x, themes))
-    for part in header, apps:
-        part.append('\n')
+        shutil.copyfile(config, config + '.fullbak')
+
+    header, apps, themes = [], [], []
+    with open(config, encoding='utf-8') as f:
+        apps_range, themes_range = False, False
+        for line in f:
+            if len(header) < 3 and line.startswith('CONFIG_TARGET') and line.endswith('=y\n'):
+                header.append(line)
+            elif re.match(r'# \d+\. Applications', line):
+                apps_range = True
+            elif re.match(r'# end of \d+\. Applications', line):
+                apps_range = False
+            elif apps_range:
+                apps.append(line)
+            elif re.match(r'# \d+\. Themes', line):
+                themes_range = True
+            elif re.match(r'# end of \d+\. Themes', line):
+                themes_range = False
+            elif themes_range:
+                themes.append(line)
+
+    if keep_header:
+        header.insert(0, '# Target\n')
+        header.append('\n')
+    else:
+        header.clear()
+
     if remain_text:
         remain_text.append('\n')
-        text = header + remain_text + apps + themes
     else:
-        text = header + apps + themes
-    with open(file, 'w', encoding='utf-8') as f:
+        remain_text = []
+
+    re_remove_text = [
+        r'^\n$',
+        r'^#\n$',
+        r'^# Configuration',
+        r'^# end of'
+    ]
+
+    apps = ['# Applications\n'] + [x for x in apps if not any(re.match(r, x) for r in re_remove_text)] + ['\n']
+    themes = ['# Themes\n'] + [x for x in themes if not any(re.match(r, x) for r in re_remove_text)]
+
+    text = header + remain_text + apps + themes
+
+    with open(config, 'w', encoding='utf-8') as f:
         f.writelines(text)

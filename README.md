@@ -4,7 +4,7 @@
 
 使用的固件源码包括openwrt官方，以及coolsnowwolf、Lienol、immortalwrt、x-wrt维护的版本，详见[表格](#固件源码)。
 
-预置机型有小米4A千兆版、小米3Gv2、小米CR6606、小米CR6608、小米CR6609等，详见[表格](#各机型对应文件)。
+预置机型有小米4A千兆版、小米CR6606、红米AX6S等，详见`preset*/headers.json`。
 
 **快速生成固件 ---> 登陆GitHub，fork此仓库，点击上方`Actions`，选择左侧流程中的`build XXX`运行，运行完毕即可下载固件。示意如下：**
 
@@ -22,7 +22,7 @@
 
 - GitHub Actions 基本使用技能
 
-**若要高度定制固件，需要掌握一定的Liunx、OpenWrt、[Actions](https://docs.github.com/cn/actions)等相关知识，途径：自行搜索学习**
+**Liunx、OpenWrt、[Actions](https://docs.github.com/cn/actions)等相关知识，可自行搜索学习**
 
 ## 使用教程
 
@@ -38,7 +38,7 @@
 
 什么也不修改，按默认配置，可以跳过此步。
 
-每个机型关联三个文件，在preset-xxx目录中。
+每个机型关联三个文件，在preset*目录中。
 
 - [数字].clone.sh
 
@@ -132,6 +132,37 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 </details>
 
+## preset*目录说明
+
+<details>
+  
+  <summary>点击展开/关闭</summary>
+
+全部机型信息可查看文件`preset*/headers.json`，各配置目录略有不同，如[preset-openwrt/headers.json](preset-openwrt/headers.json)。
+
+### config说明
+- 1.config用于小闪存设备（16MB及以下）
+- 2.config用于大闪存设备
+
+### 标号规则
+- headers.json中每个机型的数字标号，用于选择对应的clone.sh、modify.sh、config。
+- 按headers.json中的机型标号，找不到对应的clone.sh、modify.sh、config时，默认选择1.clone.sh、1.modify.sh、1.config。
+
+### 自定义配置
+#### 方法一
+修改clone.sh、modify.sh、config三个文件
+
+#### 方法二
+- 添加新的clone.sh、modify.sh、config，并用数字标号，比如5.clone.sh、5.modify.sh、5.config
+- 修改headers.json指定机型的标号，比如把`"xiaomi-ac2100": ["1", "ramips", "mt7621", "xiaomi_mi-router-ac2100"]`改成`"xiaomi-ac2100": ["5", "ramips", "mt7621", "xiaomi_mi-router-ac2100"]`
+
+#### 方法三
+- 添加新的clone.sh、modify.sh、config，并用数字标号，比如5.clone.sh、5.modify.sh、5.config
+- 向headers.json添加新机型，比如添加`"xiaomi-ac2100-xxx": ["5", "ramips", "mt7621", "xiaomi_mi-router-ac2100"]`
+- 向`.github/workflows/build-xxx.yml`inputs.model.options添加新机型，比如向.github/workflows/build-openwrt.yml添加`- 'xiaomi-ac2100-xxx'`
+
+</details>
+
 ## 固件源码
 
 |配置目录|流程名|源码|
@@ -142,17 +173,9 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 |preset-immortalwrt|build immortalwrt|[immortalwrt/immortalwrt](https://github.com/immortalwrt/immortalwrt)|
 |preset-x-wrt|build x-wrt|[x-wrt/x-wrt](https://github.com/x-wrt/x-wrt)|
 
-## 机型
-
-全部机型信息可查看文件`preset-*/headers.json`，各配置目录略有不同，如[preset-openwrt/headers.json](preset-openwrt/headers.json)。
-
-序号标1的为大闪存机型，对应配置文件1.config、1.clone.sh、1.modify.sh；
-
-序号标2的为小闪存机型，对应配置文件2.config、1.clone.sh、1.modify.sh。
-
 ## 提示
 
-1. 直接在Actions中运行`build XXX`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，到`[数字].config`中自行选择。若在`[数字].clone.sh`中添加了插件源，在`[数字].config`要作对应修改，建议先在本地make menuconfig测试。
+1. 直接在Actions中运行`build XXX`就能编译出固件，但默认插件数量较少，对插件有增、减需要的，可修改`preset*/[数字].config`。若在`[数字].clone.sh`中添加了插件源，在`[数字].config`要作对应修改，建议先在本地make menuconfig测试。
 
 1. 超频方案默认不启用，方案来自该[帖子](https://www.right.com.cn/forum/thread-4042045-1-1.html)。
 

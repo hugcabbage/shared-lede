@@ -11,7 +11,6 @@ mv ./$CODE_DIR/* ./
 mkdir -p package/_supply_packages && cd package/_supply_packages
 git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon.git
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config.git
-git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr.git
 git clone --depth 1 https://github.com/jerrykuku/lua-maxminddb.git
 git clone --depth 1 https://github.com/Ausaci/luci-app-nat6-helper.git
 git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall-packages.git pw-dependencies

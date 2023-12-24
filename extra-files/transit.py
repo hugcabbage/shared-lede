@@ -1,15 +1,17 @@
 #!/usr/bin/python3
-import os
 import glob
 import json
+import os
 import shutil
-import requests
 from urllib.parse import urlparse
 
+import requests
 
 from tools.code_summary import CodeSummary
 from tools.crypt_text import crypt_str
+from tools.process_text import generate_header
 from tools.process_text import manifest_to_lists
+from tools.process_text import modify_config_header
 from tools.process_text import to_markdown_table
 from tools.workflow import set_output
 from tools.workflow import set_summary
@@ -35,66 +37,52 @@ def check_device_support_single(url, define_str):
         return False
 
 
-def produce_temp_workfiles(headers: dict, model: str, temp: str, *, branch=None, ltag=None, ip=None, pwd=None) -> dict:
-    """Generate temporary work files to make workflow easy to call
-    headers is the model data
-    model is a model name
+def produce_temp_workfiles(headers: dict, model: str, temp: str, *, branch=None, ltag=False, ip=None, pwd=None) -> dict:
+    """Generate temporary work files to make workflow easy to call,
     temp is the prefix for temporary files in the compilation process
     """
 
-    num = headers[model][0]
-    files = {}
+    num = num_ori = headers[model][0]
+    t1, t2, t3 = headers[model][1:4]
+    files = dict()
 
     # Generate temporary .config
-    hindex = []
-    header = [
-        f'CONFIG_TARGET_{(t1 := headers[model][1])}=y\n',
-        f'CONFIG_TARGET_{t1}_{(t2 := headers[model][2])}=y\n',
-        f'CONFIG_TARGET_{t1}_{t2}_DEVICE_{(t3 := headers[model][3])}=y\n'
-    ]
-    with open(num + '.config', encoding='utf-8') as f:
-        text = f.readlines()
-    for index, value in enumerate(text):
-        if value.startswith('CONFIG_TARGET') and '=y' in value:
-            hindex.append(index)
-            if len(hindex) == 3:
-                break
-    if len(hindex) == 0:
-        text = header + text
-    else:
-        for i in range(3):
-            text[hindex[i]] = header[i]
-    with open(tc1 := temp + '.config', 'w', encoding='utf-8') as f:
-        f.writelines(text)
+    if not os.path.exists(num_ori + '.config'):
+        num = '1'
+    header = generate_header(headers, model)
+    modify_config_header(num + '.config', header, tc1 := temp + '.config')
     files['dot_config'] = tc1
 
     # Generate temporary clone.sh
-    if not os.path.exists(num + '.clone.sh'):
+    if not os.path.exists(num_ori + '.clone.sh'):
         num = '1'
     with open(num + '.clone.sh', encoding='utf-8') as f:
         text = f.readlines()
-        can_switch_branch = False
-        for i, line in enumerate(text.copy()):
-            if line.startswith('CODE_URL=') and branch:
-                code_ = urlparse(line.split('=')[-1].strip()).path[1:].removesuffix('.git')
-                subtarget_mk_url = f'https://raw.githubusercontent.com/{code_}/{branch}/target/linux/{t1}/image/{t2}.mk'
-                device_define_str = f'define Device/{t3}'
-                if check_device_support_single(subtarget_mk_url, device_define_str):
-                    can_switch_branch = True
-                else:
-                    print(f'{branch} branch does not support this model, and the branch retains the default value in clone.sh')
-            elif line.startswith('CODE_BRANCH=') and can_switch_branch:
-                text[i] = 'CODE_BRANCH=' + branch + '\n'
-            elif line.startswith('SWITCH_LATEST_TAG=') and ltag == 'true':
-                text[i] = 'SWITCH_LATEST_TAG=true\n'
-                break
-            elif i >= 10:
-                break
+    can_switch_branch = False
+    for i, line in enumerate(text.copy()):
+        if line.startswith('CODE_URL=') and branch:
+            code = urlparse(line.split('=')[-1].strip()).path[1:].removesuffix('.git')
+            subtarget_mk_url = f'https://raw.githubusercontent.com/{code}/{branch}/target/linux/{t1}/image/{t2}.mk'
+            device_define_str = f'define Device/{t3}'
+            if check_device_support_single(subtarget_mk_url, device_define_str):
+                can_switch_branch = True
+            else:
+                print(f'{branch} branch does not support this model,\n'
+                      f'and the branch keeps default value')
+        elif line.startswith('CODE_BRANCH=') and can_switch_branch:
+            text[i] = 'CODE_BRANCH=' + branch + '\n'
+        elif line.startswith('SWITCH_LATEST_TAG=') and ltag:
+            text[i] = 'SWITCH_LATEST_TAG=true\n'
+            break
+        elif i >= 10:
+            break
     with open(tc2 := temp + '.clone.sh', 'w', encoding='utf-8') as f:
         f.writelines(text)
     files['clone_sh'] = tc2
 
     # Generate temporary modify.sh
+    if not os.path.exists(num_ori + '.modify.sh'):
+        num = '1'
     shutil.copyfile(num + '.modify.sh', tm1 := temp + '.modify.sh')
     spmodel = (
         'xiaomi-4a-gigabit',
@@ -121,7 +109,7 @@ def main():
     temppre = os.getenv('TEMP_PREFIX')
     modelname = os.getenv('MODEL_NAME')
     branchname = os.getenv('BRANCH_NAME')
-    latesttag = os.getenv('LATEST_TAG')
+    latesttag = True if os.getenv('LATEST_TAG') == 'true' else False
     loginip = os.getenv('LOGIN_IP').strip()
     loginpwd = os.getenv('LOGIN_PWD').strip()
 
