@@ -5,11 +5,8 @@ on:
     inputs:
       period:
         description: "the amount of days to hold"
-        default: "0"
-        required: false
-      repo:
-        description: "the repo to clean"
-        required: false
+        default: 0
+        required: true
 
 jobs:
   clean-logs:
