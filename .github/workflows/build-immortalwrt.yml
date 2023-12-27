@@ -114,7 +114,7 @@ jobs:
           REQUIREMENTS: ${{ env.EXTRA_STR }}/extra-files/requirements-transit.txt
         run: |
           sudo apt-get update
-          sudo apt-get -y install gcc-multilib gettext libncurses5-dev
+          sudo apt-get -y install gcc-multilib gettext
           sudo apt-get clean
           pip3 install -r $REQUIREMENTS
 
