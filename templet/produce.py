@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import glob
 import os
+import re
 import shutil
 import sys
 
@@ -10,62 +11,29 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)) + '/extra-files')
 from tools.crypt_text import crypt_str
 from tools.routine_cmd import gen_dot_config
 from tools.process_text import simplify_config
-
-
-def get_serial(directory: str) -> str:
-    """Get the serial number"""
-
-    if (total := len(glob.glob(f'{directory}/*clone.sh'))) == 0:
-        number = '1'
-    else:
-        if os.getenv('OVERWRITE_LAST') == 'true':
-            number = str(total)
-        elif (os1 := os.getenv('OVERWRITE_SPEC')) != '':
-            number = str(os1)
-        else:
-            number = str(total + 1)
-    return number
-
-
-def extract_app_name(links: list) -> list:
-    """Extract app name from links"""
-
-    apps = []
-    for link in links:
-        apps += [f'* {link.split("@")[0].split("/")[-1].rstrip(".git")}\n']
-    return apps
+from tools.process_text import get_remain_text
+from tools.process_text import generate_header
 
 
 def produce_git_command(link: str, isbase=False) -> str:
     """Produce git command by link"""
 
-    path = ''
-    link = link.strip().rstrip('@')
-    # no @
-    if '@' not in (url := link):
-        command = f'git clone --depth 1 {url}'
-    else:
-        segment = link.split('@')
-        url = segment[0]
-        # one @
-        if link.count('@') == 1:
-            branch = segment[1]
-            command = f'git clone --depth 1 -b {branch} {url}'
-        # two @
-        else:
-            if segment[1] == '':
-                path = segment[2]
-                command = f'git clone --depth 1 {url} {path}'
-            else:
-                branch = segment[1]
-                path = segment[2]
-                command = f'git clone --depth 1 -b {branch} {url} {path}'
+    segments = link.strip().rstrip('@').split('@')
+    url = segments[0]
+    branch = segments[1] if len(segments) > 1 else ''
+    path = segments[2] if len(segments) > 2 else ('_firmware_code' if isbase else '')
+
+    branch_part = f' -b {branch}' if branch else ''
+    path_part = f' {path}' if path else ''
+
     if isbase:
-        if path != '':
-            path = path.rstrip('/')
-            command += f' && mv ./{path}/* ./'
-        else:
-            command += f' openwrt && mv ./openwrt/* ./'
+        command = (
+            f'CODE_DIR={path}\n'
+            f'git clone --single-branch{branch_part} {url}{path_part}\n'
+            'mv ./$CODE_DIR/* ./')
+    else:
+        command = f'git clone --depth 1{branch_part} {url}{path_part}'
+
     return command
 
 
@@ -73,208 +41,196 @@ def produce_svn_command(link: str) -> str:
     """Produce svn command by link"""
 
     link = link.strip().rstrip('@')
-    # no @
-    if '@' not in (url := link):
-        command = f'svn export {url}'
-    # one @
-    else:
-        segment = link.split('@')
-        url = segment[0]
-        path = segment[1]
-        command = f'svn export {url} {path}'
+    segments = link.split('@')
+    url = segments[0]
+    path = segments[1] if len(segments) > 1 else ''
+    command = f'svn export {url} {path}'
+
     return command
 
 
-def produce_conf(data: dict, prefix: str) -> bool:
+def produce_conf(data: dict, prefix: str):
     """Generate template-based configuration files"""
 
+    required_keys = ['board', 'subtarget', 'device', 'base']
+    if not all(data.get(key) for key in required_keys):
+        sys.exit('missing required key(s)')
+
     # Generate clone.sh
-    basecommands = produce_git_command(ba := data['base'], True) + '\n'
-    appcommands = []
-    try:
-        if data['git_app'] == '':
-            raise KeyError('The value cannot be empty')
-        for link in data['git_app']:
-            appcommands += [f'{produce_git_command(link)}\n']
-        ga = True
-    except KeyError:
-        ga = False
-    try:
-        if data['svn_app'] == '':
-            raise KeyError('The value cannot be empty')
-        for link in data['svn_app']:
-            appcommands += [f'{produce_svn_command(link)}\n']
-        sa = True
-    except KeyError:
-        sa = False
-    dla = []
-    if ga or sa:
-        try:
-            if data['app_path'] == '':
-                raise KeyError('The value cannot be empty')
-            if (path := data["app_path"]).startswith('package/') or path == 'package':
-                pass
-            else:
-                print('app_path not in package folder')
-                sys.exit()
-            dla = [
-                '\n# download app codes\n',
-                f'mkdir -p {path} && cd {path}\n'
-            ]
-        except KeyError:
-            print('app source has existed, but the lack app_path')
-            sys.exit()
-    text1 = [
-                '#!/bin/sh\n',
-                '\n# download base code\n',
-                basecommands
-            ] + dla
-    text1 += appcommands
+    base_command = produce_git_command(data['base'], True) + '\n'
+    app_commands, dl_app_text = '', ''
+
+    for link in data.get('git_app', ''):
+        app_commands += f'{produce_git_command(link)}\n'
+    for link in data.get('svn_app', ''):
+        app_commands += f'{produce_svn_command(link)}\n'
+
+    if app_commands:
+        app_path = data.get('app_path', '')
+        if not re.match(r'^package(/|$)', app_path):
+            app_path = 'package/_supply_packages'
+        dl_app_text = (
+            f'\n# download app codes\n'
+            f'mkdir -p {app_path} && cd {app_path}\n'
+            f'{app_commands}')
+
+    clone_text = (
+        '#!/bin/sh\n'
+        '\n# download base code\n'
+        f'{base_command}'
+        f'{dl_app_text}')
+
     with open(prefix + '.clone.sh', 'w', encoding='utf-8') as f:
-        f.writelines(text1)
+        f.write(clone_text)
 
     # Generate modify.sh
-    text2 = [
-        '#!/bin/sh\n',
-        '\n# modify login IP\n'
-    ]
-    try:
-        if data['login_ip'] == '':
-            raise KeyError('The value cannot be empty')
-        text2.append(
-            f'sed -i \'s/192.168.1.1/{data["login_ip"]}/g\' package/base-files/files/bin/config_generate\n')
-        li = True
-    except KeyError:
-        text2.append(
-            '# sed -i \'s/192.168.1.1/192.168.51.1/g\' package/base-files/files/bin/config_generate\n')
-        li = False
-    text2.append('\n# modify login password\n')
-    n = text2.index('\n# modify login password\n')
-    try:
-        if data['login_pwd'] == '':
-            raise KeyError('The value cannot be empty')
-        text2.append(
-            f"sed -i '/root/c{crypt_str(data['login_pwd'])}' package/base-files/files/etc/shadow\n")
-        text2[n] = text2[n].replace(
-            'password', f'password to {data["login_pwd"]}')
-        lp = True
-    except KeyError:
-        text2.append(
-            f"# sed -i '/root/c{crypt_str('888888')}' package/base-files/files/etc/shadow\n")
-        text2[n] = text2[n].replace('password', 'password to 888888')
-        lp = False
-    if 'openwrt/openwrt' in ba:
-        text2 += [
-            '\n# copy uci-defaults script(s)\n',
-            'mkdir -p files/etc/uci-defaults\n',
-            'cp preset-openwrt/uci-scripts/17_wireless files/etc/uci-defaults/\n',
-            '\n# modify default package(s)\n',
-            "sed -i 's/dnsmasq/dnsmasq-full/g' include/target.mk\n"
-        ]
-        offi = True
+    modify_text = (
+        '#!/bin/sh\n'
+        '\n# modify login IP\n')
+    login_ip = data.get('login_ip')
+    if login_ip:
+        modify_text += (
+            f'sed -i \'s/192.168.1.1/{login_ip}/g\' package/base-files/files/bin/config_generate\n')
     else:
-        offi = False
+        modify_text += (
+            '#sed -i \'s/192.168.1.1/192.168.51.1/g\' package/base-files/files/bin/config_generate\n')
+
+    login_pwd = data.get('login_pwd')
+    if login_pwd:
+        modify_text += (
+            f'\n# modify login password to {login_pwd}\n'
+            f"sed -i '/root/c{crypt_str(login_pwd)}' package/base-files/files/etc/shadow\n")
+    else:
+        modify_text += (
+            '\n# modify login password to 888888\n'
+            f"#sed -i '/root/c{crypt_str('888888')}' package/base-files/files/etc/shadow\n")
+
+    if offi_code := 'openwrt/openwrt' in data['base']:
+        modify_text += (
+            '\n# copy uci-defaults script(s)\n'
+            'mkdir -p files/etc/uci-defaults\n'
+            'cp $(dirname $0)/../preset-openwrt/uci-scripts/17_wireless files/etc/uci-defaults/\n'
+            '\n# modify default package(s)\n'
+            "sed -i 's/dnsmasq/dnsmasq-full/g' include/target.mk\n")
+
     with open(prefix + '.modify.sh', 'w', encoding='utf-8') as f:
-        f.writelines(text2)
+        f.write(modify_text)
 
     # Generate .config
-    text3 = [
-        f'CONFIG_TARGET_{(t1 := data["board"])}=y\n',
-        f'CONFIG_TARGET_{t1}_{(t2 := data["subtarget"])}=y\n',
-        f'CONFIG_TARGET_{t1}_{t2}_DEVICE_{data["device"]}=y\n'
-    ]
-    if offi:
-        extra_t = [
-            '# Collections\n',
-            'CONFIG_PACKAGE_luci=y\n',
-            '\n# Translations\n',
+    header_dict = {data['device_name']: [prefix, data['board'], data['subtarget'], data['device']]}
+    config_text = ''.join(generate_header(header_dict, data['device_name']))
+
+    if offi_code:
+        config_text += (
+            '\n# Collections\n'
+            'CONFIG_PACKAGE_luci=y\n'
+            '\n# Translations\n'
             'CONFIG_LUCI_LANG_zh_Hans=y\n'
-        ]
-        text3 += extra_t
+            '\n# Applications\n')
+
     with open(prefix + '.config', 'w', encoding='utf-8') as f:
-        f.writelines(text3)
+        f.write(config_text)
 
-    # Generate release.md
-    text4 = [
-        f'## {data["base_name"]} for {data["device_name"]}\n',
-        f'\nversion: {data["base_version"]}\n',
-        '\nlogin info: \n'
-    ]
-    if li:
-        text4.insert(3, f'* IP {data["login_ip"]}\n')
+
+def get_serial(dest_dir, ow_last, ow_spec):
+    """Get the serial number"""
+
+    total = len(glob.glob(f'{dest_dir}/*clone.sh'))
+    if ow_spec:
+        return ow_spec
+    elif ow_last:
+        return str(total)
     else:
-        text4.insert(3, '* IP default\n')
-    if lp:
-        text4.insert(4, f'* Password {data["login_pwd"]}\n')
-    else:
-        text4.insert(4, '* Password default\n')
-    if ga or sa:
-        text4.append('\napplications: \n')
-        if ga:
-            text4 += extract_app_name(data['git_app'])
-        if sa:
-            text4 += extract_app_name(data['svn_app'])
-    with open(prefix + '.release.md', 'w', encoding='utf-8') as f:
-        f.writelines(text4)
-    return extra_t
+        return str(total + 1)
 
 
-def main():
-    destdir = (rp1 := os.getenv('REPO_PATH').rstrip('/')) + \
-              '/' + (dd1 := os.getenv('DEPLOY_DIR').rstrip('/'))
-    ba1 = f'{destdir}/backups'
-    wf1 = f'{rp1}/.github/workflows'
-    if os.getenv('DELETE_ALL') == 'true':
-        if dd1 != 'templet':
-            if (len(glob.glob(f'{destdir}/*clone.sh'))) > 0:
-                shutil.rmtree(destdir, ignore_errors=True)
-            else:
-                sys.exit()
+def delete_all(deploy_dir, dest_dir, wf_dir, ba_dir):
+    if deploy_dir != 'templet':
+        if (len(glob.glob(f'{dest_dir}/*clone.sh'))) > 0:
+            shutil.rmtree(dest_dir, ignore_errors=True)
         else:
-            shutil.rmtree(ba1, ignore_errors=True)
-            for item in glob.glob(f'{destdir}/[0-9].*'):
-                os.remove(item)
-        for item in glob.glob(f'{wf1}/{dd1}-[0-9]*'):
+            sys.exit()
+    else:
+        shutil.rmtree(ba_dir, ignore_errors=True)
+        for item in glob.glob(f'{dest_dir}/[0-9].*'):
             os.remove(item)
-        sys.exit()
-    if (ds1 := os.getenv('DELETE_SPEC')) != '':
-        ds1 = ds1.replace(' ', '').rstrip(',').split(',')
-        for root, dirs, files in os.walk(destdir):
-            for name in files:
-                for serial in ds1:
-                    if name.startswith(serial + '.'):
-                        os.remove(os.path.join(root, name))
-                        break
-        for serial in ds1:
-            for item in glob.glob(f'{wf1}/{dd1}-{serial}*'):
-                os.remove(item)
-        sys.exit()
-    os.makedirs(ba1, exist_ok=True)
-    serial = get_serial(destdir)
-    initfile = rp1 + '/' + os.getenv('INITFILE')
-    with open(initfile) as f:
-        extra_t = produce_conf(tl1 := toml.load(f), serial)
-    gen_dot_config(serial + '.clone.sh', serial + '.config')
-    simplify_config(serial + '.config', remain_text=extra_t)
+    for item in glob.glob(f'{wf_dir}/{deploy_dir}-[0-9]*'):
+        os.remove(item)
+    sys.exit()
 
-    # Move file to the target folder, prepare for commit
-    if os.getenv('OVERWRITE_LAST') == 'true':
-        for item in glob.glob(f'{wf1}/{dd1}-{serial}*'):
+
+def delete_some(deploy_dir, dest_dir, wf_dir, some_num):
+    some_num = some_num.replace(' ', '').rstrip(',').split(',')
+    for root, dirs, files in os.walk(dest_dir):
+        for name in files:
+            for serial in some_num:
+                if name.startswith(serial + '.'):
+                    os.remove(os.path.join(root, name))
+                    break
+    for serial in some_num:
+        for item in glob.glob(f'{wf_dir}/{deploy_dir}-{serial}*'):
+            os.remove(item)
+    sys.exit()
+
+
+def process_config(ba_dir, init_file, serial):
+    os.makedirs(ba_dir, exist_ok=True)
+    with open(init_file, encoding='utf-8') as f:
+        init_dict = toml.load(f)
+    if not init_dict.get('device_name'):
+        init_dict['device_name'] = init_dict['device'].replace('-', ' ').replace('_', ' ')
+    produce_conf(init_dict, serial)
+    rt = get_remain_text(serial + '.config')
+    gen_dot_config(serial + '.clone.sh', serial + '.config')
+    simplify_config(serial + '.config', remain_text=rt, keep_header=True)
+    return init_dict
+
+
+def move_files(deploy_dir, dest_dir, wf_dir, ba_dir, serial, ow_last):
+    if ow_last:
+        for item in glob.glob(f'{wf_dir}/{deploy_dir}-{serial}*'):
             os.remove(item)
     for item in glob.glob(serial + '*'):
         if item.endswith('config.fullbak'):
-            shutil.move(item, f'{ba1}/{item}')
+            shutil.move(item, f'{ba_dir}/{item}')
         else:
-            shutil.move(item, f'{destdir}/{item}')
+            shutil.move(item, f'{dest_dir}/{item}')
 
-    with open(f'{rp1}/templet/build.yml', encoding='utf-8') as f1, \
-            open(f'{wf1}/{dd1}-{serial}-{tl1["device_name"].replace(" ", "-")}.yml', 'w', encoding='utf-8') as f2:
+
+def generate_build_yml(deploy_dir, wf_dir, repo_path, init_dict, serial):
+    ori_file = f'{repo_path}/templet/build.yml'
+    new_file = f'{wf_dir}/{deploy_dir}-{serial}-{init_dict["device_name"].replace(" ", "-")}.yml'
+    with open(ori_file, encoding='utf-8') as f1, open(new_file, 'w', encoding='utf-8') as f2:
         text = f1.read()
-        text = text.replace(
-            'name: xxxxxx', f'name: {dd1} {tl1["device_name"]}')
-        text = text.replace('SERIAL_NU: xxxxxx', f'SERIAL_NU: {serial}')
-        text = text.replace('DEPLOY_DIR: xxxxxx', f'DEPLOY_DIR: {dd1}')
+        replacements = {
+            'xxxxxx??name': f'{deploy_dir} {init_dict["device_name"]}',
+            'xxxxxx??serial': f'{serial}',
+            'xxxxxx??deploy': f'{deploy_dir}',
+        }
+        for ori, new in replacements.items():
+            text = text.replace(ori, new)
         f2.write(text)
+
+
+def main():
+    repo_path = os.getenv('REPO_PATH')
+    deploy_dir = os.getenv('DEPLOY_DIR').rstrip('/')
+    dest_dir = f'{repo_path}/{deploy_dir}'
+    ba_dir = f'{dest_dir}/backups'
+    wf_dir = f'{repo_path}/.github/workflows'
+    init_file = f'{repo_path}/{os.getenv("INIT_FILE")}'
+    ow_last = True if os.getenv('OVERWRITE_LAST') == 'true' else False
+    ow_spec = os.getenv('OVERWRITE_SPEC').strip()
+    serial = get_serial(dest_dir, ow_last, ow_spec)
+
+    if os.getenv('DELETE_ALL') == 'true':
+        delete_all(deploy_dir, dest_dir, ba_dir, wf_dir)
+    if (ds := os.getenv('DELETE_SOME')) != '':
+        delete_some(deploy_dir, dest_dir, wf_dir, ds)
+
+    init_dict = process_config(ba_dir, init_file, serial)
+    move_files(deploy_dir, dest_dir, wf_dir, ba_dir, serial, ow_last)
+    generate_build_yml(deploy_dir, wf_dir, repo_path, init_dict, serial)
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@
 #
 # <https://github.com/hugcabbage/shared-lede>
 #
-name: xxxxxx
+name: xxxxxx??name
 
 on:
   workflow_dispatch:
@@ -31,10 +31,9 @@ permissions:
 
 jobs:
   to-build:
+    name: build
     runs-on: ubuntu-latest
     env:
-      SERIAL_NU: xxxxxx
-      DEPLOY_DIR: xxxxxx
       EXTRA_STR: _some
     steps:
 
@@ -50,12 +49,26 @@ jobs:
       - name: Prepare environments
         run: |
           sudo apt-get update
-          sudo apt-get -y install gcc-multilib gettext libncurses5-dev
+          sudo apt-get -y install gcc-multilib gettext
           sudo apt-get clean
 
-      - name: Clone sources
+      - name: Prepare deployment
+        id: prepare-deployment
+        env:
+          SERIAL: xxxxxx??serial
+          DEPLOY_DIR: ${{ env.EXTRA_STR }}/xxxxxx??deploy
         run: |
-          CLONE_SH=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.clone.sh
+          CLONE_SH=$DEPLOY_DIR/$SERIAL.clone.sh
+          echo "modelname=${GITHUB_WORKFLOW#* }" >> "$GITHUB_OUTPUT"
+          echo "codedir=$(grep '^CODE_DIR=' $CLONE_SH | cut -d '=' -f 2)" >> "$GITHUB_OUTPUT"
+          echo "clone_sh=$CLONE_SH" >> "$GITHUB_OUTPUT"
+          echo "modify_sh=$DEPLOY_DIR/$SERIAL.modify.sh" >> "$GITHUB_OUTPUT"
+          echo "dot_config=$DEPLOY_DIR/$SERIAL.config" >> "$GITHUB_OUTPUT"
+
+      - name: Clone sources
+        env:
+          CLONE_SH: ${{ steps.prepare-deployment.outputs.clone_sh }}
+        run: |
           chmod +x $CLONE_SH
           $CLONE_SH
 
@@ -65,14 +78,16 @@ jobs:
           ./scripts/feeds install -a
 
       - name: Modify configuration
+        env:
+          MODIFY_SH: ${{ steps.prepare-deployment.outputs.modify_sh }}
         run: |
-          MODIFY_SH=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.modify.sh
           chmod +x $MODIFY_SH
           $MODIFY_SH
 
       - name: Generate .config
+        env:
+          DOT_CONFIG: ${{ steps.prepare-deployment.outputs.dot_config }}
         run: |
-          DOT_CONFIG=${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.config
           mv $DOT_CONFIG .config
           make defconfig
 
@@ -95,19 +110,16 @@ jobs:
           cd packages
           zip -r ../packages.zip *
 
-      - name: Read release text
-        id: release-text
-        if: inputs.release == true
+      - name: Generate summary
+        continue-on-error: true
+        id: generate-summary
+        env:
+          MODEL_NAME: ${{ steps.prepare-deployment.outputs.modelname }}
+          CODE_DIR: ${{ steps.prepare-deployment.outputs.codedir }}
+          TRANSIT_PY: ${{ env.EXTRA_STR }}/extra-files/transit.py
         run: |
-          cp ${{ env.EXTRA_STR }}/${DEPLOY_DIR}/${SERIAL_NU}.release.md release.tmp
-          rt=$(head -n 1 release.tmp)
-          rt="${rt#*# }"
-          echo "RELEASE_TITLE=$rt" >> $GITHUB_OUTPUT
-          rb=$(sed -n '3,$p' release.tmp)
-          rb="${rb//'%'/'%25'}"
-          rb="${rb//$'\n'/'%0A'}"
-          rb="${rb//$'\r'/'%0D'}"
-          echo "RELEASE_BODY=$rb" >> $GITHUB_OUTPUT
+          chmod +x $TRANSIT_PY
+          $TRANSIT_PY
 
       - name: Calculate tag version
         id: calculate-version
@@ -118,18 +130,18 @@ jobs:
 
       - name: Upload firmware to release
         id: to-release
-        if: steps.release-text.conclusion == 'success'
+        if: steps.calculate-version.conclusion == 'success' && inputs.release == true
         continue-on-error: true
         uses: svenstaro/upload-release-action@v2
         with:
           file: _collected_firmware/*
           tag: ${{ steps.calculate-version.outputs.version }}
-          release_name: ${{ steps.calculate-version.outputs.version }} ${{ steps.release-text.outputs.RELEASE_TITLE }}
+          release_name: ${{ steps.calculate-version.outputs.version }} ${{ steps.generate-summary.outputs.stitle }}
           overwrite: true
           prerelease: false
           body: |
-            ${{ steps.release-text.outputs.RELEASE_BODY }}
             ${{ inputs.record }}
+            ${{ steps.generate-summary.outputs.summary }}
           file_glob: true
 
       - name: Upload firmware to artifact
@@ -141,7 +153,7 @@ jobs:
             _collected_firmware/
             !_collected_firmware/*.zip
 
-      - name: Display finishing disk space 
+      - name: Display finishing disk space
         run: |
           df -h
           echo "----------------------------"

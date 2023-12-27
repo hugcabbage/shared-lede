@@ -1,7 +1,7 @@
-# device_name is a custom string to use for workflow name
-
 # board, subtarget and device, you could look them up in openwrt code
 # for example: openwrt/target/linux/ramips/image/mt7621.mk
+
+# device_name is a custom string to use for workflow name
 
 # base source uses git way, <path> is a custom path to store the code
 # format: <url>@<branch>@<path>; <url>@<branch>; <url>@@<path>; <url>
@@ -10,34 +10,23 @@
 # git format: same as base source
 # svn format: <url>@<path>; <url>
 
-# device_name, board, subtarget, device, base_name, base_version, base are required
+# board, subtarget, device, base are required, others are optional
 
-device_name = "netgear r7450"
+board = "qualcommax"
+subtarget = "ipq807x"
+device = "xiaomi_ax9000"
+base = "https://git.openwrt.org/openwrt/openwrt.git@master"
 
-board = "ramips"
-subtarget = "mt7621"
-device = "netgear_r7450"
-
-base_name = "ExOpenWrt"
-base_version = "beta from main branch"
-base = "https://git.openwrt.org/openwrt/openwrt.git@main"
-
+device_name = "xiaomi ax9000"
 app_path = "package/_supply_packages"
-
 git_app = [
   "https://github.com/jerrykuku/luci-theme-argon.git",
   "https://github.com/jerrykuku/luci-app-argon-config.git",
-  "https://github.com/jerrykuku/luci-app-vssr.git",
-  "https://github.com/jerrykuku/lua-maxminddb.git",
-  "https://github.com/Ausaci/luci-app-nat6-helper.git",
   "https://github.com/xiaorouji/openwrt-passwall-packages.git@@pw-dependencies"
 ]
-
 svn_app = [
   "https://github.com/xiaorouji/openwrt-passwall/trunk/luci-app-passwall",
-  "https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2",
-  "https://github.com/vernesong/OpenClash/trunk/luci-app-openclash"
+  "https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2"
 ]
-
-login_ip = "192.168.91.1"
+login_ip = "192.168.21.1"
 login_pwd = "00009999"

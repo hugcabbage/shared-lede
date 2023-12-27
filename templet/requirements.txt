@@ -1,2 +1,2 @@
 toml~=0.10.2
-py-purecrypt~=0.0.3
+py-purecrypt~=0.1.1
