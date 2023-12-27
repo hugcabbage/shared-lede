@@ -3,11 +3,10 @@ which can also be used to verify whether the cryptographic certificate is correc
 """
 import time
 
-from purecrypt import Crypt, Method
-
 
 def crypt_str(plaintext, user='root') -> str:
     """generate crypt string"""
+    from purecrypt import Crypt, Method
 
     salt = Crypt.generate_salt(Method.MD5)
     ciphertext = Crypt.encrypt(plaintext, salt).replace('\\', '\\\\')
@@ -21,6 +20,7 @@ def crypt_str(plaintext, user='root') -> str:
 
 def validate_cipher(plaintext, ciphertext):
     """validate cipher"""
+    from purecrypt import Crypt
 
     # ciphertext example: $1$MCGAgYw.$Ip1GcyeUliId3wzVcKR/e/
     assert Crypt.is_valid(plaintext, ciphertext), 'password does not match'

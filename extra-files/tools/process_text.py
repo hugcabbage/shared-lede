@@ -169,9 +169,7 @@ def get_header_index(config) -> list:
         for i, line in enumerate(f):
             if line.startswith('CONFIG_TARGET') and line.endswith('=y\n'):
                 h_index.append(i)
-                if len(h_index) == 3:
-                    break
-            if i > 500:
+            if len(h_index) == 3 or i > 500:
                 break
     return h_index
 
@@ -193,6 +191,19 @@ def modify_config_header(config, header: list, new_file=None):
             return
     with open(new_file, 'w', encoding='utf-8') as f:
         f.writelines(content)
+
+
+def check_device_support_single(url, define_str):
+    import requests
+
+    r = requests.get(url, timeout=3)
+    if define_str in r.text:
+        return True
+    elif url.endswith('.mk'):
+        url = url.rsplit('/', 1)[0] + '/Makefile'
+        return check_device_support_single(url, define_str)
+    else:
+        return False
 
 
 def simplify_config(config, *, backup=True, remain_text: list = None, keep_header=False):

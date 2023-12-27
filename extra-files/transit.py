@@ -5,10 +5,9 @@ import os
 import shutil
 from urllib.parse import urlparse
 
-import requests
-
 from tools.code_summary import CodeSummary
 from tools.crypt_text import crypt_str
+from tools.process_text import check_device_support_single
 from tools.process_text import generate_header
 from tools.process_text import manifest_to_lists
 from tools.process_text import modify_config_header
@@ -24,17 +23,6 @@ def get_code_dir(clone_sh):
     j = text[i:].index('\n')
     codedir = text[i:][:j].split('=')[1]
     return codedir
-
-
-def check_device_support_single(url, define_str):
-    r = requests.get(url, timeout=3)
-    if define_str in r.text:
-        return True
-    elif url.endswith('.mk'):
-        url = url.rsplit('/', 1)[0] + '/Makefile'
-        return check_device_support_single(url, define_str)
-    else:
-        return False
 
 
 def produce_temp_workfiles(headers: dict, model: str, temp: str, *, branch=None, ltag=False, ip=None, pwd=None) -> dict:
