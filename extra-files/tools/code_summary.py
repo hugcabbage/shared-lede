@@ -44,8 +44,8 @@ class CodeSummary:
             'login_pwd': login_info[2],
             'board': profiles[0],
             'subtarget': profiles[1],
-            'profile': profiles[2],
-            'arch_packages': profiles[3]
+            'arch_packages': profiles[2],
+            'profile': profiles[3]
         }
 
     def get_profiles(self):
@@ -53,29 +53,26 @@ class CodeSummary:
         Example:
         CONFIG_TARGET_BOARD="ramips"
         CONFIG_TARGET_SUBTARGET="mt7621"
-        CONFIG_TARGET_PROFILE="DEVICE_xiaomi_mi-router-cr6608"
         CONFIG_TARGET_ARCH_PACKAGES="mipsel_24kc"
+        CONFIG_TARGET_DEVICE_ramips_mt7621_DEVICE_xiaomi_mi-router-ac2100=y
         """
 
         file = self.config
-        board = None
-        subtarget = None
-        profile = None
-        arch_packages = None
+        board, subtarget, arch_packages, profile = '', '', '', []
         with open(file, encoding='utf-8') as f:
             for line in f:
                 if line.startswith('CONFIG_TARGET_BOARD='):
                     board = line.split('=')[1].strip().strip('"')
                 elif line.startswith('CONFIG_TARGET_SUBTARGET='):
                     subtarget = line.split('=')[1].strip().strip('"')
-                elif line.startswith('CONFIG_TARGET_PROFILE='):
-                    profile = line.split('=')[1].strip().strip('"').removeprefix('DEVICE_')
+                elif line.startswith('CONFIG_TARGET_DEVICE_') and line.endswith('=y\n'):
+                    profile.append(line.strip().split("_DEVICE_")[-1].split("=")[0])
                 elif line.startswith('CONFIG_TARGET_ARCH_PACKAGES='):
                     arch_packages = line.split('=')[1].strip().strip('"')
 
-                if all([board, subtarget, profile, arch_packages]):
+                if all([board, subtarget, arch_packages, profile]):
                     break
-        return board, subtarget, profile, arch_packages
+        return board, subtarget, arch_packages, profile
 
     def get_last_log(self):
         prev_dir = os.getcwd()
@@ -170,11 +167,8 @@ class CodeSummary:
                     ip_regex = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
                     match = re.search(ip_regex, line)
                     if match:
-                        ip = match.group()
-                    else:
-                        ip = ''
-                    break
-        return ip
+                        return match.group()
+                    return ''
 
     def __login_user(self):
         """Locate the 'config login' line from rpcd.config
@@ -183,6 +177,8 @@ class CodeSummary:
         Get the password id from the example string 'option password '$p$root'
         """
 
+        username = 'not set'
+        password_id = 'not set'
         file = self.rpcd
         with open(file, encoding='utf-8') as f:
             for line in f:
@@ -194,10 +190,7 @@ class CodeSummary:
                 elif 'option password' in line:
                     password_id = line.split()[-1].strip("'")[3:]
                     break
-        try:
-            return username, password_id
-        except UnboundLocalError:
-            return 'not set', 'not set'
+        return username, password_id
 
     def __login_pwd(self, password_id):
         """Read the line starting with the example string 'root' from the 'shadow' file
@@ -209,12 +202,7 @@ class CodeSummary:
             for line in f:
                 if line.startswith(password_id):
                     pwd_value = line.strip().split(':', 1)[-1]
-                    break
-        try:
-            if pwd_value == '::0:99999:7:::':
-                password = 'blank'
-            else:
-                password = 'customized by you'
-        except UnboundLocalError:
-            password = 'not set'
-        return password
+                    if pwd_value == '::0:99999:7:::':
+                        return 'blank'
+                    return 'customized by you'
+        return 'not set'

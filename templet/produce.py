@@ -146,14 +146,7 @@ def get_serial(dest_dir, ow_last, ow_spec):
 
 def delete_all(deploy_dir, dest_dir, wf_dir, ba_dir):
     if deploy_dir != 'templet':
-        if (len(glob.glob(f'{dest_dir}/*clone.sh'))) > 0:
-            shutil.rmtree(dest_dir, ignore_errors=True)
-        else:
-            sys.exit()
-    else:
-        shutil.rmtree(ba_dir, ignore_errors=True)
-        for item in glob.glob(f'{dest_dir}/[0-9].*'):
-            os.remove(item)
+        shutil.rmtree(dest_dir, ignore_errors=True)
     for item in glob.glob(f'{wf_dir}/{deploy_dir}-[0-9]*'):
         os.remove(item)
     sys.exit()
@@ -163,10 +156,8 @@ def delete_some(deploy_dir, dest_dir, wf_dir, some_num):
     some_num = some_num.replace(' ', '').rstrip(',').split(',')
     for root, dirs, files in os.walk(dest_dir):
         for name in files:
-            for serial in some_num:
-                if name.startswith(serial + '.'):
-                    os.remove(os.path.join(root, name))
-                    break
+            if any(name.startswith(serial + '.') for serial in some_num):
+                os.remove(os.path.join(root, name))
     for serial in some_num:
         for item in glob.glob(f'{wf_dir}/{deploy_dir}-{serial}*'):
             os.remove(item)
@@ -214,18 +205,18 @@ def generate_build_yml(deploy_dir, wf_dir, repo_path, init_dict, serial):
 
 def main():
     repo_path = os.getenv('REPO_PATH')
-    deploy_dir = os.getenv('DEPLOY_DIR').rstrip('/')
+    deploy_dir = os.getenv('DEPLOY_DIR').strip('/ ')
     dest_dir = f'{repo_path}/{deploy_dir}'
     ba_dir = f'{dest_dir}/backups'
     wf_dir = f'{repo_path}/.github/workflows'
-    init_file = f'{repo_path}/{os.getenv("INIT_FILE")}'
+    init_file = f'{repo_path}/{os.getenv("INIT_FILE").strip("/ ")}'
     ow_last = True if os.getenv('OVERWRITE_LAST') == 'true' else False
     ow_spec = os.getenv('OVERWRITE_SPEC').strip()
     serial = get_serial(dest_dir, ow_last, ow_spec)
 
     if os.getenv('DELETE_ALL') == 'true':
-        delete_all(deploy_dir, dest_dir, ba_dir, wf_dir)
-    if (ds := os.getenv('DELETE_SOME')) != '':
+        delete_all(deploy_dir, dest_dir, wf_dir, ba_dir)
+    if ds := os.getenv('DELETE_SOME').strip():
         delete_some(deploy_dir, dest_dir, wf_dir, ds)
 
     init_dict = process_config(ba_dir, init_file, serial)
