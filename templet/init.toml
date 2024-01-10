@@ -6,9 +6,8 @@
 # base source uses git way, <path> is a custom path to store the code
 # format: <url>@<branch>@<path>; <url>@<branch>; <url>@@<path>; <url>
 
-# app source uses git or svn way, <path> is a custom path to store the code
+# app source uses git way, <path> is a custom path to store the code
 # git format: same as base source
-# svn format: <url>@<path>; <url>
 
 # board, subtarget, device, base are required, others are optional
 
@@ -22,11 +21,9 @@ app_path = "package/_supply_packages"
 git_app = [
   "https://github.com/jerrykuku/luci-theme-argon.git",
   "https://github.com/jerrykuku/luci-app-argon-config.git",
-  "https://github.com/xiaorouji/openwrt-passwall-packages.git@@pw-dependencies"
-]
-svn_app = [
-  "https://github.com/xiaorouji/openwrt-passwall/trunk/luci-app-passwall",
-  "https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2"
+  "https://github.com/xiaorouji/openwrt-passwall-packages.git@@pw-dependencies",
+  "https://github.com/xiaorouji/openwrt-passwall.git",
+  "https://github.com/xiaorouji/openwrt-passwall2.git"
 ]
 login_ip = "192.168.21.1"
 login_pwd = "00009999"
