@@ -8,8 +8,32 @@
 name: build multi devices
 
 on:
+#  schedule:
+#    - cron: 0 22 * * 5
   workflow_dispatch:
     inputs:
+      branch:
+        description: 'select version'
+        required: true
+        type: choice
+        options:
+          - 'openwrt-23.05'
+          - 'openwrt-22.03'
+          - 'master'
+      latest_tag:
+        description: 'switch to the latest stable version (none in master)'
+        required: false
+        type: boolean
+      lan_ipad:
+        description: 'set LAN port IP address (will override settings in modify script)'
+        required: false
+        default: ''
+        type: string
+      login_pwd:
+        description: 'set initial login password (will override settings in modify script)'
+        required: false
+        default: ''
+        type: string
       record:
         description: 'input version description'
         required: false
@@ -31,11 +55,23 @@ permissions:
 
 jobs:
   to-build:
-    name: build
+    name: ${{ matrix.multi_config }}
     runs-on: ubuntu-latest
     env:
       EXTRA_STR: _some
+    strategy:
+      fail-fast: false
+      matrix:
+        multi_config:
+          - 'multi-common.config'
+          - 'multi-mini.config'
     steps:
+
+      - name: Hide sensitive inputs
+        if: github.event_name == 'workflow_dispatch'
+        uses: hugcabbage/action-hide-sensitive-inputs@v1
+        with:
+          include_inputs: login_pwd
 
       - name: Display initial disk space
         run: |
@@ -47,22 +83,28 @@ jobs:
           path: ${{ env.EXTRA_STR }}
 
       - name: Prepare environments
+        env:
+          REQUIREMENTS: ${{ env.EXTRA_STR }}/extra-files/requirements-transit.txt
         run: |
           sudo apt-get update
-          sudo apt-get -y install gcc-multilib gettext
+          sudo apt-get -y install gcc-multilib gettext libfuse-dev
           sudo apt-get clean
+          pip3 install -r $REQUIREMENTS
 
       - name: Prepare deployment
         id: prepare-deployment
         env:
+          MULTI_CONFIG: ${{ matrix.multi_config }}
+          BRANCH_NAME: ${{ inputs.branch }}
+          LATEST_TAG: ${{ inputs.latest_tag }}
+          LOGIN_IP: ${{ inputs.lan_ipad }}
+          LOGIN_PWD: ${{ inputs.login_pwd }}
+          TEMP_PREFIX: ${{ env.EXTRA_STR }}
           DEPLOY_DIR: ${{ env.EXTRA_STR }}/preset-openwrt
+          TRANSIT_PY: ${{ env.EXTRA_STR }}/extra-files/transit.py
         run: |
-          CLONE_SH=$DEPLOY_DIR/1.clone.sh
-          echo "modelname=${GITHUB_WORKFLOW#* }" >> "$GITHUB_OUTPUT"
-          echo "codedir=$(grep '^CODE_DIR=' $CLONE_SH | cut -d '=' -f 2)" >> "$GITHUB_OUTPUT"
-          echo "clone_sh=$CLONE_SH" >> "$GITHUB_OUTPUT"
-          echo "modify_sh=$DEPLOY_DIR/1.modify.sh" >> "$GITHUB_OUTPUT"
-          echo "dot_config=$DEPLOY_DIR/multi.config" >> "$GITHUB_OUTPUT"
+          chmod +x $TRANSIT_PY
+          $TRANSIT_PY
 
       - name: Clone sources
         env:
@@ -113,7 +155,7 @@ jobs:
         continue-on-error: true
         id: generate-summary
         env:
-          MODEL_NAME: ${{ steps.prepare-deployment.outputs.modelname }}
+          FOR_DEVICE: ${{ steps.prepare-deployment.outputs.fordevice }}
           CODE_DIR: ${{ steps.prepare-deployment.outputs.codedir }}
           TRANSIT_PY: ${{ env.EXTRA_STR }}/extra-files/transit.py
         run: |
@@ -122,14 +164,14 @@ jobs:
 
       - name: Calculate tag version
         id: calculate-version
-        if: inputs.release == true
+        if: inputs.release || github.event_name != 'workflow_dispatch'
         uses: hugcabbage/next-version@v1
         with:
           repo_path: ${{ env.EXTRA_STR }}
 
       - name: Upload firmware to release
         id: to-release
-        if: steps.calculate-version.conclusion == 'success' && inputs.release == true
+        if: steps.calculate-version.conclusion == 'success' && inputs.release || github.event_name != 'workflow_dispatch'
         continue-on-error: true
         uses: svenstaro/upload-release-action@v2
         with:
@@ -144,7 +186,7 @@ jobs:
           file_glob: true
 
       - name: Upload firmware to artifact
-        if: inputs.artifact == true || steps.to-release.outcome != 'success'
+        if: inputs.artifact || steps.to-release.outcome != 'success'
         uses: actions/upload-artifact@v3
         with:
           name: collected_firmware

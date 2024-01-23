@@ -52,6 +52,7 @@ on:
           - 'xiaomi-4c'
           - 'miwifi-3c'
           - 'miwifi-nano'
+          - 'other'
       branch:
         description: '选择版本'
         required: true
@@ -101,6 +102,12 @@ jobs:
     env:
       EXTRA_STR: _some
     steps:
+
+      - name: Hide sensitive inputs
+        if: github.event_name == 'workflow_dispatch'
+        uses: hugcabbage/action-hide-sensitive-inputs@v1
+        with:
+          include_inputs: login_pwd
 
       - name: Display initial disk space
         run: |
@@ -184,7 +191,7 @@ jobs:
         continue-on-error: true
         id: generate-summary
         env:
-          MODEL_NAME: ${{ inputs.model }}
+          FOR_DEVICE: ${{ steps.prepare-deployment.outputs.fordevice }}
           CODE_DIR: ${{ steps.prepare-deployment.outputs.codedir }}
           TRANSIT_PY: ${{ env.EXTRA_STR }}/extra-files/transit.py
         run: |
@@ -193,14 +200,14 @@ jobs:
 
       - name: Calculate tag version
         id: calculate-version
-        if: inputs.release == true
+        if: inputs.release
         uses: hugcabbage/next-version@v1
         with:
           repo_path: ${{ env.EXTRA_STR }}
 
       - name: Upload firmware to release
         id: to-release
-        if: steps.calculate-version.conclusion == 'success' && inputs.release == true
+        if: steps.calculate-version.conclusion == 'success' && inputs.release
         continue-on-error: true
         uses: svenstaro/upload-release-action@v2
         with:
@@ -215,7 +222,7 @@ jobs:
           file_glob: true
 
       - name: Upload firmware to artifact
-        if: inputs.artifact == true || steps.to-release.outcome != 'success'
+        if: inputs.artifact || steps.to-release.outcome != 'success'
         uses: actions/upload-artifact@v3
         with:
           name: collected_firmware
