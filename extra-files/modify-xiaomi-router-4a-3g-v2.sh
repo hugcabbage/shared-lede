@@ -1,8 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 AIMFILE=target/linux/ramips/dts/mt7621_xiaomi_mi-router-4a-common.dtsi
 AIDFILE=target/linux/ramips/dts/mt7621_youhua_wr1200js.dts
-[ ! -e "$AIMFILE" ] && AIMFILE=target/linux/ramips/dts/mt7621_xiaomi_mi-router-4a-3g-v2.dtsi
+[ -e "$AIMFILE" ] || AIMFILE=target/linux/ramips/dts/mt7621_xiaomi_mi-router-4a-3g-v2.dtsi
+
+MARK="// The file has been modified by@hugcabbage"
+if grep -q "$MARK" $AIMFILE; then
+    exit 0
+else
+    sed -i "1i $MARK" $AIMFILE
+fi
 
 SPECIFIC_LINE=$(sed -n '/&spi0/=' $AIMFILE)
 BASE_TEXT=$(sed '/&spi0/,/^};/d' $AIMFILE)

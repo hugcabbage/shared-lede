@@ -7,12 +7,12 @@ import sys
 
 import toml
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)) + '/extra-files')
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'extra-files'))
+from tools.color import *
 from tools.crypt_text import crypt_str
-from tools.routine_cmd import gen_dot_config
-from tools.process_text import simplify_config
-from tools.process_text import get_remain_text
 from tools.process_text import generate_header
+from tools.process_text import simplify_config
+from tools.routine_cmd import gen_dot_config
 
 
 def produce_git_command(link: str, isbase=False) -> str:
@@ -67,7 +67,7 @@ def produce_conf(data: dict, prefix: str):
 
     if app_commands:
         app_path = data.get('app_path', '')
-        if not re.match(r'^package(/|$)', app_path):
+        if not re.match(r'package(/|$)', app_path):
             app_path = 'package/_supply_packages'
         dl_app_text = (
             f'\n# download app codes\n'
@@ -75,7 +75,7 @@ def produce_conf(data: dict, prefix: str):
             f'{app_commands}')
 
     clone_text = (
-        '#!/bin/sh\n'
+        '#!/usr/bin/env bash\n'
         '\n# download base code\n'
         f'{base_command}'
         f'{dl_app_text}')
@@ -85,7 +85,7 @@ def produce_conf(data: dict, prefix: str):
 
     # Generate modify.sh
     modify_text = (
-        '#!/bin/sh\n'
+        '#!/usr/bin/env bash\n'
         '\n# modify login IP\n')
     login_ip = data.get('login_ip')
     if login_ip:
@@ -144,23 +144,28 @@ def get_serial(dest_dir, ow_last, ow_spec):
         return str(total + 1)
 
 
-def delete_all(deploy_dir, dest_dir, wf_dir, ba_dir):
-    if deploy_dir != 'templet':
+def delete_all(deploy_dir, dest_dir, wf_dir):
+    if deploy_dir == 'templet':
+        print(red('Cannot delete templet directory!'))
+        sys.exit(1)
+    else:
         shutil.rmtree(dest_dir, ignore_errors=True)
     for item in glob.glob(f'{wf_dir}/{deploy_dir}-[0-9]*'):
         os.remove(item)
+    print(green(f'{deploy_dir} and related files have been removed!'))
     sys.exit()
 
 
 def delete_some(deploy_dir, dest_dir, wf_dir, some_num):
-    some_num = some_num.replace(' ', '').rstrip(',').split(',')
+    nums = some_num.replace(' ', '').rstrip(',').split(',')
     for root, dirs, files in os.walk(dest_dir):
         for name in files:
-            if any(name.startswith(serial + '.') for serial in some_num):
+            if any(name.startswith(serial + '.') for serial in nums):
                 os.remove(os.path.join(root, name))
-    for serial in some_num:
+    for serial in nums:
         for item in glob.glob(f'{wf_dir}/{deploy_dir}-{serial}*'):
             os.remove(item)
+    print(green(f'Files related to {some_num} in {deploy_dir} have been removed!'))
     sys.exit()
 
 
@@ -171,9 +176,8 @@ def process_config(ba_dir, init_file, serial):
     if not init_dict.get('device_name'):
         init_dict['device_name'] = init_dict['device'].replace('-', ' ').replace('_', ' ')
     produce_conf(init_dict, serial)
-    rt = get_remain_text(serial + '.config')
     gen_dot_config(serial + '.clone.sh', serial + '.config')
-    simplify_config(serial + '.config', remain_text=rt, keep_header=True)
+    simplify_config(serial + '.config', keep_header=True)
     return init_dict
 
 
@@ -215,13 +219,15 @@ def main():
     serial = get_serial(dest_dir, ow_last, ow_spec)
 
     if os.getenv('DELETE_ALL') == 'true':
-        delete_all(deploy_dir, dest_dir, wf_dir, ba_dir)
+        delete_all(deploy_dir, dest_dir, wf_dir)
     if ds := os.getenv('DELETE_SOME').strip():
         delete_some(deploy_dir, dest_dir, wf_dir, ds)
 
     init_dict = process_config(ba_dir, init_file, serial)
     move_files(deploy_dir, dest_dir, wf_dir, ba_dir, serial, ow_last)
     generate_build_yml(deploy_dir, wf_dir, repo_path, init_dict, serial)
+
+    print(green(f'Device configuration files have been generated in {deploy_dir}!'))
 
 
 if __name__ == '__main__':

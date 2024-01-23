@@ -3,8 +3,8 @@ import glob
 import os
 import shutil
 
+from tools.process_text import check_header_existence
 from tools.process_text import generate_header
-from tools.process_text import get_remain_text
 from tools.process_text import modify_config_header
 from tools.process_text import simplify_config
 from tools.routine_cmd import gen_dot_config
@@ -17,13 +17,14 @@ def main():
 
     fce = f'{destdir}/{fclone}' if os.path.exists(f'{destdir}/{fclone}') else f'{destdir}/1.clone.sh'
     fcg = f'{destdir}/{fconfig}'
-    rt = get_remain_text(fcg)
+    has_header = check_header_existence(fcg)
 
-    sample = {'xiaomi-ac2100': ['xx', 'ramips', 'mt7621', 'xiaomi_mi-router-ac2100']}
-    modify_config_header(fcg, generate_header(sample, 'xiaomi-ac2100'))
+    if not has_header:
+        sample = {'xiaomi-ac2100': ['xx', 'ramips', 'mt7621', 'xiaomi_mi-router-ac2100']}
+        modify_config_header(fcg, generate_header(sample, 'xiaomi-ac2100'))
 
     gen_dot_config(fce, fcg)
-    simplify_config(fcg, remain_text=rt)
+    simplify_config(fcg, keep_header=has_header)
 
     # Move .fullbak to the backups directory
     os.makedirs(bas := f'{destdir}/backups', exist_ok=True)

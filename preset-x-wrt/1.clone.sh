@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # download base code
 CODE_DIR=_firmware_code

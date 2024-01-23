@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # modify login IP
 #sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate
@@ -42,5 +42,4 @@ sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.10' target/linux/ramips/Makefile
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
 
 # replace geodata source
-GEODIR=package/_supply_packages/small/v2ray-geodata
 . $(dirname $0)/../extra-files/update-geodata.sh
