@@ -25,7 +25,11 @@ jobs:
         dotconfig:
           - 1.config
           - 2.config
-
+        include:
+          - deploydir: preset-openwrt
+            dotconfig: multi-common.config
+          - deploydir: preset-openwrt
+            dotconfig: multi-mini.config
     steps:
 
     - uses: actions/checkout@v4
