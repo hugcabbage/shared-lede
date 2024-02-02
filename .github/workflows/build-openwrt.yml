@@ -123,7 +123,7 @@ jobs:
           REQUIREMENTS: ${{ env.EXTRA_STR }}/extra-files/requirements-transit.txt
         run: |
           sudo apt-get update
-          sudo apt-get -y install gcc-multilib gettext
+          sudo apt-get -y install gcc-multilib gettext libfuse-dev
           sudo apt-get clean
           pip3 install -r $REQUIREMENTS
 
@@ -183,7 +183,7 @@ jobs:
           cp $(find bin/targets/ -type f) _collected_firmware
           cp $(find bin/packages/ -type f -name '*.ipk') _collected_firmware/packages
           cd _collected_firmware
-          zip -r allfiles.zip *
+          zip -r -s 2000m allfiles.zip *
           cd packages
           zip -r ../packages.zip *
 

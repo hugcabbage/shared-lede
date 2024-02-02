@@ -7,6 +7,5 @@
 [ -e /etc/init.d/passwall_server ] && /etc/init.d/passwall_server disable
 [ -e /etc/init.d/nat6-helper ] && /etc/init.d/nat6-helper disable
 [ -e /etc/init.d/xray ] && /etc/init.d/xray disable
-[ -e /etc/init.d/vssr ] && /etc/init.d/vssr disable
 
 exit 0

@@ -163,7 +163,81 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 
 </details>
 
+## 本地测试
+
+<details>
+  
+  <summary>点击展开/关闭</summary>
+
+### 本地测试生成.config文件
+
+> 以生成preset-openwrt/other.config为例，编译流程`build openwrt`中`other`机型对应当前的other.config。
+
+1. 使用Codespace或本地环境，克隆本仓库，并进入仓库根目录。
+
+   建议使用Codespace，只需要一个浏览器即可，且不会存在网络问题。
+
+1. 安装yq工具。
+
+   Codespace中安装yq，命令如下：
+
+    ```shell
+   wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O ~/.local/bin/yq
+   chmod +x ~/.local/bin/yq
+    ```
+
+   本地Linux环境可使用snap安装，命令如下：
+
+    ```shell
+   snap install yq
+    ```
+
+1. 运行以下命令，克隆openwrt源码。
+
+    ```shell
+    chmod +x extra-files/clone.sh
+    ./extra-files/clone.sh extra-files/clone.toml openwrt
+    cd _test_code
+    ```
+
+   clone.sh脚本可以不加参数运行，但需根据提示输入clone.toml路径、源码名、测试文件存放目录（可选）。
+
+1. （可选）从已有的.config修改。
+
+     ```shell
+     cp ../preset-openwrt/other.config .config
+     ```
+
+1. 运行以下命令，开始配置。
+
+    ```shell
+    make menuconfig
+    ```
+
+1. 配置完成后，_test_code目录里，也就是现在所在的目录下已生成.config文件。
+
+1. （可选）简化一下.config文件，只保留常用的配置项，运行以下命令。
+
+   ```shell
+   chmod +x ../extra-files/ptext
+   ../extra-files/ptext c2m .config ../preset-openwrt/other.config
+   ```
+
+1. 若执行了上一步的简化则该步跳过。将.config文件复制到本仓库的preset-openwrt目录下，运行以下命令。
+
+   ```shell
+   cp .config ../preset-openwrt/other.config
+   ```
+
+1. 提交到远程仓库，开始运行编译流程`build openwrt`，选择机型`other`。
+
+</details>
+
 ## 固件源码
+
+<details>
+  
+  <summary>点击展开/关闭</summary>
 
 |配置目录|流程名|源码|
 |:----:|:----:|:----:|
@@ -172,6 +246,8 @@ Actions流程顺利完成后，去release(或者artifact)下载你的固件，re
 |preset-openwrt|build openwrt|[openwrt/openwrt](https://github.com/openwrt/openwrt)|
 |preset-immortalwrt|build immortalwrt|[immortalwrt/immortalwrt](https://github.com/immortalwrt/immortalwrt)|
 |preset-x-wrt|build x-wrt|[x-wrt/x-wrt](https://github.com/x-wrt/x-wrt)|
+
+</details>
 
 ## 提示
 

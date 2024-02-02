@@ -20,9 +20,9 @@ rm -rf feeds/packages/net/xray-core
 rm -rf package/feeds/packages/xray-core
 
 # copy smartdns configuration
-#rm -rf feeds/packages/net/smartdns
-#rm -rf package/feeds/packages/net/smartdns
-#cp -r $(dirname $0)/../extra-files/smartdns feeds/packages/net/
+#sed -i 's#$(PKG_BUILD_DIR)/package/openwrt/address.conf#$(CURDIR)/files/address.conf#g' feeds/packages/net/smartdns/Makefile
+#sed -i 's#$(PKG_BUILD_DIR)/package/openwrt/files/etc/config/smartdns#$(CURDIR)/files/smartdns#g' feeds/packages/net/smartdns/Makefile
+#cp -r $(dirname $0)/../extra-files/smartdns/files feeds/packages/net/smartdns/
 
 # copy uci-defaults script(s)
 mkdir -p files/etc/uci-defaults

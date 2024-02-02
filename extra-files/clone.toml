@@ -1,0 +1,72 @@
+[common]
+code_dir = '_test_code'
+supply_dir = '$code_dir/_supply_packages'
+b_dir = '$code_dir/.b_supply_packages'
+
+[base.openwrt]
+url = 'https://git.openwrt.org/openwrt/openwrt.git'
+branch = 'openwrt-23.05'
+switch_latest_tag = false
+
+[base.lede]
+url = 'https://github.com/coolsnowwolf/lede.git'
+
+[base.immortalwrt]
+url = 'https://github.com/immortalwrt/immortalwrt.git'
+branch = 'openwrt-23.05'
+switch_latest_tag = false
+
+[base.lienol-openwrt]
+url = 'https://github.com/Lienol/openwrt.git'
+branch = '23.05'
+
+[base.x-wrt]
+url = 'https://github.com/x-wrt/x-wrt.git'
+switch_latest_tag = false
+clone_flag = 'none'
+
+[application.luci-theme-argon]
+url = 'https://github.com/jerrykuku/luci-theme-argon.git'
+branch_for_lede = '18.06'
+
+[application.luci-app-argon-config]
+url = 'https://github.com/jerrykuku/luci-app-argon-config.git'
+
+[application.luci-app-nat6-helper]
+url = 'https://github.com/Ausaci/luci-app-nat6-helper.git'
+
+[application.luci-app-alist]
+url = 'https://github.com/sbwml/luci-app-alist.git'
+
+[application.luci-app-xray]
+url = 'https://github.com/yichya/luci-app-xray.git'
+path = '$b_dir/luci-app-xray'
+rsync = [
+    'rsync -a --delete $path/core/ $supply_dir/luci-app-xray-core/',
+    'rsync -a --delete $path/status/ $supply_dir/luci-app-xray-status/']
+
+[application.pw-dependencies]
+url = 'https://github.com/xiaorouji/openwrt-passwall-packages.git'
+path = '$supply_dir/pw-dependencies'
+
+[application.luci-app-passwall]
+url = 'https://github.com/xiaorouji/openwrt-passwall.git'
+path = '$b_dir/openwrt-passwall'
+rsync = 'rsync -a --delete $path/luci-app-passwall/ $supply_dir/luci-app-passwall/'
+
+[application.luci-app-passwall2]
+url = 'https://github.com/xiaorouji/openwrt-passwall2.git'
+path = '$b_dir/openwrt-passwall2'
+rsync = 'rsync -a --delete $path/luci-app-passwall2/ $supply_dir/luci-app-passwall2/'
+
+[application.luci-app-openclash]
+url = 'https://github.com/vernesong/OpenClash.git'
+path = '$b_dir/openclash'
+rsync = 'rsync -a --delete $path/luci-app-openclash/ $supply_dir/luci-app-openclash/'
+
+[application.set]
+openwrt-packages.url = 'https://github.com/kenzok8/openwrt-packages.git'
+small.url = 'https://github.com/kenzok8/small.git'
+
+[application.set-supply]
+nat6helper = '.application.luci-app-nat6-helper'

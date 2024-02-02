@@ -1,5 +1,4 @@
 """Text processing"""
-import json
 import re
 import shutil
 
@@ -82,36 +81,6 @@ def manifest_to_lists(file) -> tuple[list, list]:
     return list(package), list(version)
 
 
-def xlsx_to_dict(file) -> dict:
-    """convert xlsx file to dict"""
-    from openpyxl import load_workbook
-
-    wb = load_workbook(file)
-    sheet = wb.active
-    dict_data = {}
-
-    # exclude title row, first column is key, convert other columns to list as value
-    for i in range(2, sheet.max_row + 1):
-        key = sheet.cell(row=i, column=1).value
-        value = []
-        for j in range(2, sheet.max_column + 1):
-            value.append(sheet.cell(row=i, column=j).value)
-        dict_data[key] = value
-
-    return dict_data
-
-
-def dict_to_json(data: dict) -> str:
-    """convert dict data to json file, apply to header.json"""
-
-    json_str = json.dumps(data, indent=2)
-
-    # make key and value be one line
-    json_str = json_str.replace('[\n    ', '[').replace(
-        ',\n    ', ', ').replace('"\n  ', '"')
-    return json_str
-
-
 def check_header_existence(config):
     with open(config, encoding='utf-8') as f:
         for line in f:
@@ -181,7 +150,7 @@ def renew_shell_variables(text, variables, renews: dict) -> tuple[str, dict]:
     return text, variables
 
 
-def simplify_config(config, *, backup=True, keep_header=True):
+def simplify_config(config, *, backup=True, keep_header=True, ptext=False):
     save = ['# Target']
     p1 = [
         r'(CONFIG_TARGET_.*=y(?s:.*)CONFIG_LINUX_.*=y)',
@@ -212,5 +181,8 @@ def simplify_config(config, *, backup=True, keep_header=True):
                   '\n'.join(save) + '\n', flags=re.MULTILINE)
     text = re.sub(r'^\s+', '', text)
 
-    with open(config, 'w', encoding='utf-8') as f:
-        f.write(text)
+    if ptext:
+        return text
+    else:
+        with open(config, 'w', encoding='utf-8') as f:
+            f.write(text)
