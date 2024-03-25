@@ -69,7 +69,7 @@ jobs:
         chmod +x $RENEW_PY
         $RENEW_PY
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: ${{ env.DEPLOY_DIR }}
         path: ${{ env.DEPLOY_DIR }}

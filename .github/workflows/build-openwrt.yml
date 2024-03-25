@@ -223,7 +223,7 @@ jobs:
 
       - name: Upload firmware to artifact
         if: inputs.artifact || steps.to-release.outcome != 'success'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: collected_firmware
           path: |
