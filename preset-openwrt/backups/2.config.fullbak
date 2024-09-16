@@ -86,6 +86,7 @@ CONFIG_TARGET_ramips_mt7621=y
 # CONFIG_TARGET_ramips_mt7621_DEVICE_cudy_m1800 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_cudy_wr1300-v1 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_cudy_wr1300-v2 is not set
+# CONFIG_TARGET_ramips_mt7621_DEVICE_cudy_wr1300-v3 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_cudy_wr2100 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_cudy_x6-v1 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_cudy_x6-v2 is not set
@@ -182,6 +183,7 @@ CONFIG_TARGET_ramips_mt7621=y
 # CONFIG_TARGET_ramips_mt7621_DEVICE_mqmaker_witi is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_mtc_wr1201 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_mts_wg430223 is not set
+# CONFIG_TARGET_ramips_mt7621_DEVICE_netgear_eax12 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_netgear_ex6150 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_netgear_r6220 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_netgear_r6260 is not set
@@ -228,6 +230,7 @@ CONFIG_TARGET_ramips_mt7621=y
 # CONFIG_TARGET_ramips_mt7621_DEVICE_tplink_eap615-wall-v1 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_tplink_ec330-g5u-v1 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_tplink_er605-v2 is not set
+# CONFIG_TARGET_ramips_mt7621_DEVICE_tplink_ex220-v1 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_tplink_mr600-v2-eu is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_tplink_re350-v1 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_tplink_re500-v1 is not set
@@ -269,6 +272,8 @@ CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-ac2100=y
 # CONFIG_TARGET_ramips_mt7621_DEVICE_yuncore_ax820 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_yuncore_fap640 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_yuncore_fap690 is not set
+# CONFIG_TARGET_ramips_mt7621_DEVICE_yuncore_g720 is not set
+# CONFIG_TARGET_ramips_mt7621_DEVICE_z-router_zr-2660 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_zbtlink_zbt-we1326 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_zbtlink_zbt-we3526 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_zbtlink_zbt-wg1602-16m is not set
@@ -557,6 +562,7 @@ CONFIG_KERNEL_CC_OPTIMIZE_FOR_PERFORMANCE=y
 # CONFIG_KERNEL_F2FS_FS_SECURITY is not set
 # CONFIG_KERNEL_UBIFS_FS_SECURITY is not set
 # CONFIG_KERNEL_JFFS2_FS_SECURITY is not set
+CONFIG_KERNEL_WERROR=y
 # end of Kernel build options
 
 #
@@ -630,6 +636,7 @@ CONFIG_SSP_SUPPORT=y
 CONFIG_BINUTILS_VERSION_2_40=y
 CONFIG_BINUTILS_VERSION="2.40"
 CONFIG_GCC_VERSION="12.3.0"
+CONFIG_GCC_USE_DEFAULT_VERSION=y
 CONFIG_LIBC="musl"
 CONFIG_TARGET_SUFFIX="musl"
 # CONFIG_IB is not set
@@ -1829,7 +1836,6 @@ CONFIG_PACKAGE_rpcd-mod-ucode=y
 # CONFIG_PACKAGE_selinux-policy is not set
 # CONFIG_PACKAGE_snapshot-tool is not set
 # CONFIG_PACKAGE_sqm-scripts is not set
-# CONFIG_PACKAGE_sqm-scripts-extra is not set
 # CONFIG_PACKAGE_swconfig is not set
 CONFIG_PACKAGE_ubox=y
 CONFIG_PACKAGE_ubus=y
@@ -2089,6 +2095,7 @@ CONFIG_PACKAGE_libiwinfo-data=y
 # CONFIG_PACKAGE_iwl3945-firmware is not set
 # CONFIG_PACKAGE_iwl4965-firmware is not set
 # CONFIG_PACKAGE_iwlwifi-firmware-ax200 is not set
+# CONFIG_PACKAGE_iwlwifi-firmware-ax201 is not set
 # CONFIG_PACKAGE_iwlwifi-firmware-ax210 is not set
 # CONFIG_PACKAGE_iwlwifi-firmware-iwl100 is not set
 # CONFIG_PACKAGE_iwlwifi-firmware-iwl1000 is not set
@@ -2235,6 +2242,7 @@ CONFIG_PACKAGE_wireless-regdb=y
 CONFIG_PACKAGE_kmod-crypto-aead=y
 # CONFIG_PACKAGE_kmod-crypto-arc4 is not set
 # CONFIG_PACKAGE_kmod-crypto-authenc is not set
+# CONFIG_PACKAGE_kmod-crypto-blake2b is not set
 # CONFIG_PACKAGE_kmod-crypto-cbc is not set
 CONFIG_PACKAGE_kmod-crypto-ccm=y
 # CONFIG_PACKAGE_kmod-crypto-chacha20poly1305 is not set
@@ -2274,6 +2282,7 @@ CONFIG_PACKAGE_kmod-crypto-sha512=y
 # CONFIG_PACKAGE_kmod-crypto-user is not set
 # CONFIG_PACKAGE_kmod-crypto-xcbc is not set
 # CONFIG_PACKAGE_kmod-crypto-xts is not set
+# CONFIG_PACKAGE_kmod-crypto-xxhash is not set
 # CONFIG_PACKAGE_kmod-cryptodev is not set
 # end of Cryptographic API modules
 
@@ -2447,6 +2456,8 @@ CONFIG_PACKAGE_kmod-hwmon-core=y
 #
 # CONFIG_PACKAGE_kmod-input-leds is not set
 CONFIG_PACKAGE_kmod-leds-gpio=y
+# CONFIG_PACKAGE_kmod-leds-lp5562 is not set
+# CONFIG_PACKAGE_kmod-leds-lp55xx-common is not set
 # CONFIG_PACKAGE_kmod-leds-pca955x is not set
 # CONFIG_PACKAGE_kmod-leds-pca963x is not set
 # CONFIG_PACKAGE_kmod-leds-tlc591xx is not set
@@ -2473,6 +2484,7 @@ CONFIG_PACKAGE_kmod-lib-crc32c=y
 # CONFIG_PACKAGE_kmod-lib-crc7 is not set
 # CONFIG_PACKAGE_kmod-lib-crc8 is not set
 # CONFIG_PACKAGE_kmod-lib-lz4 is not set
+# CONFIG_PACKAGE_kmod-lib-lz4hc is not set
 # CONFIG_PACKAGE_kmod-lib-textsearch is not set
 # CONFIG_PACKAGE_kmod-lib-zstd is not set
 # CONFIG_PACKAGE_kmod-oid-registry is not set
@@ -2675,6 +2687,12 @@ CONFIG_PACKAGE_kmod-nft-tproxy=y
 # CONFIG_PACKAGE_kmod-phylink is not set
 # CONFIG_PACKAGE_kmod-qlcnic is not set
 # CONFIG_PACKAGE_kmod-r6040 is not set
+# CONFIG_PACKAGE_kmod-r8101 is not set
+# CONFIG_PACKAGE_kmod-r8125 is not set
+# CONFIG_PACKAGE_kmod-r8125-rss is not set
+# CONFIG_PACKAGE_kmod-r8126 is not set
+# CONFIG_PACKAGE_kmod-r8126-rss is not set
+# CONFIG_PACKAGE_kmod-r8168 is not set
 # CONFIG_PACKAGE_kmod-r8169 is not set
 # CONFIG_PACKAGE_kmod-sfc is not set
 # CONFIG_PACKAGE_kmod-sfc-falcon is not set
@@ -2859,6 +2877,7 @@ CONFIG_PACKAGE_kmod-gpio-button-hotplug=y
 # CONFIG_PACKAGE_kmod-tpm is not set
 # CONFIG_PACKAGE_kmod-tpm-i2c-atmel is not set
 # CONFIG_PACKAGE_kmod-tpm-i2c-infineon is not set
+# CONFIG_PACKAGE_kmod-ubootenv-nvram is not set
 # CONFIG_PACKAGE_kmod-wdt-sp805 is not set
 # CONFIG_PACKAGE_kmod-zram is not set
 # end of Other modules
@@ -3059,6 +3078,10 @@ CONFIG_PACKAGE_kmod-mt7615e=y
 # CONFIG_PACKAGE_kmod-mt7921s is not set
 # CONFIG_PACKAGE_kmod-mt7921u is not set
 # CONFIG_PACKAGE_kmod-mt7922-firmware is not set
+# CONFIG_PACKAGE_kmod-mt7925e is not set
+# CONFIG_PACKAGE_kmod-mt7925u is not set
+# CONFIG_PACKAGE_kmod-mt7996-firmware is not set
+# CONFIG_PACKAGE_kmod-mt7996e is not set
 # CONFIG_PACKAGE_kmod-mwifiex-pcie is not set
 # CONFIG_PACKAGE_kmod-mwifiex-sdio is not set
 # CONFIG_PACKAGE_kmod-mwl8k is not set
@@ -4374,8 +4397,6 @@ CONFIG_PACKAGE_libgmp=y
 # CONFIG_PACKAGE_libgphoto2 is not set
 # CONFIG_PACKAGE_libgpiod is not set
 # CONFIG_PACKAGE_libgps is not set
-# CONFIG_PACKAGE_libh2o is not set
-# CONFIG_PACKAGE_libh2o-evloop is not set
 # CONFIG_PACKAGE_libhamlib is not set
 # CONFIG_PACKAGE_libhavege is not set
 # CONFIG_PACKAGE_libhiredis is not set
@@ -4399,6 +4420,7 @@ CONFIG_PACKAGE_libiwinfo=y
 # CONFIG_PACKAGE_libjaylink is not set
 # CONFIG_PACKAGE_libjpeg-turbo is not set
 CONFIG_PACKAGE_libjson-c=y
+# CONFIG_PACKAGE_libjwt is not set
 # CONFIG_PACKAGE_libkeyutils is not set
 # CONFIG_PACKAGE_libkmod is not set
 # CONFIG_PACKAGE_libksba is not set
@@ -4758,6 +4780,7 @@ CONFIG_PACKAGE_luci-app-argon-config=y
 # CONFIG_PACKAGE_luci-app-bmx7 is not set
 # CONFIG_PACKAGE_luci-app-cjdns is not set
 # CONFIG_PACKAGE_luci-app-clamav is not set
+# CONFIG_PACKAGE_luci-app-cloudflared is not set
 # CONFIG_PACKAGE_luci-app-commands is not set
 # CONFIG_PACKAGE_luci-app-crowdsec-firewall-bouncer is not set
 # CONFIG_PACKAGE_luci-app-cshark is not set
@@ -4791,7 +4814,6 @@ CONFIG_PACKAGE_luci-app-firewall=y
 # CONFIG_PACKAGE_luci-app-nextdns is not set
 # CONFIG_PACKAGE_luci-app-nft-qos is not set
 CONFIG_PACKAGE_luci-app-nlbwmon=y
-# CONFIG_PACKAGE_luci-app-ntpc is not set
 # CONFIG_PACKAGE_luci-app-nut is not set
 # CONFIG_PACKAGE_luci-app-ocserv is not set
 # CONFIG_PACKAGE_luci-app-olsr is not set
@@ -4808,30 +4830,6 @@ CONFIG_PACKAGE_luci-app-opkg=y
 # CONFIG_PACKAGE_luci-app-p910nd is not set
 # CONFIG_PACKAGE_luci-app-pagekitec is not set
 # CONFIG_PACKAGE_luci-app-passwall is not set
-
-#
-# Configuration
-#
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Brook is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Haproxy is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Hysteria is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_NaiveProxy is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks_Libev_Client is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks_Libev_Server is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks_Rust_Client is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks_Rust_Server is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_ShadowsocksR_Libev_Client is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_ShadowsocksR_Libev_Server is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Simple_Obfs is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_SingBox is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Trojan_GO is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Trojan_Plus is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_V2ray_Geodata is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_V2ray_Plugin is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Xray is not set
-# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Xray_Plugin is not set
-# end of Configuration
-
 CONFIG_PACKAGE_luci-app-passwall2=y
 
 #
@@ -4839,7 +4837,6 @@ CONFIG_PACKAGE_luci-app-passwall2=y
 #
 # CONFIG_PACKAGE_luci-app-passwall2_Iptables_Transparent_Proxy is not set
 CONFIG_PACKAGE_luci-app-passwall2_Nftables_Transparent_Proxy=y
-# CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_Brook is not set
 # CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_Haproxy is not set
 # CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_Hysteria is not set
 # CONFIG_PACKAGE_luci-app-passwall2_INCLUDE_NaiveProxy is not set
@@ -4884,6 +4881,7 @@ CONFIG_PACKAGE_luci-app-passwall2_Nftables_Transparent_Proxy=y
 # CONFIG_PACKAGE_luci-app-unbound is not set
 CONFIG_PACKAGE_luci-app-upnp=y
 # CONFIG_PACKAGE_luci-app-usteer is not set
+# CONFIG_PACKAGE_luci-app-v2raya is not set
 # CONFIG_PACKAGE_luci-app-vnstat is not set
 # CONFIG_PACKAGE_luci-app-vnstat2 is not set
 # CONFIG_PACKAGE_luci-app-watchcat is not set
@@ -5474,12 +5472,11 @@ CONFIG_PACKAGE_ddns-scripts-services=y
 # CONFIG_PACKAGE_knot-host is not set
 # CONFIG_PACKAGE_knot-keymgr is not set
 # CONFIG_PACKAGE_knot-nsupdate is not set
-# CONFIG_PACKAGE_knot-resolver is not set
 
 #
 # Configuration
 #
-# CONFIG_PACKAGE_knot-resolver_dnstap is not set
+CONFIG_PACKAGE_knot-resolver_dnstap=y
 # end of Configuration
 
 # CONFIG_PACKAGE_knot-tests is not set
@@ -5802,7 +5799,6 @@ CONFIG_PACKAGE_ip-full=y
 # CONFIG_PACKAGE_linuxptp is not set
 # CONFIG_PACKAGE_ntp-keygen is not set
 # CONFIG_PACKAGE_ntp-utils is not set
-# CONFIG_PACKAGE_ntpclient is not set
 # CONFIG_PACKAGE_ntpd is not set
 # CONFIG_PACKAGE_ntpdate is not set
 # end of Time Synchronization
@@ -5833,7 +5829,6 @@ CONFIG_PACKAGE_ip-full=y
 # CONFIG_PACKAGE_sstp-client is not set
 # CONFIG_PACKAGE_strongswan is not set
 # CONFIG_PACKAGE_tailscale is not set
-# CONFIG_PACKAGE_tailscaled is not set
 # CONFIG_PACKAGE_tinc is not set
 # CONFIG_PACKAGE_uanytun is not set
 # CONFIG_PACKAGE_uanytun-nettle is not set
@@ -6095,6 +6090,7 @@ CONFIG_PACKAGE_wpad-basic-mbedtls=y
 # CONFIG_PACKAGE_gnunet is not set
 # CONFIG_PACKAGE_gre is not set
 # CONFIG_PACKAGE_gsocket is not set
+# CONFIG_PACKAGE_hev-socks5-server is not set
 # CONFIG_PACKAGE_hnet-full is not set
 # CONFIG_PACKAGE_hnet-full-l2tp is not set
 # CONFIG_PACKAGE_hnet-full-secure is not set
@@ -7082,6 +7078,7 @@ CONFIG_PACKAGE_libjson-script=y
 # CONFIG_PACKAGE_ssdeep is not set
 # CONFIG_PACKAGE_sshpass is not set
 # CONFIG_PACKAGE_stdiscosrv is not set
+# CONFIG_PACKAGE_stlink is not set
 # CONFIG_PACKAGE_strace is not set
 CONFIG_STRACE_NONE=y
 # CONFIG_STRACE_LIBDW is not set
