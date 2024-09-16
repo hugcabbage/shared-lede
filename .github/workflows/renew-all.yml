@@ -11,10 +11,9 @@ jobs:
   renew:
     runs-on: ubuntu-latest
     env:
-      DEPLOY_DIR: ${{ matrix.deploydir }}
-      DOT_CONFIG: ${{ matrix.dotconfig }}
+      EXTRA_STR: _some
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         deploydir:
           - preset-lede
@@ -22,43 +21,42 @@ jobs:
           - preset-immortalwrt
           - preset-lienol-openwrt
           - preset-x-wrt
-        dotconfig:
-          - 1.config
-          - 2.config
-        include:
-          - deploydir: preset-openwrt
-            dotconfig: multi-common.config
-          - deploydir: preset-openwrt
-            dotconfig: multi-mini.config
     steps:
 
     - uses: actions/checkout@v4
+      with:
+        path: ${{ env.EXTRA_STR }}
 
     - name: Carry out
       env:
-        RENEW_PY: extra-files/renew.py
+        RENEW_PY: ${{ env.EXTRA_STR }}/extra-files/renew.py
+        DEPLOY_DIR: ${{ env.EXTRA_STR }}/${{ matrix.deploydir }}
       run: |
-        chmod +x $RENEW_PY
-        $RENEW_PY
+        dot_config_array=(1.config 2.config)
+        if [ "$DEPLOY_DIR" = "$EXTRA_STR/preset-openwrt" ]; then
+          dot_config_array+=(multi-common.config multi-mini.config)
+        fi
+        for dc in "${dot_config_array[@]}"; do
+          export DOT_CONFIG=$dc
+          chmod +x $RENEW_PY
+          $RENEW_PY
+        done
 
     - uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.DEPLOY_DIR }}
-        path: ${{ env.DEPLOY_DIR }}
+        name: ${{ matrix.deploydir }}
+        path: ${{ env.EXTRA_STR }}/${{ matrix.deploydir }}
 
   commit:
-    if: always()
     needs: renew
     runs-on: ubuntu-latest
     steps:
 
     - uses: actions/checkout@v4
 
-    - uses: actions/download-artifact@v3
-    
-    - uses: actions/download-artifact@v3
-      
-    - uses: geekyeggo/delete-artifact@v2
+    - uses: actions/download-artifact@v4
+
+    - uses: geekyeggo/delete-artifact@v5
       with:
           name: '*'
 

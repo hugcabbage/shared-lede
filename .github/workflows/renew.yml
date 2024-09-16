@@ -19,60 +19,38 @@ permissions:
 
 jobs:
 
-  set-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      dotconfig: ${{ steps.set-matrix.outputs.dotconfig }}
-      deploydir: ${{ steps.set-matrix.outputs.deploydir }}
-    steps:
-
-      - uses: actions/checkout@v4
-      
-      - id: set-matrix        
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const fs = require('fs');
-            let dotconfig = [];
-            let cLs = "${{ inputs.dotconfig }}".replaceAll(' ', '').split(',');
-            let deploydir = "${{ inputs.deploydir }}".trim();
-            if (deploydir.endsWith('/')) deploydir = deploydir.slice(0, -1);
-            for (i=0; i<cLs.length; i++) {
-                try {
-                    fs.accessSync(deploydir + '/' + cLs[i]);
-                    dotconfig.push(cLs[i]);
-                }
-                catch (err) {
-                    console.log(cLs[i] + ' does not exist!');
-                }
-            }
-            core.setOutput("dotconfig", JSON.stringify(dotconfig));
-            core.setOutput("deploydir", deploydir);
-
   renew:
-    needs: set-matrix
     runs-on: ubuntu-latest
     env:
-      DEPLOY_DIR: ${{ needs.set-matrix.outputs.deploydir }}
-      DOT_CONFIG: ${{ matrix.dotconfig }}
-    strategy:
-      matrix: 
-        dotconfig: ${{ fromJSON(needs.set-matrix.outputs.dotconfig) }}
+      EXTRA_STR: _some
     steps:
 
     - uses: actions/checkout@v4
+      with:
+        path: ${{ env.EXTRA_STR }}
 
     - name: Carry out
       env:
-        RENEW_PY: extra-files/renew.py
+        RENEW_PY: ${{ env.EXTRA_STR }}/extra-files/renew.py
+        DEPLOY_DIR: ${{ env.EXTRA_STR }}/${{ inputs.deploydir }}
+        DOT_CONFIG_IN: ${{ inputs.dotconfig }}
       run: |
-        chmod +x $RENEW_PY
-        $RENEW_PY
+        if [ ! -d "$DEPLOY_DIR" ]; then
+          echo "Directory $DEPLOY_DIR does not exist!"
+          exit 1
+        fi
+    
+        dot_config_array=($(echo $DOT_CONFIG_IN | tr -d ' ' | tr ',' '\n'))
+        for dc in "${dot_config_array[@]}"; do
+          export DOT_CONFIG=$dc
+          chmod +x $RENEW_PY
+          $RENEW_PY
+        done
 
     - uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.DEPLOY_DIR }}
-        path: ${{ env.DEPLOY_DIR }}
+        name: ${{ inputs.deploydir }}
+        path: ${{ env.EXTRA_STR }}/${{ inputs.deploydir }}
 
   commit:
     needs: renew
@@ -81,9 +59,9 @@ jobs:
 
     - uses: actions/checkout@v4
 
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       
-    - uses: geekyeggo/delete-artifact@v2
+    - uses: geekyeggo/delete-artifact@v5
       with:
           name: '*'
 

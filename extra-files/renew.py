@@ -31,9 +31,9 @@ def main():
     shutil.move(f'{fcg}.fullbak', f'{bas}/{fconfig}.fullbak')
 
     # Only .config and .config.fullbak of this renew are kept
-    for item in glob.glob(f'{destdir}/**', recursive=True):
-        if not os.path.isdir(item) and fconfig not in item:
-            os.remove(item)
+    #for item in glob.glob(f'{destdir}/**', recursive=True):
+    #    if not os.path.isdir(item) and fconfig not in item:
+    #        os.remove(item)
 
 
 if __name__ == '__main__':

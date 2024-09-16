@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 
@@ -12,5 +13,7 @@ def gen_dot_config(clone: str, config: str):
         f'mv -f {config} .config && make defconfig',
         f'cp -f .config {config}'
     ]
+    if os.path.isdir('feeds'):
+        commands[:] = commands[2:]
     for cmd in commands:
         subprocess.run(cmd, shell=True)
